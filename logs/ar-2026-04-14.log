@@ -1,0 +1,152 @@
+[2026-04-14 01:48:25] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 01:48:25] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 01:48:25] [DBG] Directorio executable: .
+[2026-04-14 01:48:25] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 01:48:25] [INFO] Locations loaded from config: 0
+[2026-04-14 01:48:25] [ERR] No se encontraron sucursales. Verifique que PVSI esté instalado o cree config.json manualmente.
+[2026-04-14 01:48:51] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 01:48:51] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 01:48:51] [DBG] Directorio executable: .
+[2026-04-14 01:48:51] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 01:48:51] [INFO] Locations loaded from config: 0
+[2026-04-14 01:48:51] [ERR] No se encontraron sucursales. Verifique que PVSI esté instalado o cree config.json manualmente.
+[2026-04-14 01:50:02] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 01:50:02] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 01:50:02] [DBG] Directorio executable: .
+[2026-04-14 01:50:02] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 01:50:02] [DBG] Escaneando: .
+[2026-04-14 01:50:02] [INFO] Sucursal encontrada: TEST01 en .\test_client
+[2026-04-14 01:50:02] [DBG] Scan . completo: 1 sucursales
+[2026-04-14 01:50:02] [INFO] Sucursales configuradas: 1
+[2026-04-14 01:50:02] [INFO] Sucursales configuradas: 1
+[2026-04-14 01:50:02] [INFO]   [TEST01] .\test_client
+[2026-04-14 01:50:02] [INFO] Registrando 1 ubicaciones...
+[2026-04-14 01:50:02] [DBG] HTTP error: 500
+[2026-04-14 01:50:02] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 01:50:02] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-14 01:58:21] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 01:58:21] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 01:58:21] [DBG] Directorio executable: .
+[2026-04-14 01:58:21] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 01:58:21] [DBG] Escaneando unidad: C:\
+[2026-04-14 01:58:26] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-14 01:58:26] [INFO] Sucursal encontrada: TEST01 en C:\respaldoSucursal\test_client
+[2026-04-14 01:58:27] [DBG] Scan C:\ completo: 2 sucursales
+[2026-04-14 01:58:27] [INFO] Sucursales configuradas: 2
+[2026-04-14 01:58:27] [INFO] Sucursales configuradas: 2
+[2026-04-14 01:58:27] [INFO]   [roton] C:\pvsi
+[2026-04-14 01:58:27] [INFO]   [TEST01] C:\respaldoSucursal\test_client
+[2026-04-14 01:58:27] [INFO] Registrando 2 ubicaciones...
+[2026-04-14 01:58:27] [DBG] HTTP error: 500
+[2026-04-14 01:58:27] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 01:58:27] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-14 02:00:33] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 02:00:33] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 02:00:33] [DBG] Directorio executable: .
+[2026-04-14 02:00:33] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 02:00:33] [DBG] Escaneando unidad: C:\
+[2026-04-14 02:00:34] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-14 02:00:34] [INFO] Sucursal encontrada: TEST01 en C:\respaldoSucursal\test_client
+[2026-04-14 02:00:34] [DBG] Scan C:\ completo: 2 sucursales
+[2026-04-14 02:00:34] [INFO] Sucursales configuradas: 2
+[2026-04-14 02:00:34] [INFO] Sucursales configuradas: 2
+[2026-04-14 02:00:34] [INFO]   [roton] C:\pvsi
+[2026-04-14 02:00:34] [INFO]   [TEST01] C:\respaldoSucursal\test_client
+[2026-04-14 02:00:34] [INFO] Registrando 2 ubicaciones...
+[2026-04-14 02:00:34] [DBG] HTTP error: 500
+[2026-04-14 02:00:34] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 02:00:34] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-14 02:09:18] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 02:09:18] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 02:09:18] [DBG] Directorio executable: .
+[2026-04-14 02:09:18] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 02:09:18] [DBG] Escaneando unidad: C:\
+[2026-04-14 02:09:19] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-14 02:09:20] [DBG] Scan C:\ completo: 1 sucursales
+[2026-04-14 02:09:20] [INFO] Sucursales configuradas: 1
+[2026-04-14 02:09:20] [INFO] Sucursales configuradas: 1
+[2026-04-14 02:09:20] [INFO]   [roton] C:\pvsi
+[2026-04-14 02:09:20] [DBG] Config saved to: .\config.json
+[2026-04-14 02:09:20] [INFO] Config guardado en: .\config.json
+[2026-04-14 02:09:20] [INFO] Registrando 1 ubicaciones...
+[2026-04-14 02:09:20] [DBG] HTTP error: 500
+[2026-04-14 02:09:20] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 02:09:20] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-14 02:09:38] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 02:09:38] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 02:09:38] [DBG] Directorio executable: .
+[2026-04-14 02:09:38] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 02:09:38] [INFO] Locations loaded from config: 1
+[2026-04-14 02:09:38] [INFO] Sucursales configuradas: 1
+[2026-04-14 02:09:38] [INFO]   [roton] C:\pvsi
+[2026-04-14 02:09:38] [DBG] Config saved to: .\config.json
+[2026-04-14 02:09:38] [INFO] Config guardado en: .\config.json
+[2026-04-14 02:09:38] [INFO] Registrando 1 ubicaciones...
+[2026-04-14 02:09:38] [DBG] HTTP error: 500
+[2026-04-14 02:09:38] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 02:09:38] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-14 02:11:38] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 02:11:38] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 02:11:38] [DBG] Directorio executable: .
+[2026-04-14 02:11:38] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 02:11:38] [INFO] Locations loaded from config: 1
+[2026-04-14 02:11:38] [INFO] Sucursales configuradas: 1
+[2026-04-14 02:11:38] [INFO]   [roton] C:\pvsi
+[2026-04-14 02:11:38] [DBG] Config saved to: .\config.json
+[2026-04-14 02:11:38] [INFO] Config guardado en: .\config.json
+[2026-04-14 02:11:38] [INFO] Registrando 1 ubicaciones...
+[2026-04-14 02:11:38] [DBG] HTTP error: 500
+[2026-04-14 02:11:38] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 02:11:38] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-14 02:12:07] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 02:12:07] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 02:12:07] [DBG] Directorio executable: .
+[2026-04-14 02:12:07] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 02:12:07] [INFO] Locations loaded from config: 1
+[2026-04-14 02:12:07] [INFO] Sucursales configuradas: 1
+[2026-04-14 02:12:07] [INFO]   [roton] C:\pvsi
+[2026-04-14 02:12:07] [DBG] Config saved to: .\config.json
+[2026-04-14 02:12:07] [INFO] Config guardado en: .\config.json
+[2026-04-14 02:12:07] [INFO] Registrando 1 ubicaciones...
+[2026-04-14 02:12:07] [DBG] HTTP error: 500
+[2026-04-14 02:12:07] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 02:12:07] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-14 02:12:44] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 02:12:44] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 02:12:44] [DBG] Directorio executable: .
+[2026-04-14 02:12:44] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 02:12:44] [INFO] Locations loaded from config: 1
+[2026-04-14 02:12:44] [INFO] Sucursales configuradas: 1
+[2026-04-14 02:12:44] [INFO]   [roton] C:\pvsi
+[2026-04-14 02:12:44] [DBG] Config saved to: .\config.json
+[2026-04-14 02:12:44] [INFO] Config guardado en: .\config.json
+[2026-04-14 02:12:44] [INFO] Registrando 1 ubicaciones...
+[2026-04-14 02:12:44] [DBG] HTTP error: 500
+[2026-04-14 02:12:44] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 02:12:44] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-14 02:16:45] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 02:16:45] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 02:16:45] [DBG] Directorio executable: .
+[2026-04-14 02:16:45] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 02:16:45] [INFO] Locations loaded from config: 1
+[2026-04-14 02:16:45] [INFO] Sucursales configuradas: 1
+[2026-04-14 02:16:45] [INFO]   [roton] C:\pvsi
+[2026-04-14 02:16:45] [DBG] Config saved to: .\config.json
+[2026-04-14 02:16:45] [INFO] Config guardado en: .\config.json
+[2026-04-14 02:16:45] [INFO] Registrando 1 ubicaciones...
+[2026-04-14 02:16:45] [DBG] HTTP error: 500
+[2026-04-14 02:16:45] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 02:16:45] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-14 02:16:56] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-14 02:16:56] [INFO] Servidor: http://sync.servicios.care
+[2026-04-14 02:16:56] [DBG] Directorio executable: .
+[2026-04-14 02:16:56] [INFO] Servidor alternativo: http://localhost:8000
+[2026-04-14 02:16:56] [INFO] Locations loaded from config: 1
+[2026-04-14 02:16:56] [INFO] Sucursales configuradas: 1
+[2026-04-14 02:16:56] [INFO]   [roton] C:\pvsi
+[2026-04-14 02:16:56] [DBG] Config saved to: .\config.json
+[2026-04-14 02:16:56] [INFO] Config guardado en: .\config.json
+[2026-04-14 02:16:56] [INFO] Registrando 1 ubicaciones...
+[2026-04-14 02:16:57] [DBG] HTTP error: 500
+[2026-04-14 02:16:57] [WARN] Register fallo: HTTP error: 500 — continuando
+[2026-04-14 02:16:57] [ERR] generateTotp fallo: No timestamp. Saltando.

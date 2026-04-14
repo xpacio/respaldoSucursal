@@ -1,11 +1,24 @@
 {
-    "server": "http:\/\/tu-servidor.com",
-    "interval": 30,
-    "full_check": 3600,
-    "files": [
-        "MASTER.DBF",
-        "XCORTE.DBF",
-        "CANOTA.DBF"
+    "server_url": "http:\/\/localhost:8000",
+    "robocopy": {
+        "copy_flags": "D",
+        "retry": 1,
+        "wait": 1,
+        "exclude_older": true,
+        "subdirs": false,
+        "backup_mode": false,
+        "multithread": 0,
+        "quiet": true
+    },
+    "sync_interval_sec": 3600,
+    "full_check_interval_ms": 3600000,
+    "locations": [
+        {
+            "rbfid": "roton",
+            "base": "C:\\pvsi",
+            "work": "C:\\pvsi\\quickbck\\"
+        }
     ],
-    "locations": []
+    "files_version": "",
+    "files": []
 }

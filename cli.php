@@ -5,10 +5,10 @@ declare(strict_types=1);
 
 define('VERSION', '0.1.0');
 
-require_once __DIR__ . '/Logger.php';
-require_once __DIR__ . '/Constants.php';
-require_once __DIR__ . '/Config.php';
-require_once __DIR__ . '/Client.php';
+require_once __DIR__ . '/shared/Logger.php';
+require_once __DIR__ . '/shared/Constants.php';
+require_once __DIR__ . '/shared/Config.php';
+require_once __DIR__ . '/cli/Client.php';
 
 function printHelp(): void
 {
@@ -99,6 +99,9 @@ function main(array $argv): void
         foreach ($client->locations as $loc) {
             Logger::info("  [{$loc->rbfid}] {$loc->base_path}");
         }
+
+        // Guardar configuración
+        $client->saveConfig();
 
         try {
             $client->register();

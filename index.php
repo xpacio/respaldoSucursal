@@ -18,10 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // 1. Autoloader + dependencias con funciones standalone
-require_once __DIR__ . '/autoload.php';
-$config = require __DIR__ . '/Config/config.php';
-require_once __DIR__ . '/auth.php';
-require_once __DIR__ . '/Router.php';
+require_once __DIR__ . '/shared/autoload.php';
+$config = require __DIR__ . '/shared/Config/config.php';
+require_once __DIR__ . '/shared/auth.php';
+require_once __DIR__ . '/shared/Router.php';
 
 // 2. Inicializar dependencias
 $db = new Database($config['db']);
@@ -185,18 +185,18 @@ if (preg_match('#^/public/cliente/([^/]+)/ssh/key$#', $path, $m) && $_SERVER['RE
 
 // 8. Endpoints publicos sin auth (TOTP o sin token)
 if (preg_match('#^/heartbeat#', $path)) {
-    require_once __DIR__ . '/routes/heartbeat.php';
+    require_once __DIR__ . '/api/routes/heartbeat.php';
     route_heartbeat($router, 'heartbeat');
 }
 
 if (preg_match('#^/ar/download$#', $path) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    require_once __DIR__ . '/routes/ar.php';
+    require_once __DIR__ . '/api/routes/ar.php';
     route_ar_download($router, []);
     exit;
 }
 
 if (preg_match('#^/ar(/|$)#', $path)) {
-    require_once __DIR__ . '/routes/ar.php';
+    require_once __DIR__ . '/api/routes/ar.php';
     route_ar($router, 'ar');
     exit;
 }
