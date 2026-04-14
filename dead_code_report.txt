@@ -1,0 +1,77 @@
+DEAD CODE REPORT
+================
+
+Unused functions:
+-----------------
+- rollback in C:\gis\app\www\sync\Config\Database.php
+- createForTesting in C:\gis\app\www\sync\Config\LoggerFactory.php
+- normalizeTemplatePath in C:\gis\app\www\sync\Config\PathUtils.php
+- getClientIdFromPath in C:\gis\app\www\sync\index.php
+- updateByRbfid in C:\gis\app\www\sync\Repositories\ClientRepository.php
+- deleteByRbfid in C:\gis\app\www\sync\Repositories\ClientRepository.php
+- updateSshKey in C:\gis\app\www\sync\Repositories\ClientRepository.php
+- deleteByClient in C:\gis\app\www\sync\Repositories\OverlayRepository.php
+- updateMountedStatus in C:\gis\app\www\sync\Repositories\OverlayRepository.php
+- clear in C:\gis\app\www\sync\Repositories\RepositoryFactory.php
+- handleAdminDisableAllSsh in C:\gis\app\www\sync\routes\admin.php
+- handleAdminOrphans in C:\gis\app\www\sync\routes\admin.php
+- handleAdminOrphansCleanup in C:\gis\app\www\sync\routes\admin.php
+- handleAdminResetStart in C:\gis\app\www\sync\routes\admin.php
+- handleAdminResetStatus in C:\gis\app\www\sync\routes\admin.php
+- handleAdminReset in C:\gis\app\www\sync\routes\admin.php
+- handleAgenteList in C:\gis\app\www\sync\routes\agente.php
+- handleAgenteRead in C:\gis\app\www\sync\routes\agente.php
+- handleAgenteSave in C:\gis\app\www\sync\routes\agente.php
+- handleAgenteUpload in C:\gis\app\www\sync\routes\agente.php
+- handleAgenteDownload in C:\gis\app\www\sync\routes\agente.php
+- handleAgenteCreateDir in C:\gis\app\www\sync\routes\agente.php
+- handleAgenteCreateFile in C:\gis\app\www\sync\routes\agente.php
+- handleAgenteDelete in C:\gis\app\www\sync\routes\agente.php
+- handleSearch in C:\gis\app\www\sync\routes\clientes.php
+- handleOptions in C:\gis\app\www\sync\routes\clientes.php
+- handleCrear in C:\gis\app\www\sync\routes\clientes.php
+- handleEnable in C:\gis\app\www\sync\routes\clientes.php
+- handleDisable in C:\gis\app\www\sync\routes\clientes.php
+- handleDelete in C:\gis\app\www\sync\routes\clientes.php
+- handleRegenKey in C:\gis\app\www\sync\routes\clientes.php
+- handleEnableSsh in C:\gis\app\www\sync\routes\clientes.php
+- handleDisableSsh in C:\gis\app\www\sync\routes\clientes.php
+- handleEnableKeyDownload in C:\gis\app\www\sync\routes\clientes.php
+- handleDisableKeyDownload in C:\gis\app\www\sync\routes\clientes.php
+- handleResetKeyDownload in C:\gis\app\www\sync\routes\clientes.php
+- handleGetKeyDownloadStatus in C:\gis\app\www\sync\routes\clientes.php
+- handleAddOverlay in C:\gis\app\www\sync\routes\clientes.php
+- handleToggleMount in C:\gis\app\www\sync\routes\clientes.php
+- handleDeleteOverlay in C:\gis\app\www\sync\routes\clientes.php
+- handleGetMounts in C:\gis\app\www\sync\routes\clientes.php
+- handleActualizar in C:\gis\app\www\sync\routes\clientes.php
+- handleGetSshKey in C:\gis\app\www\sync\routes\clientes.php
+- handleSyncOverlays in C:\gis\app\www\sync\routes\clientes.php
+- handleEnableOverlay in C:\gis\app\www\sync\routes\clientes.php
+- handleDisableOverlay in C:\gis\app\www\sync\routes\clientes.php
+- handleEnablePlantillaOverlay in C:\gis\app\www\sync\routes\clientes.php
+- handleDisablePlantillaOverlay in C:\gis\app\www\sync\routes\clientes.php
+- handleDeleteOverlayById in C:\gis\app\www\sync\routes\clientes.php
+- handleGetLogs in C:\gis\app\www\sync\routes\logs.php
+- handleGetEjecucion in C:\gis\app\www\sync\routes\logs.php
+- handlePurgeLogs in C:\gis\app\www\sync\routes\logs.php
+- handleGetPermisos in C:\gis\app\www\sync\routes\permisos.php
+- handleGetPlantillas in C:\gis\app\www\sync\routes\plantillas.php
+- handleCrearPlantilla in C:\gis\app\www\sync\routes\plantillas.php
+- handleEditarPlantilla in C:\gis\app\www\sync\routes\plantillas.php
+- handleEliminarPlantilla in C:\gis\app\www\sync\routes\plantillas.php
+- handleRoot in C:\gis\app\www\sync\routes\root.php
+- getMountStatus in C:\gis\app\www\sync\Services\MountService.php
+- enableAllOverlays in C:\gis\app\www\sync\Services\MountService.php
+- disableAllOverlays in C:\gis\app\www\sync\Services\MountService.php
+- createServicesForTesting in C:\gis\app\www\sync\Services\ServiceFactory.php
+- getCurrentUserRbfid in C:\gis\app\www\sync\ui\logging.php
+- initUILogger in C:\gis\app\www\sync\ui\logging.php
+- logUIPageView in C:\gis\app\www\sync\ui\logging.php
+- logUIAction in C:\gis\app\www\sync\ui\logging.php
+- logUIAuthEvent in C:\gis\app\www\sync\ui\logging.php
+
+Unused classs:
+--------------
+None found.
+

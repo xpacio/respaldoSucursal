@@ -1,0 +1,11 @@
+{
+    "server": "http:\/\/tu-servidor.com",
+    "interval": 30,
+    "full_check": 3600,
+    "files": [
+        "MASTER.DBF",
+        "XCORTE.DBF",
+        "CANOTA.DBF"
+    ],
+    "locations": []
+}

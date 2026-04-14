@@ -1,0 +1,351 @@
+[2026-04-13 01:01:53] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 01:01:53] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 01:01:53] [DBG] Directorio executable: .
+[2026-04-13 01:01:53] [DBG] Config file not found: .\config.json
+[2026-04-13 01:01:53] [DBG] Escaneando unidad: C:\
+[2026-04-13 01:01:55] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-13 01:01:55] [DBG] Scan C:\ completo: 1 sucursales
+[2026-04-13 01:01:55] [DBG] Config saved to: .\config.json
+[2026-04-13 01:01:55] [INFO] Sucursales configuradas: 1
+[2026-04-13 01:01:55] [INFO]   [roton] C:\pvsi
+[2026-04-13 01:01:55] [INFO] Sucursales configuradas: 1
+[2026-04-13 01:01:55] [INFO]   [roton] C:\pvsi
+[2026-04-13 01:01:55] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 01:01:55] [DBG]   - roton en C:\pvsi
+[2026-04-13 01:01:55] [INFO] [roton] fetchTimestamp resultado: 1776042113
+[2026-04-13 01:01:55] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-13 01:01:55] [INFO] [roton] Registrado OK
+[2026-04-13 01:01:55] [DBG] Config saved to: .\config.json
+[2026-04-13 01:01:55] [INFO] Lista obtenida del servidor: 94 archivos (v726665cb)
+[2026-04-13 01:01:55] [INFO] Full sync horario
+[2026-04-13 01:02:13] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 01:02:13] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 01:02:13] [DBG] Directorio executable: .
+[2026-04-13 01:02:13] [DBG] Config loaded from: .\config.json
+[2026-04-13 01:02:13] [INFO] Locations loaded from config: 1
+[2026-04-13 01:02:13] [INFO] Sucursales configuradas: 1
+[2026-04-13 01:02:13] [INFO]   [roton] C:\pvsi
+[2026-04-13 01:02:13] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 01:02:13] [DBG]   - roton en C:\pvsi
+[2026-04-13 01:02:14] [INFO] [roton] fetchTimestamp resultado: 1776042132
+[2026-04-13 01:02:14] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-13 01:02:14] [INFO] [roton] Registrado OK
+[2026-04-13 01:02:14] [INFO] Lista sin cambios (94 archivos)
+[2026-04-13 01:02:14] [INFO] Full sync horario
+[2026-04-13 01:03:18] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 01:03:18] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 01:03:18] [DBG] Directorio executable: .
+[2026-04-13 01:03:18] [DBG] Config file not found: .\config.json
+[2026-04-13 01:03:18] [DBG] Escaneando unidad: C:\
+[2026-04-13 01:03:19] [INFO] Sucursal encontrada: roton en C:\gis\cliente1
+[2026-04-13 01:03:19] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-13 01:03:19] [DBG] Scan C:\ completo: 2 sucursales
+[2026-04-13 01:03:19] [DBG] Config saved to: .\config.json
+[2026-04-13 01:15:03] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 01:15:03] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 01:15:03] [DBG] Directorio executable: .
+[2026-04-13 01:15:03] [DBG] Config file not found: .\config.json
+[2026-04-13 01:15:03] [DBG] Escaneando unidad: C:\
+[2026-04-13 01:15:03] [INFO] Sucursal encontrada: roton en C:\gis\cliente1
+[2026-04-13 01:15:03] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-13 01:15:03] [DBG] Scan C:\ completo: 2 sucursales
+[2026-04-13 01:15:03] [DBG] Config saved to: .\config.json
+[2026-04-13 01:15:03] [INFO] Sucursales configuradas: 1
+[2026-04-13 01:15:03] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 01:15:03] [INFO] Sucursales configuradas: 1
+[2026-04-13 01:15:03] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 01:15:03] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 01:15:03] [DBG]   - roton en C:\gis\cliente1
+[2026-04-13 01:15:04] [INFO] [roton] fetchTimestamp resultado: 1776042902
+[2026-04-13 01:15:04] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-13 01:15:04] [INFO] [roton] Registrado OK
+[2026-04-13 01:15:04] [DBG] Config saved to: .\config.json
+[2026-04-13 01:15:04] [INFO] Lista obtenida del servidor: 94 archivos (v726665cb)
+[2026-04-13 01:15:04] [INFO] Full sync horario
+[2026-04-13 01:15:04] [DBG] Lista sin cambios
+[2026-04-13 01:15:04] [INFO] Ejecutando Robocopy: robocopy "C:\gis\cliente1" "C:\gis\cliente1\quickbck" "AJTFLU.DBF" "ASISTE.DBF" "CAJAS.DBF" "CANCFDI.DBF" "CANCFDI.FPT" "CANOTA.DBF" "CANOTA.DBT" "CANOTA.FPT" "CANOTAEX.DBF" "CARPORT.DBF" "CARPORT.FPT" "CASEMANA.DBF" "CATPROD3.DBF" "CAT_NEG.DBF" "CAT_PROD.DBF" "CCOTIZA.DBF" "CENTER.DBF" "CFDREL.DBF" "CG3_VAEN.DBF" "CG3_VAPA.DBF" "CLIENTE.DBF" "COBRANZA.DBF" "COMPRAS.DBF" "CONCXC.DBF" "CONVTODO.DBF" "CPEDIDO.DBF" "CPENDIE.DBF" "CPXCORTE.DBF" "CRMC_OBS.DBF" "CUENGAS.DBF" "CUNOTA.DBF" "DD_CONTROL.DBF" "DD_DATOS.DBF" "DESEMANA.DBF" "ES_COBRO.DBF" "EYSIENC.DBF" "EYSIPAR.DBF" "FACCFD.DBF" "FACCFD.FPT" "FLUJO01.DBF" "FLUJORES.DBF" "HISTORIA.DBF" "INVFSIC.DBF" "MASTER.DBF" "MINTINV.DBF" "MOVCXCD.DBF" "MOVSINV.DBF" "M_CONF.DBF" "NEGADOS.DBF" "NOESTA.DBF" "NOHAY.DBF" "N_CONF.DBF" "N_RESP.DBF" "N_RESP.DBT" "N_RESP_M.DBF" "N_RESP_M.DBT" "OBSDOCS.DBF" "PAGDOCS.DBF" "PAGMULT.DBF" "PAGSPEI.DBF" "PARAMS.DBF" "PARTCOMP.DBF" "PARTCOT.DBF" "PARVALES.DBF" "PARXCAR.DBF" "PAVACL.DBF" "PCOTIZA.DBF" "PEDIDO.DBF" "PEDIDO1.DBF" "PEDIDO2.DBF" "PPEDIDO.DBF" "PPENDIE.DBF" "RESP_PIN.DBF" "R_BBVA.DBF" "R_KUSHKI.DBF" "SERCFD2.DBF" "STOCK.DBF" "SUCURCTAI.DBF" "TABLA004.DBF" "TABLA005.DBF" "TERCAJAS.DBF" "TLSERVI.DBF" "USUARIOS.DBF" "VACLI.DBF" "VALES.DBF" "VALPEN.DBF" "VCPENDI.DBF" "VENDEDOR.DBF" "VENTA.DBF" "VENTA.DBT" "VENTA.FPT" "VENTAPP.DBF" "VPPENDI.DBF" "XCORTE.DBF" /COPY:D /R:1 /W:1 /XO
+[2026-04-13 01:15:04] [DBG] Iniciando sync de archivo: CLIENTE.DBF
+[2026-04-13 01:15:04] [INFO] Cambio detectado en full check: CLIENTE.DBF
+[2026-04-13 01:15:05] [DBG] HTTP error: 500
+[2026-04-13 01:15:05] [DBG] Sync CLIENTE.DBF retry 2/3: HTTP error: 500
+[2026-04-13 01:15:05] [DBG] HTTP error: 500
+[2026-04-13 01:15:05] [DBG] Sync CLIENTE.DBF retry 3/3: HTTP error: 500
+[2026-04-13 01:15:05] [DBG] HTTP error: 500
+[2026-04-13 01:15:05] [DBG] Sync CLIENTE.DBF retry 4/3: HTTP error: 500
+[2026-04-13 01:15:05] [ERR] Sync CLIENTE.DBF fallo después de 3 intentos
+[2026-04-13 01:15:05] [ERR] Full check sync fallo: CLIENTE.DBF — se reintentará en el próximo ciclo
+[2026-04-13 01:15:05] [DBG] Iniciando sync de archivo: PARAMS.DBF
+[2026-04-13 01:15:05] [INFO] Cambio detectado en full check: PARAMS.DBF
+[2026-04-13 01:15:05] [DBG] HTTP error: 500
+[2026-04-13 01:15:05] [DBG] Sync PARAMS.DBF retry 2/3: HTTP error: 500
+[2026-04-13 01:15:05] [DBG] HTTP error: 500
+[2026-04-13 01:15:05] [DBG] Sync PARAMS.DBF retry 3/3: HTTP error: 500
+[2026-04-13 01:15:06] [DBG] HTTP error: 500
+[2026-04-13 01:15:06] [DBG] Sync PARAMS.DBF retry 4/3: HTTP error: 500
+[2026-04-13 01:15:06] [ERR] Sync PARAMS.DBF fallo después de 3 intentos
+[2026-04-13 01:15:06] [ERR] Full check sync fallo: PARAMS.DBF — se reintentará en el próximo ciclo
+[2026-04-13 01:15:06] [DBG] Iniciando sync de archivo: PEDIDO.DBF
+[2026-04-13 01:15:06] [INFO] Cambio detectado en full check: PEDIDO.DBF
+[2026-04-13 01:15:06] [DBG] HTTP error: 500
+[2026-04-13 01:15:06] [DBG] Sync PEDIDO.DBF retry 2/3: HTTP error: 500
+[2026-04-13 01:15:06] [DBG] HTTP error: 500
+[2026-04-13 01:15:06] [DBG] Sync PEDIDO.DBF retry 3/3: HTTP error: 500
+[2026-04-13 01:15:06] [DBG] HTTP error: 500
+[2026-04-13 01:15:06] [DBG] Sync PEDIDO.DBF retry 4/3: HTTP error: 500
+[2026-04-13 01:15:06] [ERR] Sync PEDIDO.DBF fallo después de 3 intentos
+[2026-04-13 01:15:06] [ERR] Full check sync fallo: PEDIDO.DBF — se reintentará en el próximo ciclo
+[2026-04-13 01:15:06] [DBG] Iniciando sync de archivo: VENTA.DBF
+[2026-04-13 01:15:06] [INFO] Cambio detectado en full check: VENTA.DBF
+[2026-04-13 01:15:06] [DBG] HTTP error: 500
+[2026-04-13 01:15:06] [DBG] Sync VENTA.DBF retry 2/3: HTTP error: 500
+[2026-04-13 01:15:06] [DBG] HTTP error: 500
+[2026-04-13 01:15:06] [DBG] Sync VENTA.DBF retry 3/3: HTTP error: 500
+[2026-04-13 01:15:07] [DBG] HTTP error: 500
+[2026-04-13 01:15:07] [DBG] Sync VENTA.DBF retry 4/3: HTTP error: 500
+[2026-04-13 01:15:07] [ERR] Sync VENTA.DBF fallo después de 3 intentos
+[2026-04-13 01:15:07] [ERR] Full check sync fallo: VENTA.DBF — se reintentará en el próximo ciclo
+[2026-04-13 01:15:07] [DBG] Iniciando ciclo de poll...
+[2026-04-13 01:15:07] [INFO] Ejecutando Robocopy: robocopy "C:\gis\cliente1" "C:\gis\cliente1\quickbck" "AJTFLU.DBF" "ASISTE.DBF" "CAJAS.DBF" "CANCFDI.DBF" "CANCFDI.FPT" "CANOTA.DBF" "CANOTA.DBT" "CANOTA.FPT" "CANOTAEX.DBF" "CARPORT.DBF" "CARPORT.FPT" "CASEMANA.DBF" "CATPROD3.DBF" "CAT_NEG.DBF" "CAT_PROD.DBF" "CCOTIZA.DBF" "CENTER.DBF" "CFDREL.DBF" "CG3_VAEN.DBF" "CG3_VAPA.DBF" "CLIENTE.DBF" "COBRANZA.DBF" "COMPRAS.DBF" "CONCXC.DBF" "CONVTODO.DBF" "CPEDIDO.DBF" "CPENDIE.DBF" "CPXCORTE.DBF" "CRMC_OBS.DBF" "CUENGAS.DBF" "CUNOTA.DBF" "DD_CONTROL.DBF" "DD_DATOS.DBF" "DESEMANA.DBF" "ES_COBRO.DBF" "EYSIENC.DBF" "EYSIPAR.DBF" "FACCFD.DBF" "FACCFD.FPT" "FLUJO01.DBF" "FLUJORES.DBF" "HISTORIA.DBF" "INVFSIC.DBF" "MASTER.DBF" "MINTINV.DBF" "MOVCXCD.DBF" "MOVSINV.DBF" "M_CONF.DBF" "NEGADOS.DBF" "NOESTA.DBF" "NOHAY.DBF" "N_CONF.DBF" "N_RESP.DBF" "N_RESP.DBT" "N_RESP_M.DBF" "N_RESP_M.DBT" "OBSDOCS.DBF" "PAGDOCS.DBF" "PAGMULT.DBF" "PAGSPEI.DBF" "PARAMS.DBF" "PARTCOMP.DBF" "PARTCOT.DBF" "PARVALES.DBF" "PARXCAR.DBF" "PAVACL.DBF" "PCOTIZA.DBF" "PEDIDO.DBF" "PEDIDO1.DBF" "PEDIDO2.DBF" "PPEDIDO.DBF" "PPENDIE.DBF" "RESP_PIN.DBF" "R_BBVA.DBF" "R_KUSHKI.DBF" "SERCFD2.DBF" "STOCK.DBF" "SUCURCTAI.DBF" "TABLA004.DBF" "TABLA005.DBF" "TERCAJAS.DBF" "TLSERVI.DBF" "USUARIOS.DBF" "VACLI.DBF" "VALES.DBF" "VALPEN.DBF" "VCPENDI.DBF" "VENDEDOR.DBF" "VENTA.DBF" "VENTA.DBT" "VENTA.FPT" "VENTAPP.DBF" "VPPENDI.DBF" "XCORTE.DBF" /COPY:D /R:1 /W:1 /XO
+[2026-04-13 01:15:07] [INFO] Cambio detectado en archivo: CLIENTE.DBF
+[2026-04-13 01:15:07] [DBG] HTTP error: 500
+[2026-04-13 01:15:07] [DBG] Sync CLIENTE.DBF retry 2/3: HTTP error: 500
+[2026-04-13 01:15:07] [DBG] HTTP error: 500
+[2026-04-13 01:15:07] [DBG] Sync CLIENTE.DBF retry 3/3: HTTP error: 500
+[2026-04-13 01:15:07] [DBG] HTTP error: 500
+[2026-04-13 01:15:07] [DBG] Sync CLIENTE.DBF retry 4/3: HTTP error: 500
+[2026-04-13 01:15:07] [ERR] Sync CLIENTE.DBF fallo después de 3 intentos
+[2026-04-13 01:15:07] [ERR] Sync CLIENTE.DBF fallo
+[2026-04-13 01:15:07] [INFO] Cambio detectado en archivo: PARAMS.DBF
+[2026-04-13 01:15:08] [DBG] HTTP error: 500
+[2026-04-13 01:15:08] [DBG] Sync PARAMS.DBF retry 2/3: HTTP error: 500
+[2026-04-13 01:15:08] [DBG] HTTP error: 500
+[2026-04-13 01:15:08] [DBG] Sync PARAMS.DBF retry 3/3: HTTP error: 500
+[2026-04-13 01:15:08] [DBG] HTTP error: 500
+[2026-04-13 01:15:08] [DBG] Sync PARAMS.DBF retry 4/3: HTTP error: 500
+[2026-04-13 01:15:08] [ERR] Sync PARAMS.DBF fallo después de 3 intentos
+[2026-04-13 01:15:08] [ERR] Sync PARAMS.DBF fallo
+[2026-04-13 01:15:08] [INFO] Cambio detectado en archivo: PEDIDO.DBF
+[2026-04-13 01:15:08] [DBG] HTTP error: 500
+[2026-04-13 01:15:08] [DBG] Sync PEDIDO.DBF retry 2/3: HTTP error: 500
+[2026-04-13 01:55:37] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 01:55:37] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 01:55:37] [DBG] Directorio executable: .
+[2026-04-13 02:00:11] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 02:00:11] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 02:00:11] [DBG] Directorio executable: .
+[2026-04-13 02:02:44] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 02:02:44] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 02:02:44] [DBG] Directorio executable: .
+[2026-04-13 02:03:00] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 02:03:00] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 02:03:00] [DBG] Directorio executable: .
+[2026-04-13 02:03:14] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 02:03:14] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 02:03:14] [DBG] Directorio executable: .
+[2026-04-13 02:03:14] [DBG] Config file not found: .\config.json
+[2026-04-13 02:03:14] [DBG] Escaneando unidad: C:\
+[2026-04-13 02:03:15] [INFO] Sucursal encontrada: roton en C:\gis\cliente1
+[2026-04-13 02:03:15] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-13 02:03:15] [DBG] Scan C:\ completo: 2 sucursales
+[2026-04-13 02:03:15] [DBG] Config saved to: .\config.json
+[2026-04-13 02:03:15] [INFO] Sucursales configuradas: 1
+[2026-04-13 02:03:15] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 02:03:15] [INFO] Sucursales configuradas: 1
+[2026-04-13 02:03:15] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 02:03:15] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 02:03:15] [DBG]   - roton en C:\gis\cliente1
+[2026-04-13 02:03:15] [INFO] [roton] fetchTimestamp resultado: 1776045794
+[2026-04-13 02:03:16] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-13 02:03:16] [INFO] [roton] Registrado OK
+[2026-04-13 02:03:16] [DBG] Config saved to: .\config.json
+[2026-04-13 02:03:16] [INFO] Lista obtenida del servidor: 94 archivos (v726665cb)
+[2026-04-13 02:03:16] [INFO] Full sync horario
+[2026-04-13 02:03:16] [DBG] Lista sin cambios
+[2026-04-13 02:03:16] [INFO] Ejecutando Robocopy: robocopy "C:\gis\cliente1" "C:\gis\cliente1\quickbck" "AJTFLU.DBF" "ASISTE.DBF" "CAJAS.DBF" "CANCFDI.DBF" "CANCFDI.FPT" "CANOTA.DBF" "CANOTA.DBT" "CANOTA.FPT" "CANOTAEX.DBF" "CARPORT.DBF" "CARPORT.FPT" "CASEMANA.DBF" "CATPROD3.DBF" "CAT_NEG.DBF" "CAT_PROD.DBF" "CCOTIZA.DBF" "CENTER.DBF" "CFDREL.DBF" "CG3_VAEN.DBF" "CG3_VAPA.DBF" "CLIENTE.DBF" "COBRANZA.DBF" "COMPRAS.DBF" "CONCXC.DBF" "CONVTODO.DBF" "CPEDIDO.DBF" "CPENDIE.DBF" "CPXCORTE.DBF" "CRMC_OBS.DBF" "CUENGAS.DBF" "CUNOTA.DBF" "DD_CONTROL.DBF" "DD_DATOS.DBF" "DESEMANA.DBF" "ES_COBRO.DBF" "EYSIENC.DBF" "EYSIPAR.DBF" "FACCFD.DBF" "FACCFD.FPT" "FLUJO01.DBF" "FLUJORES.DBF" "HISTORIA.DBF" "INVFSIC.DBF" "MASTER.DBF" "MINTINV.DBF" "MOVCXCD.DBF" "MOVSINV.DBF" "M_CONF.DBF" "NEGADOS.DBF" "NOESTA.DBF" "NOHAY.DBF" "N_CONF.DBF" "N_RESP.DBF" "N_RESP.DBT" "N_RESP_M.DBF" "N_RESP_M.DBT" "OBSDOCS.DBF" "PAGDOCS.DBF" "PAGMULT.DBF" "PAGSPEI.DBF" "PARAMS.DBF" "PARTCOMP.DBF" "PARTCOT.DBF" "PARVALES.DBF" "PARXCAR.DBF" "PAVACL.DBF" "PCOTIZA.DBF" "PEDIDO.DBF" "PEDIDO1.DBF" "PEDIDO2.DBF" "PPEDIDO.DBF" "PPENDIE.DBF" "RESP_PIN.DBF" "R_BBVA.DBF" "R_KUSHKI.DBF" "SERCFD2.DBF" "STOCK.DBF" "SUCURCTAI.DBF" "TABLA004.DBF" "TABLA005.DBF" "TERCAJAS.DBF" "TLSERVI.DBF" "USUARIOS.DBF" "VACLI.DBF" "VALES.DBF" "VALPEN.DBF" "VCPENDI.DBF" "VENDEDOR.DBF" "VENTA.DBF" "VENTA.DBT" "VENTA.FPT" "VENTAPP.DBF" "VPPENDI.DBF" "XCORTE.DBF" /COPY:D /R:1 /W:1 /XO
+[2026-04-13 02:03:16] [DBG] Iniciando sync de archivo: CLIENTE.DBF
+[2026-04-13 02:03:16] [INFO] Cambio detectado en full check: CLIENTE.DBF
+[2026-04-13 02:03:16] [DBG] HTTP error: 500
+[2026-04-13 02:03:16] [DBG] Sync CLIENTE.DBF retry 2/3: HTTP error: 500
+[2026-04-13 02:03:17] [DBG] HTTP error: 500
+[2026-04-13 02:03:17] [DBG] Sync CLIENTE.DBF retry 3/3: HTTP error: 500
+[2026-04-13 02:03:17] [DBG] HTTP error: 500
+[2026-04-13 02:03:17] [DBG] Sync CLIENTE.DBF retry 4/3: HTTP error: 500
+[2026-04-13 02:03:17] [ERR] Sync CLIENTE.DBF fallo después de 3 intentos
+[2026-04-13 02:03:17] [ERR] Full check sync fallo: CLIENTE.DBF — se reintentará en el próximo ciclo
+[2026-04-13 02:17:43] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 02:17:43] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 02:17:43] [DBG] Directorio executable: .
+[2026-04-13 02:17:43] [DBG] Config file not found: .\config.json
+[2026-04-13 02:17:43] [DBG] Escaneando unidad: C:\
+[2026-04-13 02:17:44] [INFO] Sucursal encontrada: roton en C:\gis\cliente1
+[2026-04-13 02:17:44] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-13 02:17:44] [DBG] Scan C:\ completo: 2 sucursales
+[2026-04-13 02:17:44] [DBG] Config saved to: .\config.json
+[2026-04-13 02:17:44] [INFO] Sucursales configuradas: 1
+[2026-04-13 02:17:44] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 02:17:44] [INFO] Sucursales configuradas: 1
+[2026-04-13 02:17:44] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 02:17:44] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 02:17:44] [DBG]   - roton en C:\gis\cliente1
+[2026-04-13 02:17:44] [INFO] [roton] fetchTimestamp resultado: 1776046662
+[2026-04-13 02:17:44] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-13 02:17:44] [INFO] [roton] Registrado OK
+[2026-04-13 02:17:44] [DBG] Config saved to: .\config.json
+[2026-04-13 02:17:44] [INFO] Lista obtenida del servidor: 94 archivos (v726665cb)
+[2026-04-13 02:17:44] [INFO] Full sync horario
+[2026-04-13 02:17:45] [DBG] Lista sin cambios
+[2026-04-13 02:17:45] [INFO] Ejecutando Robocopy: robocopy "C:\gis\cliente1" "C:\gis\cliente1\quickbck" "AJTFLU.DBF" "ASISTE.DBF" "CAJAS.DBF" "CANCFDI.DBF" "CANCFDI.FPT" "CANOTA.DBF" "CANOTA.DBT" "CANOTA.FPT" "CANOTAEX.DBF" "CARPORT.DBF" "CARPORT.FPT" "CASEMANA.DBF" "CATPROD3.DBF" "CAT_NEG.DBF" "CAT_PROD.DBF" "CCOTIZA.DBF" "CENTER.DBF" "CFDREL.DBF" "CG3_VAEN.DBF" "CG3_VAPA.DBF" "CLIENTE.DBF" "COBRANZA.DBF" "COMPRAS.DBF" "CONCXC.DBF" "CONVTODO.DBF" "CPEDIDO.DBF" "CPENDIE.DBF" "CPXCORTE.DBF" "CRMC_OBS.DBF" "CUENGAS.DBF" "CUNOTA.DBF" "DD_CONTROL.DBF" "DD_DATOS.DBF" "DESEMANA.DBF" "ES_COBRO.DBF" "EYSIENC.DBF" "EYSIPAR.DBF" "FACCFD.DBF" "FACCFD.FPT" "FLUJO01.DBF" "FLUJORES.DBF" "HISTORIA.DBF" "INVFSIC.DBF" "MASTER.DBF" "MINTINV.DBF" "MOVCXCD.DBF" "MOVSINV.DBF" "M_CONF.DBF" "NEGADOS.DBF" "NOESTA.DBF" "NOHAY.DBF" "N_CONF.DBF" "N_RESP.DBF" "N_RESP.DBT" "N_RESP_M.DBF" "N_RESP_M.DBT" "OBSDOCS.DBF" "PAGDOCS.DBF" "PAGMULT.DBF" "PAGSPEI.DBF" "PARAMS.DBF" "PARTCOMP.DBF" "PARTCOT.DBF" "PARVALES.DBF" "PARXCAR.DBF" "PAVACL.DBF" "PCOTIZA.DBF" "PEDIDO.DBF" "PEDIDO1.DBF" "PEDIDO2.DBF" "PPEDIDO.DBF" "PPENDIE.DBF" "RESP_PIN.DBF" "R_BBVA.DBF" "R_KUSHKI.DBF" "SERCFD2.DBF" "STOCK.DBF" "SUCURCTAI.DBF" "TABLA004.DBF" "TABLA005.DBF" "TERCAJAS.DBF" "TLSERVI.DBF" "USUARIOS.DBF" "VACLI.DBF" "VALES.DBF" "VALPEN.DBF" "VCPENDI.DBF" "VENDEDOR.DBF" "VENTA.DBF" "VENTA.DBT" "VENTA.FPT" "VENTAPP.DBF" "VPPENDI.DBF" "XCORTE.DBF" /COPY:D /R:1 /W:1 /XO
+[2026-04-13 02:17:45] [DBG] Iniciando sync de archivo: CLIENTE.DBF
+[2026-04-13 02:17:45] [INFO] Cambio detectado en full check: CLIENTE.DBF
+[2026-04-13 02:17:45] [INFO] CLIENTE.DBF — enviando 1/1 chunks
+[2026-04-13 02:17:45] [DBG] Upload chunk 0 OK
+[2026-04-13 02:17:45] [INFO] CLIENTE.DBF — sync completo (1 chunks enviados)
+[2026-04-13 02:25:02] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 02:25:02] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 02:25:02] [DBG] Directorio executable: .
+[2026-04-13 02:25:02] [DBG] Config file not found: .\config.json
+[2026-04-13 02:25:02] [DBG] Escaneando unidad: C:\
+[2026-04-13 02:25:02] [INFO] Sucursal encontrada: roton en C:\gis\cliente1
+[2026-04-13 02:25:02] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-13 02:25:02] [DBG] Scan C:\ completo: 2 sucursales
+[2026-04-13 02:25:02] [DBG] Config saved to: .\config.json
+[2026-04-13 02:25:02] [INFO] Sucursales configuradas: 1
+[2026-04-13 02:25:02] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 02:25:02] [INFO] Sucursales configuradas: 1
+[2026-04-13 02:25:02] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 02:25:02] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 02:25:02] [DBG]   - roton en C:\gis\cliente1
+[2026-04-13 02:25:03] [INFO] [roton] fetchTimestamp resultado: 1776047101
+[2026-04-13 02:25:03] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-13 02:25:03] [INFO] [roton] Registrado OK
+[2026-04-13 02:25:03] [DBG] Config saved to: .\config.json
+[2026-04-13 02:25:03] [INFO] Lista obtenida del servidor: 94 archivos (v726665cb)
+[2026-04-13 02:25:03] [INFO] Full sync horario
+[2026-04-13 02:25:03] [DBG] Lista sin cambios
+[2026-04-13 02:25:03] [INFO] Ejecutando Robocopy: robocopy "C:\gis\cliente1" "C:\gis\cliente1\quickbck" "AJTFLU.DBF" "ASISTE.DBF" "CAJAS.DBF" "CANCFDI.DBF" "CANCFDI.FPT" "CANOTA.DBF" "CANOTA.DBT" "CANOTA.FPT" "CANOTAEX.DBF" "CARPORT.DBF" "CARPORT.FPT" "CASEMANA.DBF" "CATPROD3.DBF" "CAT_NEG.DBF" "CAT_PROD.DBF" "CCOTIZA.DBF" "CENTER.DBF" "CFDREL.DBF" "CG3_VAEN.DBF" "CG3_VAPA.DBF" "CLIENTE.DBF" "COBRANZA.DBF" "COMPRAS.DBF" "CONCXC.DBF" "CONVTODO.DBF" "CPEDIDO.DBF" "CPENDIE.DBF" "CPXCORTE.DBF" "CRMC_OBS.DBF" "CUENGAS.DBF" "CUNOTA.DBF" "DD_CONTROL.DBF" "DD_DATOS.DBF" "DESEMANA.DBF" "ES_COBRO.DBF" "EYSIENC.DBF" "EYSIPAR.DBF" "FACCFD.DBF" "FACCFD.FPT" "FLUJO01.DBF" "FLUJORES.DBF" "HISTORIA.DBF" "INVFSIC.DBF" "MASTER.DBF" "MINTINV.DBF" "MOVCXCD.DBF" "MOVSINV.DBF" "M_CONF.DBF" "NEGADOS.DBF" "NOESTA.DBF" "NOHAY.DBF" "N_CONF.DBF" "N_RESP.DBF" "N_RESP.DBT" "N_RESP_M.DBF" "N_RESP_M.DBT" "OBSDOCS.DBF" "PAGDOCS.DBF" "PAGMULT.DBF" "PAGSPEI.DBF" "PARAMS.DBF" "PARTCOMP.DBF" "PARTCOT.DBF" "PARVALES.DBF" "PARXCAR.DBF" "PAVACL.DBF" "PCOTIZA.DBF" "PEDIDO.DBF" "PEDIDO1.DBF" "PEDIDO2.DBF" "PPEDIDO.DBF" "PPENDIE.DBF" "RESP_PIN.DBF" "R_BBVA.DBF" "R_KUSHKI.DBF" "SERCFD2.DBF" "STOCK.DBF" "SUCURCTAI.DBF" "TABLA004.DBF" "TABLA005.DBF" "TERCAJAS.DBF" "TLSERVI.DBF" "USUARIOS.DBF" "VACLI.DBF" "VALES.DBF" "VALPEN.DBF" "VCPENDI.DBF" "VENDEDOR.DBF" "VENTA.DBF" "VENTA.DBT" "VENTA.FPT" "VENTAPP.DBF" "VPPENDI.DBF" "XCORTE.DBF" /COPY:D /R:1 /W:1 /XO
+[2026-04-13 02:25:03] [DBG] Iniciando sync de archivo: CLIENTE.DBF
+[2026-04-13 02:25:03] [INFO] Cambio detectado en full check: CLIENTE.DBF
+[2026-04-13 02:25:04] [INFO] CLIENTE.DBF → /CLIENTE.DBF [ MD5: A5NwGaolM0w ] — enviando 1/1 chunks
+[2026-04-13 02:25:04] [DBG] Upload chunk 0 OK
+[2026-04-13 02:25:04] [INFO] CLIENTE.DBF — sync completo (1 chunks enviados)
+[2026-04-13 03:27:36] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 03:27:36] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 03:27:36] [DBG] Directorio executable: .
+[2026-04-13 03:27:36] [DBG] Config file not found: .\config.json
+[2026-04-13 03:27:36] [DBG] Escaneando unidad: C:\
+[2026-04-13 03:27:37] [INFO] Sucursal encontrada: roton en C:\gis\cliente1
+[2026-04-13 03:27:37] [INFO] Sucursal encontrada: roton en C:\pvsi
+[2026-04-13 03:27:37] [DBG] Scan C:\ completo: 2 sucursales
+[2026-04-13 03:27:37] [DBG] Config saved to: .\config.json
+[2026-04-13 03:27:37] [INFO] Sucursales configuradas: 1
+[2026-04-13 03:27:37] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 03:27:37] [INFO] Sucursales configuradas: 1
+[2026-04-13 03:27:37] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 03:27:37] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 03:27:37] [DBG]   - roton en C:\gis\cliente1
+[2026-04-13 03:27:37] [INFO] [roton] fetchTimestamp resultado: 1776050855
+[2026-04-13 03:27:37] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-13 03:27:37] [INFO] [roton] Registrado OK
+[2026-04-13 03:27:37] [DBG] Config saved to: .\config.json
+[2026-04-13 03:27:37] [INFO] Lista obtenida del servidor: 94 archivos (v726665cb)
+[2026-04-13 03:27:37] [INFO] Full sync horario
+[2026-04-13 03:27:38] [DBG] Lista sin cambios
+[2026-04-13 03:27:38] [INFO] Ejecutando Robocopy: robocopy "C:\gis\cliente1" "C:\gis\cliente1\quickbck" "AJTFLU.DBF" "ASISTE.DBF" "CAJAS.DBF" "CANCFDI.DBF" "CANCFDI.FPT" "CANOTA.DBF" "CANOTA.DBT" "CANOTA.FPT" "CANOTAEX.DBF" "CARPORT.DBF" "CARPORT.FPT" "CASEMANA.DBF" "CATPROD3.DBF" "CAT_NEG.DBF" "CAT_PROD.DBF" "CCOTIZA.DBF" "CENTER.DBF" "CFDREL.DBF" "CG3_VAEN.DBF" "CG3_VAPA.DBF" "CLIENTE.DBF" "COBRANZA.DBF" "COMPRAS.DBF" "CONCXC.DBF" "CONVTODO.DBF" "CPEDIDO.DBF" "CPENDIE.DBF" "CPXCORTE.DBF" "CRMC_OBS.DBF" "CUENGAS.DBF" "CUNOTA.DBF" "DD_CONTROL.DBF" "DD_DATOS.DBF" "DESEMANA.DBF" "ES_COBRO.DBF" "EYSIENC.DBF" "EYSIPAR.DBF" "FACCFD.DBF" "FACCFD.FPT" "FLUJO01.DBF" "FLUJORES.DBF" "HISTORIA.DBF" "INVFSIC.DBF" "MASTER.DBF" "MINTINV.DBF" "MOVCXCD.DBF" "MOVSINV.DBF" "M_CONF.DBF" "NEGADOS.DBF" "NOESTA.DBF" "NOHAY.DBF" "N_CONF.DBF" "N_RESP.DBF" "N_RESP.DBT" "N_RESP_M.DBF" "N_RESP_M.DBT" "OBSDOCS.DBF" "PAGDOCS.DBF" "PAGMULT.DBF" "PAGSPEI.DBF" "PARAMS.DBF" "PARTCOMP.DBF" "PARTCOT.DBF" "PARVALES.DBF" "PARXCAR.DBF" "PAVACL.DBF" "PCOTIZA.DBF" "PEDIDO.DBF" "PEDIDO1.DBF" "PEDIDO2.DBF" "PPEDIDO.DBF" "PPENDIE.DBF" "RESP_PIN.DBF" "R_BBVA.DBF" "R_KUSHKI.DBF" "SERCFD2.DBF" "STOCK.DBF" "SUCURCTAI.DBF" "TABLA004.DBF" "TABLA005.DBF" "TERCAJAS.DBF" "TLSERVI.DBF" "USUARIOS.DBF" "VACLI.DBF" "VALES.DBF" "VALPEN.DBF" "VCPENDI.DBF" "VENDEDOR.DBF" "VENTA.DBF" "VENTA.DBT" "VENTA.FPT" "VENTAPP.DBF" "VPPENDI.DBF" "XCORTE.DBF" /COPY:D /R:1 /W:1 /XO
+[2026-04-13 03:27:38] [DBG] Iniciando sync de archivo: CLIENTE.DBF
+[2026-04-13 03:27:38] [INFO] Cambio detectado en full check: CLIENTE.DBF
+[2026-04-13 03:27:38] [INFO] CLIENTE.DBF → /srv/qbck/tst/tst02/roton/CLIENTE.DBF [ MD5: A5NwGaolM0w ] — work: /tmp/ar/roton/CLIENTE.DBF — enviando 1/1 chunks
+[2026-04-13 03:27:38] [DBG] Upload chunk 0 OK
+[2026-04-13 03:27:38] [INFO] CLIENTE.DBF — sync completo (1 chunks enviados)
+[2026-04-13 03:28:07] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 03:28:07] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 03:28:07] [DBG] Directorio executable: .
+[2026-04-13 03:28:07] [DBG] Config loaded from: .\config.json
+[2026-04-13 03:28:07] [INFO] Locations loaded from config: 1
+[2026-04-13 03:28:07] [INFO] Sucursales configuradas: 1
+[2026-04-13 03:28:07] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 03:28:07] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 03:28:07] [DBG]   - roton en C:\gis\cliente1
+[2026-04-13 03:28:08] [INFO] [roton] fetchTimestamp resultado: 1776050886
+[2026-04-13 03:28:08] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-13 03:28:08] [INFO] [roton] Registrado OK
+[2026-04-13 03:28:08] [INFO] Lista sin cambios (94 archivos)
+[2026-04-13 03:28:08] [INFO] Full sync horario
+[2026-04-13 03:28:08] [DBG] Lista sin cambios
+[2026-04-13 03:28:08] [INFO] Ejecutando Robocopy: robocopy "C:\gis\cliente1" "C:\gis\cliente1\quickbck" "AJTFLU.DBF" "ASISTE.DBF" "CAJAS.DBF" "CANCFDI.DBF" "CANCFDI.FPT" "CANOTA.DBF" "CANOTA.DBT" "CANOTA.FPT" "CANOTAEX.DBF" "CARPORT.DBF" "CARPORT.FPT" "CASEMANA.DBF" "CATPROD3.DBF" "CAT_NEG.DBF" "CAT_PROD.DBF" "CCOTIZA.DBF" "CENTER.DBF" "CFDREL.DBF" "CG3_VAEN.DBF" "CG3_VAPA.DBF" "CLIENTE.DBF" "COBRANZA.DBF" "COMPRAS.DBF" "CONCXC.DBF" "CONVTODO.DBF" "CPEDIDO.DBF" "CPENDIE.DBF" "CPXCORTE.DBF" "CRMC_OBS.DBF" "CUENGAS.DBF" "CUNOTA.DBF" "DD_CONTROL.DBF" "DD_DATOS.DBF" "DESEMANA.DBF" "ES_COBRO.DBF" "EYSIENC.DBF" "EYSIPAR.DBF" "FACCFD.DBF" "FACCFD.FPT" "FLUJO01.DBF" "FLUJORES.DBF" "HISTORIA.DBF" "INVFSIC.DBF" "MASTER.DBF" "MINTINV.DBF" "MOVCXCD.DBF" "MOVSINV.DBF" "M_CONF.DBF" "NEGADOS.DBF" "NOESTA.DBF" "NOHAY.DBF" "N_CONF.DBF" "N_RESP.DBF" "N_RESP.DBT" "N_RESP_M.DBF" "N_RESP_M.DBT" "OBSDOCS.DBF" "PAGDOCS.DBF" "PAGMULT.DBF" "PAGSPEI.DBF" "PARAMS.DBF" "PARTCOMP.DBF" "PARTCOT.DBF" "PARVALES.DBF" "PARXCAR.DBF" "PAVACL.DBF" "PCOTIZA.DBF" "PEDIDO.DBF" "PEDIDO1.DBF" "PEDIDO2.DBF" "PPEDIDO.DBF" "PPENDIE.DBF" "RESP_PIN.DBF" "R_BBVA.DBF" "R_KUSHKI.DBF" "SERCFD2.DBF" "STOCK.DBF" "SUCURCTAI.DBF" "TABLA004.DBF" "TABLA005.DBF" "TERCAJAS.DBF" "TLSERVI.DBF" "USUARIOS.DBF" "VACLI.DBF" "VALES.DBF" "VALPEN.DBF" "VCPENDI.DBF" "VENDEDOR.DBF" "VENTA.DBF" "VENTA.DBT" "VENTA.FPT" "VENTAPP.DBF" "VPPENDI.DBF" "XCORTE.DBF" /COPY:D /R:1 /W:1 /XO
+[2026-04-13 03:28:08] [DBG] Iniciando sync de archivo: CLIENTE.DBF
+[2026-04-13 03:28:08] [INFO] Cambio detectado en full check: CLIENTE.DBF
+[2026-04-13 03:28:09] [INFO] CLIENTE.DBF → /srv/qbck/tst/tst02/roton/CLIENTE.DBF [ MD5: A5NwGaolM0w ] — work: /tmp/ar/roton/CLIENTE.DBF — enviando 1/1 chunks
+[2026-04-13 03:28:09] [DBG] Upload chunk 0 OK
+[2026-04-13 03:28:09] [INFO] CLIENTE.DBF — sync completo (1 chunks enviados)
+[2026-04-13 03:28:13] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 03:28:13] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 03:28:13] [DBG] Directorio executable: .
+[2026-04-13 03:28:13] [DBG] Config loaded from: .\config.json
+[2026-04-13 03:28:13] [INFO] Locations loaded from config: 1
+[2026-04-13 03:28:13] [INFO] Sucursales configuradas: 1
+[2026-04-13 03:28:13] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 03:28:13] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 03:28:13] [DBG]   - roton en C:\gis\cliente1
+[2026-04-13 03:28:14] [INFO] [roton] fetchTimestamp resultado: 1776050892
+[2026-04-13 03:28:14] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-13 03:28:14] [INFO] [roton] Registrado OK
+[2026-04-13 03:28:14] [INFO] Lista sin cambios (94 archivos)
+[2026-04-13 03:28:14] [INFO] Full sync horario
+[2026-04-13 03:28:14] [DBG] Lista sin cambios
+[2026-04-13 03:28:14] [INFO] Ejecutando Robocopy: robocopy "C:\gis\cliente1" "C:\gis\cliente1\quickbck" "AJTFLU.DBF" "ASISTE.DBF" "CAJAS.DBF" "CANCFDI.DBF" "CANCFDI.FPT" "CANOTA.DBF" "CANOTA.DBT" "CANOTA.FPT" "CANOTAEX.DBF" "CARPORT.DBF" "CARPORT.FPT" "CASEMANA.DBF" "CATPROD3.DBF" "CAT_NEG.DBF" "CAT_PROD.DBF" "CCOTIZA.DBF" "CENTER.DBF" "CFDREL.DBF" "CG3_VAEN.DBF" "CG3_VAPA.DBF" "CLIENTE.DBF" "COBRANZA.DBF" "COMPRAS.DBF" "CONCXC.DBF" "CONVTODO.DBF" "CPEDIDO.DBF" "CPENDIE.DBF" "CPXCORTE.DBF" "CRMC_OBS.DBF" "CUENGAS.DBF" "CUNOTA.DBF" "DD_CONTROL.DBF" "DD_DATOS.DBF" "DESEMANA.DBF" "ES_COBRO.DBF" "EYSIENC.DBF" "EYSIPAR.DBF" "FACCFD.DBF" "FACCFD.FPT" "FLUJO01.DBF" "FLUJORES.DBF" "HISTORIA.DBF" "INVFSIC.DBF" "MASTER.DBF" "MINTINV.DBF" "MOVCXCD.DBF" "MOVSINV.DBF" "M_CONF.DBF" "NEGADOS.DBF" "NOESTA.DBF" "NOHAY.DBF" "N_CONF.DBF" "N_RESP.DBF" "N_RESP.DBT" "N_RESP_M.DBF" "N_RESP_M.DBT" "OBSDOCS.DBF" "PAGDOCS.DBF" "PAGMULT.DBF" "PAGSPEI.DBF" "PARAMS.DBF" "PARTCOMP.DBF" "PARTCOT.DBF" "PARVALES.DBF" "PARXCAR.DBF" "PAVACL.DBF" "PCOTIZA.DBF" "PEDIDO.DBF" "PEDIDO1.DBF" "PEDIDO2.DBF" "PPEDIDO.DBF" "PPENDIE.DBF" "RESP_PIN.DBF" "R_BBVA.DBF" "R_KUSHKI.DBF" "SERCFD2.DBF" "STOCK.DBF" "SUCURCTAI.DBF" "TABLA004.DBF" "TABLA005.DBF" "TERCAJAS.DBF" "TLSERVI.DBF" "USUARIOS.DBF" "VACLI.DBF" "VALES.DBF" "VALPEN.DBF" "VCPENDI.DBF" "VENDEDOR.DBF" "VENTA.DBF" "VENTA.DBT" "VENTA.FPT" "VENTAPP.DBF" "VPPENDI.DBF" "XCORTE.DBF" /COPY:D /R:1 /W:1 /XO
+[2026-04-13 03:28:14] [DBG] Iniciando sync de archivo: CLIENTE.DBF
+[2026-04-13 03:28:14] [INFO] Cambio detectado en full check: CLIENTE.DBF
+[2026-04-13 03:28:14] [INFO] CLIENTE.DBF → /srv/qbck/tst/tst02/roton/CLIENTE.DBF [ MD5: A5NwGaolM0w ] — work: /tmp/ar/roton/CLIENTE.DBF — enviando 1/1 chunks
+[2026-04-13 03:28:15] [DBG] Upload chunk 0 OK
+[2026-04-13 03:28:15] [INFO] CLIENTE.DBF — sync completo (1 chunks enviados)
+[2026-04-13 03:54:45] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 03:54:45] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 03:54:45] [DBG] Directorio executable: .
+[2026-04-13 03:54:45] [DBG] Config loaded from: .\config.json
+[2026-04-13 03:54:45] [INFO] Locations loaded from config: 1
+[2026-04-13 03:54:45] [INFO] Sucursales configuradas: 1
+[2026-04-13 03:54:45] [INFO]   [roton] C:\gis\cliente1
+[2026-04-13 03:54:45] [INFO] Registrando 1 ubicaciones...
+[2026-04-13 03:54:45] [DBG]   - roton en C:\gis\cliente1
+[2026-04-13 03:54:45] [INFO] [roton] fetchTimestamp resultado: 0
+[2026-04-13 03:54:45] [INFO] Full sync horario
+[2026-04-13 03:54:45] [ERR] generateTotp fallo: No timestamp. Saltando fetchFileList.
+[2026-04-13 03:54:45] [DBG] Iniciando ciclo de poll...
+[2026-04-13 03:54:45] [INFO] Ejecutando Robocopy: robocopy "C:\gis\cliente1" "C:\gis\cliente1\quickbck" "AJTFLU.DBF" "ASISTE.DBF" "CAJAS.DBF" "CANCFDI.DBF" "CANCFDI.FPT" "CANOTA.DBF" "CANOTA.DBT" "CANOTA.FPT" "CANOTAEX.DBF" "CARPORT.DBF" "CARPORT.FPT" "CASEMANA.DBF" "CATPROD3.DBF" "CAT_NEG.DBF" "CAT_PROD.DBF" "CCOTIZA.DBF" "CENTER.DBF" "CFDREL.DBF" "CG3_VAEN.DBF" "CG3_VAPA.DBF" "CLIENTE.DBF" "COBRANZA.DBF" "COMPRAS.DBF" "CONCXC.DBF" "CONVTODO.DBF" "CPEDIDO.DBF" "CPENDIE.DBF" "CPXCORTE.DBF" "CRMC_OBS.DBF" "CUENGAS.DBF" "CUNOTA.DBF" "DD_CONTROL.DBF" "DD_DATOS.DBF" "DESEMANA.DBF" "ES_COBRO.DBF" "EYSIENC.DBF" "EYSIPAR.DBF" "FACCFD.DBF" "FACCFD.FPT" "FLUJO01.DBF" "FLUJORES.DBF" "HISTORIA.DBF" "INVFSIC.DBF" "MASTER.DBF" "MINTINV.DBF" "MOVCXCD.DBF" "MOVSINV.DBF" "M_CONF.DBF" "NEGADOS.DBF" "NOESTA.DBF" "NOHAY.DBF" "N_CONF.DBF" "N_RESP.DBF" "N_RESP.DBT" "N_RESP_M.DBF" "N_RESP_M.DBT" "OBSDOCS.DBF" "PAGDOCS.DBF" "PAGMULT.DBF" "PAGSPEI.DBF" "PARAMS.DBF" "PARTCOMP.DBF" "PARTCOT.DBF" "PARVALES.DBF" "PARXCAR.DBF" "PAVACL.DBF" "PCOTIZA.DBF" "PEDIDO.DBF" "PEDIDO1.DBF" "PEDIDO2.DBF" "PPEDIDO.DBF" "PPENDIE.DBF" "RESP_PIN.DBF" "R_BBVA.DBF" "R_KUSHKI.DBF" "SERCFD2.DBF" "STOCK.DBF" "SUCURCTAI.DBF" "TABLA004.DBF" "TABLA005.DBF" "TERCAJAS.DBF" "TLSERVI.DBF" "USUARIOS.DBF" "VACLI.DBF" "VALES.DBF" "VALPEN.DBF" "VCPENDI.DBF" "VENDEDOR.DBF" "VENTA.DBF" "VENTA.DBT" "VENTA.FPT" "VENTAPP.DBF" "VPPENDI.DBF" "XCORTE.DBF" /COPY:D /R:1 /W:1 /XO
+[2026-04-13 03:54:45] [INFO] Cambio detectado en archivo: CLIENTE.DBF
+[2026-04-13 03:54:45] [ERR] generateTotp fallo: No timestamp. No se puede continuar sin timestamp.
+[2026-04-13 03:54:45] [ERR] Sync CLIENTE.DBF fallo
+[2026-04-13 03:54:45] [INFO] Cambio detectado en archivo: PARAMS.DBF
+[2026-04-13 03:54:46] [ERR] generateTotp fallo: No timestamp. No se puede continuar sin timestamp.
+[2026-04-13 03:54:46] [ERR] Sync PARAMS.DBF fallo
+[2026-04-13 03:54:46] [INFO] Cambio detectado en archivo: PEDIDO.DBF
+[2026-04-13 03:54:46] [ERR] generateTotp fallo: No timestamp. No se puede continuar sin timestamp.
+[2026-04-13 03:54:46] [ERR] Sync PEDIDO.DBF fallo
+[2026-04-13 03:54:46] [INFO] Cambio detectado en archivo: VENTA.DBF
+[2026-04-13 03:54:46] [ERR] generateTotp fallo: No timestamp. No se puede continuar sin timestamp.
+[2026-04-13 03:54:46] [ERR] Sync VENTA.DBF fallo
+[2026-04-13 21:59:59] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 21:59:59] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 21:59:59] [DBG] Directorio executable: .
+[2026-04-13 21:59:59] [INFO] Locations loaded from config: 0
+[2026-04-13 21:59:59] [ERR] No se encontraron sucursales. Verifique que PVSI esté instalado o cree config.json manualmente.
+[2026-04-13 22:00:05] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 22:00:05] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 22:00:05] [DBG] Directorio executable: .
+[2026-04-13 22:00:05] [INFO] Locations loaded from config: 0
+[2026-04-13 22:00:05] [ERR] No se encontraron sucursales. Verifique que PVSI esté instalado o cree config.json manualmente.
+[2026-04-13 22:25:22] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 22:25:22] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 22:25:22] [DBG] Directorio executable: .
+[2026-04-13 22:25:22] [INFO] Locations loaded from config: 0
+[2026-04-13 22:25:22] [ERR] No se encontraron sucursales. Verifique que PVSI esté instalado o cree config.json manualmente.
+[2026-04-13 22:44:43] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 22:44:43] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 22:44:43] [DBG] Directorio executable: .
+[2026-04-13 22:44:43] [INFO] Locations loaded from config: 0
+[2026-04-13 22:44:43] [ERR] No se encontraron sucursales. Verifique que PVSI esté instalado o cree config.json manualmente.
+[2026-04-13 22:46:03] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-13 22:46:03] [INFO] Servidor: http://sync.servicios.care
+[2026-04-13 22:46:03] [DBG] Directorio executable: .
+[2026-04-13 22:46:03] [INFO] Locations loaded from config: 0
+[2026-04-13 22:46:03] [ERR] No se encontraron sucursales. Verifique que PVSI esté instalado o cree config.json manualmente.
