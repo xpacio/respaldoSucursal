@@ -1,22 +1,18 @@
 # respaldoSucursal
 
-## Backup API compartida
+## Arquitectura simplificada
 
-Se agregó un módulo de backup compartido bajo `shared/Backup/` para procesar sesiones de backup y recibir chunks de archivos.
+Este proyecto ha sido refactorizado para enfocarse únicamente en las funcionalidades de backup y sincronización AR. El entrypoint `index.php` y el router han sido simplificados para eliminar lógica legacy de UI y autenticación.
 
-### Endpoints
+### Endpoints disponibles
 
-- `POST /backup/init`
-  - Request body: `filename`, `file_hash`.
-  - Response: `{ "session_id": "...", "status": "ready" }`
+- `GET /` o `GET /health` - Health check básico
+- `POST /ar/*` - Endpoints de sincronización AR (registro, config, sync, upload, etc.)
+- `POST /backup/*` - Endpoints de backup (init, chunk)
+- `POST /heartbeat` - Endpoint de heartbeat
+- `POST /client/*`, `POST /job/*`, `POST /public/*` - Endpoints atómicos
 
-- `POST /backup/chunk`
-  - Request body: `session_id`, `file_hash`, `chunk_index`, `chunk_hash`, `data`, `is_last`
-  - Response: `{ "verified": true, "chunk_index": 0 }` o `{ "verified": true, "finalized": true, "message": "Backup completed" }`
-
-### Prueba rápida
-
-Desde la raíz del proyecto:
+### Pruebas
 
 ```bash
 php shared/Backup/test_backup_flow.php
@@ -25,6 +21,7 @@ php test_ar_registration_flow.php
 
 ### Notas
 
-- El repositorio de backup usa directorios temporales bajo `sys_get_temp_dir()`.
-- El nuevo endpoint se registra en el router estándar como `/backup/init` y `/backup/chunk`.
+- El proyecto usa solo las rutas API esenciales sin UI heredada.
+- La configuración de base de datos se mantiene en `shared/Config/config.php`.
+- El autoloader carga clases bajo demanda desde `shared/autoload.php`.
 

@@ -11,37 +11,16 @@ class Router {
     // Dependencias globales (accesibles desde handlers)
     public $db;
     public $logger;
-    public $system;
-    public $clientService;
-    public $userService;
-    public $sshService;
-    public $mountService;
-    public $overlaySyncService;
-    public $adminService;
-    public $clientManager;
     public $testResponse;
 
     // Mapeo: primer segmento de URL → archivo de handler
     private array $resourceMap = [
         'ar'          => 'ar',
         'backup'      => 'backup',
-        'clientes'   => 'clientes',
-        'cliente'    => 'clientes',
-        'plantillas' => 'plantillas',
-        'plantilla'  => 'plantillas',
-        'logs'       => 'logs',
-        'log'        => 'logs',
-        'admin'      => 'admin',
-        'permisos'   => 'permisos',
-        'agente'     => 'agente',
-        'sheditor'   => 'sheditor',
-        'sh'         => 'sheditor',
-        'distribucion' => 'distribucion',
-        'root'       => 'root',
-        'client'     => 'atomic',
-        'job'        => 'atomic',
-        'public'     => 'atomic',
-        'heartbeat'  => 'heartbeat',
+        'client'      => 'atomic',
+        'job'         => 'atomic',
+        'public'      => 'atomic',
+        'heartbeat'   => 'heartbeat',
     ];
 
     private function __construct() {}
@@ -53,16 +32,9 @@ class Router {
         return self::$instance;
     }
 
-    public function setDependencies($db, $logger, $system, $clientService, $userService, $sshService, $mountService, $overlaySyncService, $adminService = null) {
+    public function setDependencies($db, $logger = null) {
         $this->db = $db;
         $this->logger = $logger;
-        $this->system = $system;
-        $this->clientService = $clientService;
-        $this->userService = $userService;
-        $this->sshService = $sshService;
-        $this->mountService = $mountService;
-        $this->overlaySyncService = $overlaySyncService;
-        $this->adminService = $adminService;
     }
 
     /**
