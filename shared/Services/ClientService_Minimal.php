@@ -10,8 +10,8 @@ class ClientService implements ClientServiceInterface {
     private SystemInterface $system;
 
     public function __construct(
-        Database $db, 
-        Logger $logger, 
+        Database $db,
+        Logger $logger,
         SystemInterface $system,
         ...$args // Accept additional args for backward compatibility
     ) {
@@ -54,7 +54,7 @@ class ClientService implements ClientServiceInterface {
         return ['ok' => false, 'error' => 'Not implemented'];
     }
 
-    public function delete(string $clientId): array {
+    public function delete(string $clientId, bool $hard = false): array {
         return ['ok' => false, 'error' => 'Not implemented'];
     }
 

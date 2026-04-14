@@ -19,10 +19,12 @@ class Router {
     public $overlaySyncService;
     public $adminService;
     public $clientManager;
+    public $testResponse;
 
     // Mapeo: primer segmento de URL → archivo de handler
     private array $resourceMap = [
         'ar'          => 'ar',
+        'backup'      => 'backup',
         'clientes'   => 'clientes',
         'cliente'    => 'clientes',
         'plantillas' => 'plantillas',
@@ -114,6 +116,11 @@ class Router {
      * Respuesta JSON estándar
      */
     public function jsonResponse(array $data, int $code = 200): void {
+        if (defined('TEST_MODE') && TEST_MODE) {
+            $this->testResponse = ['data' => $data, 'code' => $code];
+            return;
+        }
+
         if ($this->logger) {
             if ($this->logger->hasContext()) {
                 $this->logger->exitContext();

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once '/srv/app/www/sync/TotpValidator.php';
+require_once __DIR__ . '/../../../../shared/TotpValidator.php';
 
 class AuthService {
     private $db;

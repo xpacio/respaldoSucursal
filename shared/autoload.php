@@ -5,13 +5,30 @@
  * Mapea nombres de clase a archivos automáticamente.
  */
 spl_autoload_register(function (string $class) {
+    $className = ltrim($class, '\\');
+    $shortName = basename(str_replace('\\', '/', $className));
+
     // Mapeo explícito: clase → archivo (cuando el nombre no coincide)
     $fileMap = [
         'System' => 'Services/System.php',
+        'BackupCommandInterface' => 'Backup/BackupCommandInterface.php',
+        'ChunkDTO' => 'Backup/ChunkDTO.php',
+        'BackupSessionRepositoryInterface' => 'Backup/BackupSessionRepositoryInterface.php',
+        'ProcessChunkCommand' => 'Backup/ProcessChunkCommand.php',
+        'BackupApiController' => 'Backup/BackupApiController.php',
+        'FileSystemBackupRepository' => 'Backup/FileSystemBackupRepository.php',
     ];
     
-    if (isset($fileMap[$class])) {
-        $file = __DIR__ . '/' . $fileMap[$class];
+    if (isset($fileMap[$className])) {
+        $file = __DIR__ . '/' . $fileMap[$className];
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
+
+    if (isset($fileMap[$shortName])) {
+        $file = __DIR__ . '/' . $fileMap[$shortName];
         if (file_exists($file)) {
             require_once $file;
             return;
@@ -21,7 +38,7 @@ spl_autoload_register(function (string $class) {
     // Búsqueda en directorios
     $dirs = ['Config', 'Services', 'Repositories'];
     foreach ($dirs as $dir) {
-        $file = __DIR__ . "/{$dir}/{$class}.php";
+        $file = __DIR__ . "/{$dir}/{$shortName}.php";
         if (file_exists($file)) {
             require_once $file;
             return;
