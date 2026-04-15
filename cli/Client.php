@@ -728,7 +728,8 @@ class Client
                 $destPath = '';
                 $md5Hash = '';
                 foreach ($response->needs_upload as $t) {
-                    $totalChunks += count($t->chunks);
+                    $chunkIdx = $t->chunk ?? $t->chunks[0] ?? 0;
+                    $totalChunks = is_array($t->chunks ?? null) ? count($t->chunks) : 1;
                     $workPath = $t->work_path ?? '';
                     $destPath = $t->dest_path ?? '';
                     $md5Hash = $t->md5 ?? '';
@@ -802,7 +803,8 @@ class Client
         }
 
         foreach ($response->needs_upload as $target) {
-            foreach ($target->chunks as $chunkIdx) {
+            $chunkIndices = $target->chunks ?? [$target->chunk ?? 0];
+            foreach ($chunkIndices as $chunkIdx) {
                 $offset = $chunkIdx * $chunkSize;
                 $size = min($chunkSize, $fileSize - $offset);
 
@@ -831,8 +833,7 @@ class Client
                         $delayMs = max($uploadResult->next_delay, $response->rate_delay);
                         if ($delayMs > 0) {
                             usleep($delayMs * 1000);
-            }
-            die("Sincronización finalizada después del primer archivo.");
+                        }
                     }
                 } catch (Exception $e) {
                     Logger::warn("Upload chunk $chunkIdx fallo: {$e->getMessage()}");

@@ -424,18 +424,23 @@ function route_ar_sync(Router $r, array $body): void {
                     'dest_path' => $destPath,
                     'md5' => $hashCompleto
                 ];
+                error_log("AR sync: $filename necesita upload chunk {$nextChunk['chunk_index']}");
+            } else {
+                error_log("AR sync: $filename no necesita upload (ya existe o completo)");
             }
         }
     }
 
-    $r->jsonResponse([
+    $response = [
         'ok' => true,
         'sync_id' => $syncId,
         'needs_upload' => $needsUpload,
         'rate_delay' => $rateDelay,
         'slots_used' => $slots['used'],
         'slots_available' => $slots['available']
-    ]);
+    ];
+    error_log("AR sync response: " . json_encode($response));
+    $r->jsonResponse($response);
     } catch (Exception $e) {
         error_log("AR sync error: " . $e->getMessage());
         $r->jsonResponse(['ok' => false, 'error' => 'Error interno: ' . $e->getMessage()], 500);
