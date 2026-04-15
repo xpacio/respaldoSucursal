@@ -754,11 +754,8 @@ class Client
 
     private function hashFile(string $path): string
     {
-        $content = file_get_contents($path);
-        if ($content === false) {
-            throw new Exception("Cannot read file: $path");
-        }
-        return Hash::compute($content)->getHex();
+        require_once __DIR__ . '/../shared/Utilities/StreamHasher.php';
+        return StreamHasher::hashFileEfficient($path, 'xxh3', 5242880);
     }
 
     private function hashChunks(string $path, int $fileSize, int $chunkSize): array

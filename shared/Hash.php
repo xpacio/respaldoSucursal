@@ -19,11 +19,9 @@ class Hash
 
     public static function computeFile(string $path): Hash
     {
-        $content = file_get_contents($path);
-        if ($content === false) {
-            throw new Exception("Cannot read file: $path");
-        }
-        return self::compute($content);
+        require_once __DIR__ . '/Utilities/StreamHasher.php';
+        $hashHex = StreamHasher::hashFileEfficient($path, 'xxh3', 5242880);
+        return new Hash($hashHex);
     }
 
     public function toBase64(): string

@@ -18,9 +18,8 @@ class SyncService {
     }
 
     public function hashFile(string $path): string {
-        $content = file_get_contents($path);
-        if ($content === false) throw new Exception("Cannot read: $path");
-        return Hash::compute($content)->getHex();
+        require_once __DIR__ . '/../Utilities/StreamHasher.php';
+        return StreamHasher::hashFileEfficient($path, 'xxh3', 5242880);
     }
 
     public function syncFile(string $serverUrl, Location $loc, string $filename, string $workFile, bool $forced): bool {
