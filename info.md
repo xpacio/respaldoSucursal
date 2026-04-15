@@ -325,3 +325,50 @@ $config = [
     └── rbf/
         └── rbf.ini   ← contiene _suc=roton
 ```
+
+## Refactorización de ja.php
+
+El archivo `ja.php` contenía código experimental que ha sido refactorizado e integrado en el proyecto:
+
+### 1. Algoritmo dinámico de cálculo de chunk size
+
+- **Original**: `calculateChunkSizejA()` en `ja.php`
+- **Refactorizado**: `Chunk::calculateChunkSizeDynamic()` en `cli/Chunk.php`
+- **Mejoras**:
+  - Usa las constantes del proyecto (`CHUNK_MIN_SIZE`, `CHUNK_MAX_SIZE`, `CHUNK_ALIGNMENT`)
+  - Incluye `declare(strict_types=1)`
+  - Alineación a `CHUNK_ALIGNMENT` (4096 bytes)
+  - Algoritmo logarítmico: `targetBlocks = 50 + log2(fileSizeMB) * 50`
+
+```php
+// Uso
+$chunkSize = Chunk::calculateChunkSizeDynamic($fileSize);
+```
+
+### 2. Stream hashing con almacenamiento temporal
+
+- **Original**: `StreamInputTrait` en `ja.php`
+- **Refactorizado**: `StreamHasher` en `shared/Utilities/StreamHasher.php`
+- **Mejoras**:
+  - Clase con métodos estáticos (sin estado)
+  - Manejo de errores con excepciones
+  - Soporte para múltiples algoritmos de hash (`md5`, `xxh3`, etc.)
+  - Métodos separados: `hashInput()`, `hashInputWithStream()`, `hashFile()`
+  - Tipado estricto y documentación PHPDoc
+
+```php
+// Ejemplos
+$hash = StreamHasher::hashInput('md5');
+$result = StreamHasher::hashInputWithStream('xxh3', 131072, 1572864);
+$fileHash = StreamHasher::hashFile('/path/to/file', 'xxh3');
+```
+
+### 3. Compatibilidad hacia atrás
+
+El archivo `ja.php` mantiene versiones deprecated de las funciones que redirigen a las nuevas implementaciones, mostrando warnings de deprecación para facilitar la transición.
+
+### 4. Estructura de directorios
+
+- `shared/Utilities/` – Nueva ubicación para utilidades reutilizables
+- `cli/Chunk.php` – Extendido con el algoritmo dinámico
+- `ja.php` – Marcado como deprecated (se puede eliminar en futuras versiones)

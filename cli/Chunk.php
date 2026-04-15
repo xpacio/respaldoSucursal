@@ -31,6 +31,18 @@ class Chunk
         return self::MAX_CHUNK;
     }
 
+    public static function calculateChunkSizeDynamic(int $fileSize): int
+    {
+        if ($fileSize <= self::MIN_CHUNK) {
+            return $fileSize;
+        }
+        $fileSizeMB = $fileSize / (1024 * 1024);
+        $targetBlocks = 50.0 + (log(max(1.0, $fileSizeMB), 2) * 50.0);
+        $chunkSize = $fileSize / $targetBlocks;
+        $chunkSize = max(self::MIN_CHUNK, min(self::MAX_CHUNK, $chunkSize));
+        return (int)(ceil($chunkSize / self::ALIGNMENT) * self::ALIGNMENT);
+    }
+
     public static function calculateChunkCount(int $fileSize): int
     {
         $chunkSize = self::calculateChunkSize($fileSize);

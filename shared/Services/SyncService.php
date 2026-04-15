@@ -71,7 +71,8 @@ class SyncService {
         $totp = $this->regService->generateTotp($loc->rbfid, $timestamp);
 
         foreach ($response->needs_upload as $target) {
-            foreach ($target->chunks as $chunkIdx) {
+            $chunkIndices = $target->chunks ?? [$target->chunk ?? 0];
+            foreach ($chunkIndices as $chunkIdx) {
                 $offset = $chunkIdx * $chunkSize;
                 $size = min($chunkSize, $fileSize - $offset);
 
