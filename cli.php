@@ -78,7 +78,6 @@ function main(array $argv): void
     Logger::init($logDir, $verbose);
     Logger::info("AR - Agente de Respaldo v" . VERSION);
     Logger::info("Servidor: " . Constants::DEFAULT_SERVER_URL);
-    Logger::debug("Directorio executable: $exeDir");
 
     if ($customServer !== null) {
         Config::getInstance()->server_url = $customServer;
@@ -96,7 +95,6 @@ function main(array $argv): void
             
             if ($data !== null && isset($data['server_url'])) {
                 $client->setServerUrl($data['server_url']);
-                Logger::info("Servidor: " . $data['server_url']);
             }
             
             if ($data !== null && isset($data['locations']) && is_array($data['locations'])) {
@@ -138,9 +136,6 @@ function main(array $argv): void
             $client->saveApiConfig($apiConfigPath, $firstLoc->rbfid, $firstLoc->base_path);
         }
 
-        // Guardar configuración
-        $client->saveConfig();
-
         try {
             $client->register();
         } catch (Exception $e) {
@@ -150,6 +145,8 @@ function main(array $argv): void
         if ($runOnce) {
             $client->fullHashCheck();
         } else {
+            $client->fullHashCheck();
+            $client->setLastFullSync(time());
             $client->runLoop();
         }
         

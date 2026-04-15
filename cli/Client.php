@@ -70,8 +70,6 @@ class Client
         foreach ($this->locations as $loc) {
             $this->createWorkDirectory($loc->work_path);
         }
-
-        Logger::info('Sucursales configuradas: ' . count($this->locations));
     }
 
 
@@ -415,26 +413,17 @@ class Client
         $pollInterval = Constants::POLL_INTERVAL_SECONDS;
         $fullCheckInterval = Constants::FULL_CHECK_INTERVAL_SECONDS;
 
-        Logger::info("Iniciando runLoop (poll={$pollInterval}s, fullCheck={$fullCheckInterval}s)");
-        
-        $this->fullHashCheck();
-        
-        Logger::info("Cache poblado con " . count($this->fileStateCache) . " archivos");
+        Logger::info("Iniciando modo espera (poll={$pollInterval}s, fullCheck={$fullCheckInterval}s)");
 
         while (true) {
-            Logger::debug("Loop iteration - checking files...");
             $now = time();
-            if ($now - $this->lastFullSync > $fullCheckInterval) {
-                Logger::info('Full sync horario');
+            if ($now - $this->lastFullSync >= $fullCheckInterval) {
+                Logger::info("Full sync — actualizando lista del servidor");
                 $this->lastFullSync = $now;
                 $this->fullHashCheck();
-                sleep($pollInterval);
-                continue;
             }
-
+            
             foreach ($this->locations as $loc) {
-                $changedFiles = 0;
-                
                 $this->copyToWork($loc);
 
                 foreach ($this->filesToWatch as $filename) {
@@ -446,34 +435,28 @@ class Client
 
                     $key = $this->hashPath($workFile);
                     $cached = $this->fileStateCache[$key] ?? null;
-                    
+
                     if ($cached !== null &&
                         $cached['mtime'] === $stat['mtime'] &&
                         $cached['size'] === $stat['size']) {
-                        Logger::debug("[{$loc->rbfid}] $filename — sin cambios (mtime={$stat['mtime']}, size={$stat['size']})");
                         continue;
                     }
 
-                    Logger::info("[{$loc->rbfid}] Evaluando $filename (mtime={$stat['mtime']}, size={$stat['size']})");
+                    Logger::info("[{$loc->rbfid}] Cambio detectado: $filename");
                     
                     if ($this->syncService->syncFile($this->serverUrl, $loc, $filename, $workFile, false)) {
                         $this->fileStateCache[$key] = [
                             'mtime' => $stat['mtime'],
                             'size' => $stat['size']
                         ];
-                        $changedFiles++;
                         Logger::info("[{$loc->rbfid}] $filename — sync OK");
                     } else {
                         Logger::err("[{$loc->rbfid}] $filename — sync fallo");
                     }
                 }
-                
-                if ($changedFiles === 0) {
-                    Logger::info("[{$loc->rbfid}] Sin cambios en " . count($this->filesToWatch) . " archivos");
-                }
             }
-            
-            Logger::info("Esperando $pollInterval segundos...");
+
+            Logger::info("Esperando {$pollInterval}s...");
             sleep($pollInterval);
         }
     }
@@ -562,11 +545,12 @@ class Client
             if (!empty($this->configPath)) {
                 $this->configService->saveLocations($this->configPath, $this->locations, $this->filesVersion, $this->filesToWatch);
             }
-            Logger::info("Lista actualizada: " . count($this->filesToWatch) . " archivos (v{$this->filesVersion})");
+            Logger::info("Lista del servidor: " . count($this->filesToWatch) . " archivos (v{$this->filesVersion})");
         }
 
         foreach ($this->locations as $loc) {
             $this->copyToWork($loc);
+            
             foreach ($this->filesToWatch as $filename) {
                 $workFile = $loc->work_path . $filename;
                 if (!file_exists($workFile)) continue;
@@ -574,12 +558,18 @@ class Client
                 $stat = stat($workFile);
                 if (!$stat) continue;
 
-                $key = $this->hashPath($workFile);
-                $this->fileStateCache[$key] = [
-                    'mtime' => $stat['mtime'],
-                    'size' => $stat['size']
-                ];
+                Logger::debug("[{$loc->rbfid}] Evaluando $filename (mtime={$stat['mtime']}, size={$stat['size']})");
+                
+                if ($this->syncService->syncFile($this->serverUrl, $loc, $filename, $workFile, true)) {
+                    $key = $this->hashPath($workFile);
+                    $this->fileStateCache[$key] = [
+                        'mtime' => $stat['mtime'],
+                        'size' => $stat['size']
+                    ];
+                }
             }
+            
+            Logger::info("[{$loc->rbfid}] Evaluados " . count($this->filesToWatch) . " archivos");
         }
         
         $this->isFirstSync = false;
@@ -881,6 +871,11 @@ class Client
     public function setConfigPath(string $path): void
     {
         $this->configPath = $path;
+    }
+
+    public function setLastFullSync(int $timestamp): void
+    {
+        $this->lastFullSync = $timestamp;
     }
 
     public function setFilesVersion(string $version): void

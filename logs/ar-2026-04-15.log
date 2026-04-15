@@ -486,3 +486,149 @@
 [2026-04-15 05:31:03] [INFO] Cache poblado con 4 archivos
 [2026-04-15 05:31:03] [DBG] Loop iteration - checking files...
 [2026-04-15 05:31:03] [INFO] Full sync horario
+[2026-04-15 05:31:54] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:31:54] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:31:54] [DBG] Directorio executable: .
+[2026-04-15 05:31:54] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:31:54] [INFO] Locations loaded from config: 1
+[2026-04-15 05:31:54] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:31:54] [INFO]   [roton] /srv/roton
+[2026-04-15 05:31:54] [DBG] Config saved to: ./config.json
+[2026-04-15 05:31:54] [INFO] Config guardado en: ./config.json
+[2026-04-15 05:31:54] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:31:54] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:31:54] [INFO] [roton] Registrado OK
+[2026-04-15 05:31:54] [INFO] Iniciando runLoop (poll=300s, fullCheck=3600s)
+[2026-04-15 05:31:54] [INFO] Cache poblado con 4 archivos
+[2026-04-15 05:31:54] [DBG] Loop iteration - checking files...
+[2026-04-15 05:31:54] [INFO] Full sync horario
+[2026-04-15 05:32:02] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:32:02] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:32:02] [DBG] Directorio executable: .
+[2026-04-15 05:32:02] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:32:02] [INFO] Locations loaded from config: 1
+[2026-04-15 05:32:02] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:32:02] [INFO]   [roton] /srv/roton
+[2026-04-15 05:32:02] [DBG] Config saved to: ./config.json
+[2026-04-15 05:32:02] [INFO] Config guardado en: ./config.json
+[2026-04-15 05:32:02] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:32:02] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:32:02] [INFO] [roton] Registrado OK
+[2026-04-15 05:32:02] [INFO] Iniciando runLoop (poll=300s, fullCheck=3600s)
+[2026-04-15 05:32:02] [INFO] Cache poblado con 4 archivos
+[2026-04-15 05:32:02] [DBG] Loop iteration - checking files...
+[2026-04-15 05:32:02] [INFO] Full sync horario
+[2026-04-15 05:32:09] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:32:09] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:32:09] [DBG] Directorio executable: .
+[2026-04-15 05:32:09] [DBG] Escaneando: /srv
+[2026-04-15 05:32:09] [INFO] Sucursal encontrada: roton en /srv/roton
+[2026-04-15 05:32:09] [DBG] Scan /srv completo: 1 sucursales
+[2026-04-15 05:32:09] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:32:09] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:32:09] [INFO]   [roton] /srv/roton
+[2026-04-15 05:32:09] [INFO] API config guardado en: ./config.json
+[2026-04-15 05:32:09] [DBG] Config saved to: ./config.json
+[2026-04-15 05:32:09] [INFO] Config guardado en: ./config.json
+[2026-04-15 05:32:09] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:32:09] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:32:09] [INFO] [roton] Registrado OK
+[2026-04-15 05:32:09] [INFO] Iniciando runLoop (poll=300s, fullCheck=3600s)
+[2026-04-15 05:32:09] [DBG] Config loaded from: ./config.json
+[2026-04-15 05:32:09] [DBG] Config saved to: ./config.json
+[2026-04-15 05:32:09] [INFO] Lista actualizada: 94 archivos (v726665cb)
+[2026-04-15 05:32:09] [INFO] Cache poblado con 4 archivos
+[2026-04-15 05:32:09] [DBG] Loop iteration - checking files...
+[2026-04-15 05:32:09] [INFO] Full sync horario
+[2026-04-15 05:36:16] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:36:16] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:36:16] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:36:16] [INFO] Locations loaded from config: 1
+[2026-04-15 05:36:16] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:36:16] [INFO]   [roton] /srv/roton
+[2026-04-15 05:36:16] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:36:16] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:36:16] [INFO] [roton] Registrado OK
+[2026-04-15 05:36:16] [INFO] Iniciando runLoop (poll=300s, fullCheck=3600s)
+[2026-04-15 05:36:16] [DBG] [roton] CANOTA.DBF — cacheado (mtime=1776231376, size=512000)
+[2026-04-15 05:36:16] [DBG] [roton] CAT_PROD.DBF — cacheado (mtime=1776231376, size=34)
+[2026-04-15 05:36:16] [DBG] [roton] MASTER.DBF — cacheado (mtime=1776231376, size=34)
+[2026-04-15 05:36:16] [DBG] [roton] XCORTE.DBF — cacheado (mtime=1776231376, size=204800)
+[2026-04-15 05:36:16] [INFO] [roton] Evaluados 4 archivos, sin cambios
+[2026-04-15 05:36:16] [INFO] Cache poblado con 4 archivos
+[2026-04-15 05:36:16] [DBG] Loop iteration - checking files...
+[2026-04-15 05:36:16] [INFO] Full sync horario
+[2026-04-15 05:36:16] [DBG] [roton] CANOTA.DBF — cacheado (mtime=1776231376, size=512000)
+[2026-04-15 05:36:16] [DBG] [roton] CAT_PROD.DBF — cacheado (mtime=1776231376, size=34)
+[2026-04-15 05:36:16] [DBG] [roton] MASTER.DBF — cacheado (mtime=1776231376, size=34)
+[2026-04-15 05:36:16] [DBG] [roton] XCORTE.DBF — cacheado (mtime=1776231376, size=204800)
+[2026-04-15 05:36:16] [INFO] [roton] Evaluados 4 archivos, sin cambios
+[2026-04-15 05:36:49] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:36:49] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:36:49] [INFO] Locations loaded from config: 1
+[2026-04-15 05:36:49] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:36:49] [INFO]   [roton] /srv/roton
+[2026-04-15 05:36:49] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:36:49] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:36:49] [INFO] [roton] Registrado OK
+[2026-04-15 05:36:49] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 05:36:49] [DBG] [roton] CANOTA.DBF — cacheado (mtime=1776231409, size=512000)
+[2026-04-15 05:36:49] [DBG] [roton] CAT_PROD.DBF — cacheado (mtime=1776231409, size=34)
+[2026-04-15 05:36:49] [DBG] [roton] MASTER.DBF — cacheado (mtime=1776231409, size=34)
+[2026-04-15 05:36:49] [DBG] [roton] XCORTE.DBF — cacheado (mtime=1776231409, size=204800)
+[2026-04-15 05:36:49] [INFO] [roton] Evaluados 4 archivos, sin cambios
+[2026-04-15 05:36:49] [INFO] Full sync — actualizando lista de archivos del servidor
+[2026-04-15 05:36:49] [DBG] [roton] CANOTA.DBF — cacheado (mtime=1776231409, size=512000)
+[2026-04-15 05:36:49] [DBG] [roton] CAT_PROD.DBF — cacheado (mtime=1776231409, size=34)
+[2026-04-15 05:36:49] [DBG] [roton] MASTER.DBF — cacheado (mtime=1776231409, size=34)
+[2026-04-15 05:36:49] [DBG] [roton] XCORTE.DBF — cacheado (mtime=1776231409, size=204800)
+[2026-04-15 05:36:49] [INFO] [roton] Evaluados 4 archivos, sin cambios
+[2026-04-15 05:36:49] [INFO] Esperando 300s...
+[2026-04-15 05:38:32] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:38:32] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:38:32] [INFO] Locations loaded from config: 1
+[2026-04-15 05:38:32] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:38:32] [INFO]   [roton] /srv/roton
+[2026-04-15 05:38:32] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:38:32] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:38:32] [INFO] [roton] Registrado OK
+[2026-04-15 05:38:32] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776231512, size=512000)
+[2026-04-15 05:38:32] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 05:38:32] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776231512, size=34)
+[2026-04-15 05:38:32] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 05:38:32] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776231512, size=34)
+[2026-04-15 05:38:32] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 05:38:32] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776231512, size=204800)
+[2026-04-15 05:38:32] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 05:38:32] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 05:38:32] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 05:38:32] [INFO] Full sync — actualizando lista del servidor
+[2026-04-15 05:38:32] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776231512, size=512000)
+[2026-04-15 05:38:32] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 05:38:32] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776231512, size=34)
+[2026-04-15 05:38:32] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 05:38:32] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776231512, size=34)
+[2026-04-15 05:38:32] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 05:38:32] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776231512, size=204800)
+[2026-04-15 05:38:32] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 05:38:32] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 05:38:32] [INFO] Esperando 300s...
+[2026-04-15 05:39:07] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:39:07] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:39:07] [INFO] Locations loaded from config: 1
+[2026-04-15 05:39:07] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:39:07] [INFO]   [roton] /srv/roton
+[2026-04-15 05:39:07] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:39:07] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:39:07] [INFO] [roton] Registrado OK
+[2026-04-15 05:39:07] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776231547, size=512000)
+[2026-04-15 05:39:07] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 05:39:07] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776231547, size=34)
+[2026-04-15 05:39:07] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 05:39:07] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776231547, size=34)
+[2026-04-15 05:39:07] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 05:39:07] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776231547, size=204800)
+[2026-04-15 05:39:07] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 05:39:07] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 05:39:07] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 05:39:07] [INFO] Esperando 300s...
