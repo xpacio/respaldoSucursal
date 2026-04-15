@@ -100,12 +100,19 @@ function main(array $argv): void
             }
             
             if ($data !== null && isset($data['locations']) && is_array($data['locations'])) {
+                $client->setConfigPath($apiConfigPath);
                 foreach ($data['locations'] as $locData) {
                     if (isset($locData['rbfid']) && isset($locData['base'])) {
                         $base = $locData['base'];
                         $work = $locData['work'] ?? ($base . DIRECTORY_SEPARATOR . 'quickbck' . DIRECTORY_SEPARATOR);
                         $client->locations[] = new Location($locData['rbfid'], $base, $work);
                     }
+                }
+                if (isset($data['files_version'])) {
+                    $client->setFilesVersion($data['files_version']);
+                }
+                if (isset($data['files']) && is_array($data['files'])) {
+                    $client->setFilesToWatch($data['files']);
                 }
                 Logger::info("Locations loaded from config: " . count($client->locations));
             } else {

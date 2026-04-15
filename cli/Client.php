@@ -846,6 +846,21 @@ class Client
         $this->syncService = new SyncService($this->http, $this->regService);
     }
 
+    public function setConfigPath(string $path): void
+    {
+        $this->configPath = $path;
+    }
+
+    public function setFilesVersion(string $version): void
+    {
+        $this->filesVersion = $version;
+    }
+
+    public function setFilesToWatch(array $files): void
+    {
+        $this->filesToWatch = $files;
+    }
+
     public function saveConfig(): void
     {
         if (empty($this->configPath)) {

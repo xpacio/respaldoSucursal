@@ -15,7 +15,7 @@ class Constants
     public const DEFAULT_RATE_DELAY_MS = 3000;
     public const FULL_SLOT_DELAY_MS = 10000;
 
-    public const DEFAULT_SERVER_URL = 'http://sync.servicios.care';
+    public const DEFAULT_SERVER_URL = 'http://respaldosucursal.servicios.care';
 
     public const POLL_INTERVAL_SECONDS = 300;
     public const STABILIZE_DELAY_MS = 2000;
