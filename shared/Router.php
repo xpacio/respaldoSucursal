@@ -49,13 +49,42 @@ class Router {
 
     /**
      * Dispatch por convención: /{resource} → route_{resource}()
+     * Si el path es raíz (/), usa la acción del body
      */
     public function dispatch(string $path): void {
         $segments = array_values(array_filter(explode('/', trim($path, '/'))));
         $resource = $segments[0] ?? null;
 
+        Logger::debug("Router.dispatch: path=$path, resource=$resource");
+
+        Logger::debug("Router.dispatch: path=$path, resource=$resource");
+
+        // Si es raíz, procesar acción del body directamente con ar.php
+        if (!$resource || $path === '/' || $path === '') {
+            Logger::debug('Router: raíz - procesar acción con ar handler');
+            $body = $this->getBody();
+            $action = $body['action'] ?? '';
+            
+            if (empty($action)) {
+                $this->jsonResponse(['ok' => true, 'status' => 'healthy']);
+                return;
+            }
+            
+            $file = __DIR__ . '/../api/routes/ar.php';
+            if (!file_exists($file)) {
+                Logger::err("Router: handler ar.php no encontrado");
+                $this->jsonResponse(['ok' => false, 'error' => 'Handler no encontrado', 'code' => 'HANDLER_MISSING'], 500);
+                return;
+            }
+            
+            require_once $file;
+            route_ar($this, '');
+            return;
+        }
+
         // Health check
-        if (!$resource) {
+        if ($resource === 'health') {
+            Logger::debug('Router: health check');
             $this->jsonResponse(['ok' => true, 'status' => 'healthy']);
             return;
         }
@@ -63,12 +92,14 @@ class Router {
         // Buscar handler por convención
         $handler = $this->resourceMap[$resource] ?? null;
         if (!$handler) {
+            Logger::warn("Router: recurso no existe: $resource");
             $this->jsonResponse(['ok' => false, 'error' => 'Recurso no existe: ' . $resource, 'code' => 'NOT_FOUND'], 404);
             return;
         }
 
-        $file = __DIR__ . "/routes/{$handler}.php";
+        $file = __DIR__ . "/../api/routes/{$handler}.php";
         if (!file_exists($file)) {
+            Logger::err("Router: handler no encontrado: $file");
             $this->jsonResponse(['ok' => false, 'error' => 'Handler no encontrado', 'code' => 'HANDLER_MISSING'], 500);
             return;
         }
@@ -77,9 +108,13 @@ class Router {
 
         $fn = "route_{$handler}";
         if (!function_exists($fn)) {
+            Logger::err("Router: función no definida: $fn");
             $this->jsonResponse(['ok' => false, 'error' => "Función route_{$handler} no definida", 'code' => 'HANDLER_INVALID'], 500);
             return;
         }
+
+        $body = $this->getBody();
+        Logger::debug("Router: body=" . json_encode($body));
 
         $fn($this, $resource);
     }
@@ -88,17 +123,13 @@ class Router {
      * Respuesta JSON estándar
      */
     public function jsonResponse(array $data, int $code = 200): void {
+        Logger::debug("Router.jsonResponse: code=$code, data=" . json_encode($data));
+
         if (defined('TEST_MODE') && TEST_MODE) {
             $this->testResponse = ['data' => $data, 'code' => $code];
             return;
         }
 
-        if ($this->logger) {
-            if ($this->logger->hasContext()) {
-                $this->logger->exitContext();
-            }
-            $this->logger->finish('success');
-        }
         http_response_code($code);
         header('Content-Type: application/json');
         echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

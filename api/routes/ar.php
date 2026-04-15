@@ -15,13 +15,17 @@ require_once __DIR__ . '/../../cli/Chunk.php';
 require_once __DIR__ . '/../ar/src/ArCore.php';
 
 function route_ar(Router $r, string $resource): void {
+    Logger::debug("route_ar: resource=$resource");
+    
     ArCore::getInstance($r);
     $body = $r->getBody();
     $action = $body['action'] ?? '';
     
-    if ($resource === '') {
+    if ($resource === '' || $resource === null) {
         $action = $action ?: ($body['action'] ?? 'sync');
     }
+
+    Logger::debug("route_ar: action=$action, body=" . json_encode($body));
 
     switch ($action) {
         case 'init':
@@ -72,8 +76,10 @@ function route_ar(Router $r, string $resource): void {
  */
 function route_ar_init(Router $r, array $body): void {
     $rbfid = $body['rbfid'] ?? '';
+    Logger::debug("route_ar_init: rbfid=$rbfid");
     
     if (empty($rbfid)) {
+        Logger::warn("route_ar_init: RBFID requerido");
         $r->jsonResponse(['ok' => false, 'error' => 'RBFID requerido', 'code' => 'MISSING_RBFID'], 400);
         return;
     }
@@ -81,6 +87,7 @@ function route_ar_init(Router $r, array $body): void {
     $client = $r->clientService->getClientStatus($rbfid);
     
     if (!$client) {
+        Logger::info("route_ar_init: nuevo cliente $rbfid, insertando...");
         $r->db->execute(
             "INSERT INTO ar_clients (rbfid, enabled, registered_at) VALUES (:rbfid, false, NOW())",
             [':rbfid' => $rbfid]
@@ -127,8 +134,10 @@ function route_ar_init(Router $r, array $body): void {
 
 function route_ar_register(Router $r, array $body): void {
     $rbfid = $body['rbfid'] ?? '';
+    Logger::debug("route_ar_register: rbfid=$rbfid");
 
     if (empty($rbfid)) {
+        Logger::warn("route_ar_register: RBFID requerido");
         $r->jsonResponse(['ok' => false, 'error' => 'RBFID requerido', 'code' => 'MISSING_RBFID'], 400);
         return;
     }
@@ -136,8 +145,10 @@ function route_ar_register(Router $r, array $body): void {
     try {
         $ar = ArCore::getInstance($r);
         $ar->client->registerClient($rbfid);
+        Logger::info("route_ar_register: success rbfid=$rbfid");
         $r->jsonResponse(['ok' => true, 'rbfid' => $rbfid]);
     } catch (Exception $e) {
+        Logger::err("route_ar_register: error " . $e->getMessage());
         $r->jsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
     }
 }
@@ -306,6 +317,7 @@ function route_ar_sync(Router $r, array $body): void {
     $rbfid = $body['rbfid'] ?? '';
     $timestamp = $body['timestamp'] ?? '';
     $files = $body['files'] ?? [];
+    Logger::debug("route_ar_sync: rbfid=$rbfid, files_count=" . count($files));
 
     try {
 
@@ -315,6 +327,7 @@ function route_ar_sync(Router $r, array $body): void {
     $clientTimestamp = $timestamp ?: ($_SERVER['HTTP_X_TIMESTAMP'] ?? '');
 
     if (empty($clientRbfid) || empty($tokenHeader)) {
+        Logger::warn("route_ar_sync: faltan datos de autenticacion");
         $r->jsonResponse(['ok' => false, 'error' => 'Faltan datos de autenticacion'], 401);
         return;
     }
@@ -324,12 +337,14 @@ function route_ar_sync(Router $r, array $body): void {
         $seed = substr($clientTimestamp, 0, -2);
         $expectedHash = xxh3_token($seed . $clientRbfid);
         if ($tokenHeader !== $expectedHash) {
+            Logger::warn("route_ar_sync: token invalido");
             $r->jsonResponse(['ok' => false, 'error' => 'Token invalido'], 401);
             return;
         }
     } else {
         $validation = validateTotp($r->db, $clientRbfid, $tokenHeader);
         if (!$validation['ok']) {
+            Logger::warn("route_ar_sync: validateTotp failed");
             $r->jsonResponse($validation, 401);
             return;
         }
@@ -337,11 +352,13 @@ function route_ar_sync(Router $r, array $body): void {
 
     $slots = getArSlots($r->db);
     $rateDelay = $slots['available'] > 0 ? 3000 : 10000;
+    Logger::debug("route_ar_sync: slots used={$slots['used']} available={$slots['available']}");
 
     $syncId = $r->db->insert(
         "INSERT INTO ar_sync_history (rbfid, status, started_at) VALUES (:rbfid, 'pending', NOW())",
         [':rbfid' => $clientRbfid]
     );
+    Logger::debug("route_ar_sync: sync_id=$syncId");
 
     // Obtener datos del cliente para ruta de destino
     $clientData = getClientArPath($r->db, $clientRbfid);
@@ -438,28 +455,34 @@ function route_ar_upload(Router $r, array $body): void {
     $hashXxh3   = $body['hash_xxh3']   ?? '';
     $data       = $body['data']        ?? '';
 
+    Logger::debug("route_ar_upload: rbfid=$rbfid filename=$filename chunk=$chunkIndex");
+
     $validation = $core->auth->validate($rbfid, $totpToken);
-    $core->log("AR upload: rbfid=$rbfid filename=$filename chunk=$chunkIndex");
     if (!$validation['ok']) {
+        Logger::warn("route_ar_upload: auth failed for $rbfid");
         $r->jsonResponse($validation, 401);
         return;
     }
 
     if (empty($filename) || empty($hashXxh3) || empty($data)) {
+        Logger::warn("route_ar_upload: campos requeridos faltantes");
         $r->jsonResponse(['ok' => false, 'error' => 'Faltan campos requeridos'], 400);
         return;
     }
 
     $clientData = getClientArPath($r->db, $rbfid);
     if (!$clientData) {
+        Logger::warn("route_ar_upload: cliente no encontrado: $rbfid");
         $r->jsonResponse(['ok' => false, 'error' => 'Cliente no encontrado'], 404);
         return;
     }
 
     try {
         $result = $core->upload->handle($rbfid, $filename, $chunkIndex, $hashXxh3, $data, $clientData);
+        Logger::info("route_ar_upload: success rbfid=$rbfid file=$filename chunk=$chunkIndex");
         $r->jsonResponse(['ok' => true, 'file' => $filename, 'chunk' => $chunkIndex, ...$result]);
     } catch (Exception $e) {
+        Logger::err("route_ar_upload: error " . $e->getMessage());
         $r->jsonResponse(['ok' => false, 'error' => $e->getMessage()], 400);
     }
 }

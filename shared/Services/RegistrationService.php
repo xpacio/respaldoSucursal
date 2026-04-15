@@ -15,7 +15,7 @@ class RegistrationService {
     }
 
     public function fetchTimestamp(string $rbfid): int {
-        $url = $this->serverUrl . '/api/ar';
+        $url = rtrim($this->serverUrl, '/');
         $body = json_encode(['action' => 'init', 'rbfid' => $rbfid]);
         
         $ch = curl_init();

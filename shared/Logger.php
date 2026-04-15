@@ -9,6 +9,7 @@ class Logger
     private static ?string $currentDate = null;
     private static $handle = null;
     private static bool $verbose = true;
+    private static bool $quiet = false;
 
     public static function init(string $logDir, bool $verbose = true): void
     {
@@ -19,6 +20,11 @@ class Logger
         if (!is_dir(self::$logDir)) {
             mkdir(self::$logDir, 0755, true);
         }
+    }
+
+    public static function setQuiet(bool $quiet): void
+    {
+        self::$quiet = $quiet;
     }
 
     private static function getHandle()
@@ -48,7 +54,7 @@ class Logger
             fwrite($handle, $line);
         }
         
-        if (self::$verbose || $level === 'ERR' || $level === 'WARN') {
+        if (!self::$quiet && (self::$verbose || $level === 'ERR' || $level === 'WARN')) {
             echo $line;
         }
     }

@@ -41,4 +41,8 @@ class ArCore {
         }
         return self::$instance;
     }
+    
+    public static function reset(): void {
+        self::$instance = null;
+    }
 }

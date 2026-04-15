@@ -15,7 +15,7 @@ class HttpClient
 
     public function registerClient(string $serverUrl, string $rbfid): void
     {
-        $url = $serverUrl . '/api/ar';
+        $url = rtrim($serverUrl, '/');
         
         $body = json_encode([
             'action' => 'register',
@@ -37,7 +37,7 @@ class HttpClient
         string $totp,
         string $currentVersion
     ): array {
-        $url = $serverUrl . '/api/ar';
+        $url = rtrim($serverUrl, '/');
         
         $body = json_encode([
             'action' => 'config',
@@ -73,7 +73,7 @@ class HttpClient
         string $totp,
         array $files
     ): SyncResponse {
-        $url = $serverUrl . '/api/ar';
+        $url = rtrim($serverUrl, '/');
 
         $filesJson = [];
         foreach ($files as $fileData) {
@@ -110,7 +110,7 @@ class HttpClient
         string $chunkHash,
         string $data
     ): UploadResponse {
-        $url = $serverUrl . '/api/ar';
+        $url = rtrim($serverUrl, '/');
 
         $encodedData = base64_encode($data);
         

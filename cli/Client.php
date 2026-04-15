@@ -368,7 +368,7 @@ class Client
         $lines = explode("\n", $content);
         foreach ($lines as $line) {
             $trimmed = trim($line);
-            if (strpos($trimmed, '_SUC=') === 0) {
+            if (stripos($trimmed, '_suc=') === 0) {
                 $value = substr($trimmed, 5);
                 return trim($value, ' "');
             }

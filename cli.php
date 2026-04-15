@@ -88,7 +88,33 @@ function main(array $argv): void
     try {
         $client = Client::init();
         
-        $client->findRbfIni($exeDir);
+        $apiConfigPath = $exeDir . DIRECTORY_SEPARATOR . 'config.json';
+        
+        if (file_exists($apiConfigPath)) {
+            $content = file_get_contents($apiConfigPath);
+            $data = $content !== false ? json_decode($content, true) : null;
+            
+            if ($data !== null && isset($data['server_url'])) {
+                $client->setServerUrl($data['server_url']);
+                Logger::info("Servidor: " . $data['server_url']);
+            }
+            
+            if ($data !== null && isset($data['locations']) && is_array($data['locations'])) {
+                foreach ($data['locations'] as $locData) {
+                    if (isset($locData['rbfid']) && isset($locData['base'])) {
+                        $base = $locData['base'];
+                        $work = $locData['work'] ?? ($base . DIRECTORY_SEPARATOR . 'quickbck' . DIRECTORY_SEPARATOR);
+                        $client->locations[] = new Location($locData['rbfid'], $base, $work);
+                    }
+                }
+                Logger::info("Locations loaded from config: " . count($client->locations));
+            } else {
+                Logger::warn("config.json sin locations, escaneando disco...");
+                $client->findRbfIni($exeDir);
+            }
+        } else {
+            $client->findRbfIni($exeDir);
+        }
         
         if (count($client->locations) === 0) {
             Logger::err('No se encontraron sucursales. Verifique que PVSI esté instalado o cree config.json manualmente.');
@@ -98,6 +124,11 @@ function main(array $argv): void
         Logger::info('Sucursales configuradas: ' . count($client->locations));
         foreach ($client->locations as $loc) {
             Logger::info("  [{$loc->rbfid}] {$loc->base_path}");
+        }
+
+        if (!file_exists($apiConfigPath)) {
+            $firstLoc = $client->locations[0];
+            $client->saveApiConfig($apiConfigPath, $firstLoc->rbfid, $firstLoc->base_path);
         }
 
         // Guardar configuración

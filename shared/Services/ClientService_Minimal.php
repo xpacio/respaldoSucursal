@@ -1,28 +1,35 @@
 <?php
-require_once __DIR__ . '/ServiceInterfaces.php';
 
 /**
  * ClientService - Minimal version for AR registration only
+ * Note: Does not implement full interface to avoid dependency issues
  */
-class ClientService implements ClientServiceInterface {
-    private Database $db;
-    private Logger $logger;
-    private SystemInterface $system;
+class ClientService_Minimal {
+    private $db;
+    private $logger;
 
-    public function __construct(
-        Database $db,
-        Logger $logger,
-        SystemInterface $system,
-        ...$args // Accept additional args for backward compatibility
-    ) {
+    public function __construct($db, $logger = null) {
         $this->db = $db;
         $this->logger = $logger;
-        $this->system = $system;
     }
 
-    /**
-     * Register a client in ar_clients table
-     */
+    public function getClientStatus(string $rbfid): ?array {
+        return $this->db->fetchOne(
+            "SELECT c.rbfid, c.emp, c.plaza, c.enabled, ar.registered_at, ar.last_sync_at
+             FROM clients c
+             LEFT JOIN ar_clients ar ON ar.rbfid = c.rbfid
+             WHERE c.rbfid = :rbfid",
+            [':rbfid' => $rbfid]
+        );
+    }
+
+    public function getClientFiles(string $rbfid): array {
+        return $this->db->fetchAll(
+            "SELECT file_name, chunk_count, updated_at FROM ar_files WHERE rbfid = :rbfid",
+            [':rbfid' => $rbfid]
+        );
+    }
+
     public function registerClient(string $rbfid): void {
         $existing = $this->db->fetchOne("SELECT rbfid FROM ar_clients WHERE rbfid = :rbfid", [':rbfid' => $rbfid]);
         if (!$existing) {
@@ -31,38 +38,5 @@ class ClientService implements ClientServiceInterface {
                 [':rbfid' => $rbfid]
             );
         }
-    }
-
-    // Stub methods for interface compliance
-    public function create(string $clientId, bool $enabled, string $emp = '', string $plaza = ''): array {
-        return ['ok' => false, 'error' => 'Not implemented in minimal ClientService'];
-    }
-
-    public function applyTemplatesToClient(string $clientId): array {
-        return ['ok' => false, 'error' => 'Not implemented'];
-    }
-
-    public function applyTemplatesToAllActiveClients(): array {
-        return ['ok' => false, 'error' => 'Not implemented'];
-    }
-
-    public function enable(string $clientId): array {
-        return ['ok' => false, 'error' => 'Not implemented'];
-    }
-
-    public function disable(string $clientId): array {
-        return ['ok' => false, 'error' => 'Not implemented'];
-    }
-
-    public function delete(string $clientId, bool $hard = false): array {
-        return ['ok' => false, 'error' => 'Not implemented'];
-    }
-
-    public function getUserService() {
-        return null;
-    }
-
-    public function getSshService() {
-        return null;
     }
 }

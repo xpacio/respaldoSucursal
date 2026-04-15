@@ -1,0 +1,242 @@
+[2026-04-15 04:18:29] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:18:29] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:18:29] [DBG] Directorio executable: .
+[2026-04-15 04:18:29] [WARN] config.json inválido, escaneando disco...
+[2026-04-15 04:18:29] [INFO] Locations loaded from config: 1
+[2026-04-15 04:18:29] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:18:29] [INFO]   [roton] C:\pvsi
+[2026-04-15 04:18:29] [DBG] Config saved to: ./config.json
+[2026-04-15 04:18:29] [INFO] Config guardado en: ./config.json
+[2026-04-15 04:18:29] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:18:29] [DBG] HTTP error: 302
+[2026-04-15 04:18:29] [WARN] Register fallo: HTTP error: 302 — continuando
+[2026-04-15 04:18:29] [INFO] Full sync horario
+[2026-04-15 04:18:29] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:21:32] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:21:32] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:21:32] [DBG] Directorio executable: .
+[2026-04-15 04:21:32] [WARN] config.json inválido, escaneando disco...
+[2026-04-15 04:21:32] [INFO] Locations loaded from config: 1
+[2026-04-15 04:21:32] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:21:32] [INFO]   [roton] C:\pvsi
+[2026-04-15 04:21:32] [DBG] Config saved to: ./config.json
+[2026-04-15 04:21:32] [INFO] Config guardado en: ./config.json
+[2026-04-15 04:21:32] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:21:32] [DBG] HTTP error: 302
+[2026-04-15 04:21:32] [WARN] Register fallo: HTTP error: 302 — continuando
+[2026-04-15 04:21:32] [INFO] Full sync horario
+[2026-04-15 04:21:32] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:23:20] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:23:20] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:23:20] [DBG] Directorio executable: .
+[2026-04-15 04:23:20] [WARN] config.json inválido, escaneando disco...
+[2026-04-15 04:23:20] [INFO] Locations loaded from config: 1
+[2026-04-15 04:23:20] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:23:20] [INFO]   [roton] C:\pvsi
+[2026-04-15 04:23:20] [DBG] Config saved to: ./config.json
+[2026-04-15 04:23:20] [INFO] Config guardado en: ./config.json
+[2026-04-15 04:23:20] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:23:20] [DBG] HTTP error: 302
+[2026-04-15 04:23:20] [WARN] Register fallo: HTTP error: 302 — continuando
+[2026-04-15 04:23:20] [INFO] Full sync horario
+[2026-04-15 04:23:20] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:23:37] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:23:37] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:23:37] [DBG] Directorio executable: .
+[2026-04-15 04:23:37] [WARN] config.json inválido, escaneando disco...
+[2026-04-15 04:23:37] [INFO] Locations loaded from config: 1
+[2026-04-15 04:23:37] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:23:37] [INFO]   [roton] C:\pvsi
+[2026-04-15 04:23:37] [DBG] Config saved to: ./config.json
+[2026-04-15 04:23:37] [INFO] Config guardado en: ./config.json
+[2026-04-15 04:23:37] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:23:37] [DBG] HTTP error: 302
+[2026-04-15 04:23:37] [WARN] Register fallo: HTTP error: 302 — continuando
+[2026-04-15 04:23:37] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:24:42] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:24:42] [INFO] Servidor: https://respaldosucursal.servicios.care
+[2026-04-15 04:24:42] [DBG] Directorio executable: .
+[2026-04-15 04:24:42] [DBG] Escaneando: /tmp
+[2026-04-15 04:24:42] [DBG] Scan /tmp completo: 0 sucursales
+[2026-04-15 04:24:42] [DBG] Escaneando: /opt
+[2026-04-15 04:24:42] [DBG] Scan /opt completo: 0 sucursales
+[2026-04-15 04:24:42] [DBG] Escaneando: /home
+[2026-04-15 04:24:42] [DBG] Scan /home completo: 0 sucursales
+[2026-04-15 04:24:42] [DBG] Escaneando: /srv
+[2026-04-15 04:24:42] [DBG] Scan /srv completo: 0 sucursales
+[2026-04-15 04:24:42] [DBG] Escaneando: /srv/pvsi
+[2026-04-15 04:24:42] [DBG] Scan /srv/pvsi completo: 0 sucursales
+[2026-04-15 04:24:42] [ERR] Error: No se encontraron sucursales.
+[2026-04-15 04:25:23] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:25:23] [INFO] Servidor: https://respaldosucursal.servicios.care
+[2026-04-15 04:25:23] [DBG] Directorio executable: .
+[2026-04-15 04:25:23] [WARN] config.json inválido, escaneando disco...
+[2026-04-15 04:25:23] [INFO] Locations loaded from config: 1
+[2026-04-15 04:25:23] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:25:23] [INFO]   [roton] /srv/roton
+[2026-04-15 04:25:23] [DBG] Config saved to: ./config.json
+[2026-04-15 04:25:23] [INFO] Config guardado en: ./config.json
+[2026-04-15 04:25:23] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:25:23] [DBG] cURL error: Failed to connect to respaldosucursal.servicios.care port 443 after 2 ms: Couldn't connect to server
+[2026-04-15 04:25:23] [WARN] Register fallo: Register failed: no response — continuando
+[2026-04-15 04:25:23] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:25:55] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:25:55] [INFO] Servidor: https://respaldosucursal.servicios.care
+[2026-04-15 04:25:55] [DBG] Directorio executable: .
+[2026-04-15 04:25:55] [WARN] config.json inválido, escaneando disco...
+[2026-04-15 04:25:55] [INFO] Locations loaded from config: 1
+[2026-04-15 04:25:55] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:25:55] [INFO]   [roton] /srv/roton
+[2026-04-15 04:25:55] [DBG] Config saved to: ./config.json
+[2026-04-15 04:25:55] [INFO] Config guardado en: ./config.json
+[2026-04-15 04:25:55] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:25:55] [DBG] cURL error: Failed to connect to respaldosucursal.servicios.care port 443 after 2 ms: Couldn't connect to server
+[2026-04-15 04:25:55] [WARN] Register fallo: Register failed: no response — continuando
+[2026-04-15 04:25:55] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:26:40] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:26:40] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:26:40] [DBG] Directorio executable: .
+[2026-04-15 04:26:40] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:26:40] [INFO] Locations loaded from config: 1
+[2026-04-15 04:26:40] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:26:40] [INFO]   [roton] /srv/roton
+[2026-04-15 04:26:40] [WARN] Config path not set, skipping save
+[2026-04-15 04:26:40] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:26:40] [DBG] HTTP error: 302
+[2026-04-15 04:26:40] [WARN] Register fallo: HTTP error: 302 — continuando
+[2026-04-15 04:26:40] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:27:52] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:27:52] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:27:52] [DBG] Directorio executable: .
+[2026-04-15 04:27:52] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:27:52] [INFO] Locations loaded from config: 1
+[2026-04-15 04:27:52] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:27:52] [INFO]   [roton] /srv/roton
+[2026-04-15 04:27:52] [WARN] Config path not set, skipping save
+[2026-04-15 04:27:52] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:27:52] [DBG] Register response: [2026-04-15 04:27:52] [INFO] === API Request: / ===
+[2026-04-15 04:27:52] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 04:27:52] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 04:27:52] 
+[2026-04-15 04:27:52] [INFO] [roton] Registrado OK
+[2026-04-15 04:27:52] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:28:23] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:28:23] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:28:23] [DBG] Directorio executable: .
+[2026-04-15 04:28:23] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:28:23] [INFO] Locations loaded from config: 1
+[2026-04-15 04:28:23] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:28:23] [INFO]   [roton] /srv/roton
+[2026-04-15 04:28:23] [WARN] Config path not set, skipping save
+[2026-04-15 04:28:23] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:28:23] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 04:28:23] [INFO] [roton] Registrado OK
+[2026-04-15 04:28:23] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:28:43] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:28:43] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:28:43] [DBG] Directorio executable: .
+[2026-04-15 04:28:43] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:28:43] [INFO] Locations loaded from config: 1
+[2026-04-15 04:28:43] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:28:43] [INFO]   [roton] /srv/roton
+[2026-04-15 04:28:43] [WARN] Config path not set, skipping save
+[2026-04-15 04:28:43] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:28:43] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 04:28:43] [INFO] [roton] Registrado OK
+[2026-04-15 04:28:43] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-15 04:29:12] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:29:12] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:29:12] [DBG] Directorio executable: .
+[2026-04-15 04:29:12] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:29:12] [INFO] Locations loaded from config: 1
+[2026-04-15 04:29:12] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:29:12] [INFO]   [roton] /srv/roton
+[2026-04-15 04:29:12] [WARN] Config path not set, skipping save
+[2026-04-15 04:29:12] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:29:12] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 04:29:12] [INFO] [roton] Registrado OK
+[2026-04-15 04:29:12] [DBG] Config file not found: 
+[2026-04-15 04:29:24] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:29:24] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:29:24] [DBG] Directorio executable: .
+[2026-04-15 04:29:24] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:29:24] [INFO] Locations loaded from config: 1
+[2026-04-15 04:29:24] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:29:24] [INFO]   [roton] /srv/roton
+[2026-04-15 04:29:24] [WARN] Config path not set, skipping save
+[2026-04-15 04:29:24] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:29:24] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 04:29:24] [INFO] [roton] Registrado OK
+[2026-04-15 04:29:24] [INFO] Lista actualizada: 94 archivos (v726665cb)
+[2026-04-15 04:29:24] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 04:29:24] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 04:29:24] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 04:29:24] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 04:29:42] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:29:42] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:29:42] [DBG] Directorio executable: .
+[2026-04-15 04:29:42] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:29:42] [INFO] Locations loaded from config: 1
+[2026-04-15 04:29:42] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:29:42] [INFO]   [roton] /srv/roton
+[2026-04-15 04:29:42] [WARN] Config path not set, skipping save
+[2026-04-15 04:29:42] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:29:42] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 04:29:42] [INFO] [roton] Registrado OK
+[2026-04-15 04:29:42] [INFO] Full sync horario
+[2026-04-15 04:29:42] [INFO] Lista actualizada: 94 archivos (v726665cb)
+[2026-04-15 04:29:42] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 04:29:42] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 04:29:42] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 04:29:42] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 04:29:42] [INFO] Cambio detectado: CANOTA.DBF
+[2026-04-15 04:29:43] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 04:29:43] [INFO] Sync CANOTA.DBF OK
+[2026-04-15 04:29:43] [INFO] Cambio detectado: CAT_PROD.DBF
+[2026-04-15 04:29:43] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 04:29:43] [INFO] Sync CAT_PROD.DBF OK
+[2026-04-15 04:29:43] [INFO] Cambio detectado: MASTER.DBF
+[2026-04-15 04:29:43] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 04:29:43] [INFO] Sync MASTER.DBF OK
+[2026-04-15 04:29:43] [INFO] Cambio detectado: XCORTE.DBF
+[2026-04-15 04:29:43] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 04:29:43] [INFO] Sync XCORTE.DBF OK
+[2026-04-15 04:32:36] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:32:36] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:32:36] [DBG] Directorio executable: .
+[2026-04-15 04:32:36] [DBG] Escaneando: /tmp
+[2026-04-15 04:32:36] [DBG] Scan /tmp completo: 0 sucursales
+[2026-04-15 04:32:36] [DBG] Escaneando: /opt
+[2026-04-15 04:32:36] [DBG] Scan /opt completo: 0 sucursales
+[2026-04-15 04:32:36] [DBG] Escaneando: /home
+[2026-04-15 04:32:36] [DBG] Scan /home completo: 0 sucursales
+[2026-04-15 04:32:36] [DBG] Escaneando: /srv
+[2026-04-15 04:32:36] [DBG] Scan /srv completo: 0 sucursales
+[2026-04-15 04:32:36] [DBG] Escaneando: /srv/pvsi
+[2026-04-15 04:32:36] [DBG] Scan /srv/pvsi completo: 0 sucursales
+[2026-04-15 04:32:36] [ERR] Error: No se encontraron sucursales.
+[2026-04-15 04:40:11] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:40:11] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:40:11] [DBG] Directorio executable: .
+[2026-04-15 04:40:11] [DBG] Escaneando: /srv
+[2026-04-15 04:40:11] [DBG] Scan /srv completo: 0 sucursales
+[2026-04-15 04:40:11] [ERR] Error: No se encontraron sucursales.
+[2026-04-15 04:42:32] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:42:32] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:42:32] [DBG] Directorio executable: .
+[2026-04-15 04:42:32] [DBG] Escaneando: /srv
+[2026-04-15 04:42:32] [DBG] Scan /srv completo: 0 sucursales
+[2026-04-15 04:42:32] [ERR] Error: No se encontraron sucursales.
+[2026-04-15 04:43:20] [DBG] Escaneando: /srv
+[2026-04-15 04:43:20] [DBG] Scan /srv completo: 0 sucursales
+[2026-04-15 04:43:51] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:43:51] [INFO] Servidor: http://sync.servicios.care
+[2026-04-15 04:43:51] [DBG] Directorio executable: .
+[2026-04-15 04:43:51] [DBG] Escaneando: /srv
+[2026-04-15 04:43:51] [INFO] Sucursal encontrada: roton en /srv/roton
+[2026-04-15 04:43:51] [DBG] Scan /srv completo: 1 sucursales
+[2026-04-15 04:43:51] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:43:51] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:43:51] [INFO]   [roton] /srv/roton
+[2026-04-15 04:43:51] [INFO] API config guardado en: ./config.json
+[2026-04-15 04:43:51] [DBG] Config saved to: ./config.json

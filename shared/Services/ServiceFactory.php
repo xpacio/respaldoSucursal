@@ -17,10 +17,9 @@ class ServiceFactory {
     /**
      * Crear ClientService
      */
-    public function createClientService(): ClientServiceInterface {
-        // Use minimal version to avoid dependency hell
+    public function createClientService(): ClientService_Minimal {
         require_once __DIR__ . '/ClientService_Minimal.php';
-        return new ClientService($this->db, $this->logger, $this->system);
+        return new ClientService_Minimal($this->db, $this->logger);
     }
     
     /**
