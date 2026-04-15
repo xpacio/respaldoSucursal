@@ -30,7 +30,9 @@ class Client
     private string $totp = '';
     private int $lastFullSync = 0;
     private array $lastFileHashes = [];
-    // private array $fileStateCache = []; // DEPRECATED: unused
+    private array $fileStateCache = [];
+
+    private bool $isFirstSync = true;
 
     public function __construct() {
         $this->serverUrl = Constants::DEFAULT_SERVER_URL;
@@ -413,12 +415,16 @@ class Client
         $pollInterval = Constants::POLL_INTERVAL_SECONDS;
         $fullCheckInterval = Constants::FULL_CHECK_INTERVAL_SECONDS;
 
+        $this->fullHashCheck();
+
         while (true) {
             $now = time();
             if ($now - $this->lastFullSync > $fullCheckInterval) {
                 Logger::info('Full sync horario');
                 $this->lastFullSync = $now;
                 $this->fullHashCheck();
+                sleep($pollInterval);
+                continue;
             }
 
             foreach ($this->locations as $loc) {
@@ -548,9 +554,19 @@ class Client
             foreach ($this->filesToWatch as $filename) {
                 $workFile = $loc->work_path . $filename;
                 if (!file_exists($workFile)) continue;
-                $this->syncService->syncFile($this->serverUrl, $loc, $filename, $workFile, true);
+                
+                $stat = stat($workFile);
+                if (!$stat) continue;
+
+                $key = $this->hashPath($workFile);
+                $this->fileStateCache[$key] = [
+                    'mtime' => $stat['mtime'],
+                    'size' => $stat['size']
+                ];
             }
         }
+        
+        $this->isFirstSync = false;
     }
 
 

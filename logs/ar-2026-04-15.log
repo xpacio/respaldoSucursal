@@ -319,3 +319,77 @@
 [2026-04-15 04:47:24] [INFO] MASTER.DBF — sin cambios
 [2026-04-15 04:47:24] [INFO] XCORTE.DBF — sin cambios
 [2026-04-15 04:47:24] [INFO] Cambio detectado: CANOTA.DBF
+[2026-04-15 04:47:39] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:47:39] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:47:39] [DBG] Directorio executable: .
+[2026-04-15 04:47:39] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:47:39] [INFO] Locations loaded from config: 1
+[2026-04-15 04:47:39] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:47:39] [INFO]   [roton] /srv/roton
+[2026-04-15 04:47:39] [DBG] Config saved to: ./config.json
+[2026-04-15 04:47:39] [INFO] Config guardado en: ./config.json
+[2026-04-15 04:47:39] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:47:39] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 04:47:39] [INFO] [roton] Registrado OK
+[2026-04-15 04:47:39] [INFO] Full sync horario
+[2026-04-15 04:47:39] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 04:47:39] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 04:47:39] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 04:47:39] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 04:47:39] [INFO] Cambio detectado: CANOTA.DBF
+[2026-04-15 04:47:39] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 04:47:39] [INFO] Sync CANOTA.DBF OK
+[2026-04-15 04:47:39] [INFO] Cambio detectado: CAT_PROD.DBF
+[2026-04-15 04:47:39] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 04:47:39] [INFO] Sync CAT_PROD.DBF OK
+[2026-04-15 04:47:39] [INFO] Cambio detectado: MASTER.DBF
+[2026-04-15 04:47:39] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 04:47:39] [INFO] Sync MASTER.DBF OK
+[2026-04-15 04:47:39] [INFO] Cambio detectado: XCORTE.DBF
+[2026-04-15 04:47:39] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 04:47:39] [INFO] Sync XCORTE.DBF OK
+[2026-04-15 04:48:07] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:48:07] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:48:07] [DBG] Directorio executable: .
+[2026-04-15 04:48:07] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:48:07] [INFO] Locations loaded from config: 1
+[2026-04-15 04:48:07] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:48:07] [INFO]   [roton] /srv/roton
+[2026-04-15 04:48:07] [DBG] Config saved to: ./config.json
+[2026-04-15 04:48:07] [INFO] Config guardado en: ./config.json
+[2026-04-15 04:48:07] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:48:07] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 04:48:07] [INFO] [roton] Registrado OK
+[2026-04-15 04:48:07] [INFO] Full sync horario
+[2026-04-15 04:48:07] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 04:48:07] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 04:48:07] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 04:48:07] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 04:48:07] [INFO] Cambio detectado: CANOTA.DBF
+[2026-04-15 04:48:07] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 04:48:07] [INFO] Sync CANOTA.DBF OK
+[2026-04-15 04:48:07] [INFO] Cambio detectado: CAT_PROD.DBF
+[2026-04-15 04:48:07] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 04:48:07] [INFO] Sync CAT_PROD.DBF OK
+[2026-04-15 04:48:07] [INFO] Cambio detectado: MASTER.DBF
+[2026-04-15 04:48:07] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 04:48:07] [INFO] Sync MASTER.DBF OK
+[2026-04-15 04:48:07] [INFO] Cambio detectado: XCORTE.DBF
+[2026-04-15 04:48:07] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 04:48:07] [INFO] Sync XCORTE.DBF OK
+[2026-04-15 04:51:08] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 04:51:08] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:51:08] [DBG] Directorio executable: .
+[2026-04-15 04:51:08] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 04:51:08] [INFO] Locations loaded from config: 1
+[2026-04-15 04:51:08] [INFO] Sucursales configuradas: 1
+[2026-04-15 04:51:08] [INFO]   [roton] /srv/roton
+[2026-04-15 04:51:08] [DBG] Config saved to: ./config.json
+[2026-04-15 04:51:08] [INFO] Config guardado en: ./config.json
+[2026-04-15 04:51:08] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 04:51:08] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 04:51:08] [INFO] [roton] Registrado OK
+[2026-04-15 04:51:08] [DBG] Config loaded from: ./config.json
+[2026-04-15 04:51:08] [DBG] Config saved to: ./config.json
+[2026-04-15 04:51:08] [INFO] Lista actualizada: 94 archivos (v726665cb)
+[2026-04-15 04:51:08] [INFO] Full sync horario
