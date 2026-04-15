@@ -415,9 +415,14 @@ class Client
         $pollInterval = Constants::POLL_INTERVAL_SECONDS;
         $fullCheckInterval = Constants::FULL_CHECK_INTERVAL_SECONDS;
 
+        Logger::info("Iniciando runLoop (poll={$pollInterval}s, fullCheck={$fullCheckInterval}s)");
+        
         $this->fullHashCheck();
+        
+        Logger::info("Cache poblado con " . count($this->fileStateCache) . " archivos");
 
         while (true) {
+            Logger::debug("Loop iteration - checking files...");
             $now = time();
             if ($now - $this->lastFullSync > $fullCheckInterval) {
                 Logger::info('Full sync horario');
@@ -428,6 +433,8 @@ class Client
             }
 
             foreach ($this->locations as $loc) {
+                $changedFiles = 0;
+                
                 $this->copyToWork($loc);
 
                 foreach ($this->filesToWatch as $filename) {
@@ -438,26 +445,35 @@ class Client
                     if (!$stat) continue;
 
                     $key = $this->hashPath($workFile);
+                    $cached = $this->fileStateCache[$key] ?? null;
                     
-                    if (isset($this->fileStateCache[$key]) &&
-                        $this->fileStateCache[$key]['mtime'] === $stat['mtime'] &&
-                        $this->fileStateCache[$key]['size'] === $stat['size']) {
+                    if ($cached !== null &&
+                        $cached['mtime'] === $stat['mtime'] &&
+                        $cached['size'] === $stat['size']) {
+                        Logger::debug("[{$loc->rbfid}] $filename — sin cambios (mtime={$stat['mtime']}, size={$stat['size']})");
                         continue;
                     }
 
-                    Logger::info("Cambio detectado: $filename");
+                    Logger::info("[{$loc->rbfid}] Evaluando $filename (mtime={$stat['mtime']}, size={$stat['size']})");
                     
                     if ($this->syncService->syncFile($this->serverUrl, $loc, $filename, $workFile, false)) {
                         $this->fileStateCache[$key] = [
                             'mtime' => $stat['mtime'],
                             'size' => $stat['size']
                         ];
-                        Logger::info("Sync $filename OK");
+                        $changedFiles++;
+                        Logger::info("[{$loc->rbfid}] $filename — sync OK");
                     } else {
-                        Logger::err("Sync $filename fallo");
+                        Logger::err("[{$loc->rbfid}] $filename — sync fallo");
                     }
                 }
+                
+                if ($changedFiles === 0) {
+                    Logger::info("[{$loc->rbfid}] Sin cambios en " . count($this->filesToWatch) . " archivos");
+                }
             }
+            
+            Logger::info("Esperando $pollInterval segundos...");
             sleep($pollInterval);
         }
     }

@@ -393,3 +393,96 @@
 [2026-04-15 04:51:08] [DBG] Config saved to: ./config.json
 [2026-04-15 04:51:08] [INFO] Lista actualizada: 94 archivos (v726665cb)
 [2026-04-15 04:51:08] [INFO] Full sync horario
+[2026-04-15 05:25:50] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:25:50] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:25:50] [DBG] Directorio executable: .
+[2026-04-15 05:25:50] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:25:50] [INFO] Locations loaded from config: 1
+[2026-04-15 05:25:50] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:25:50] [INFO]   [roton] /srv/roton
+[2026-04-15 05:25:50] [DBG] Config saved to: ./config.json
+[2026-04-15 05:25:50] [INFO] Config guardado en: ./config.json
+[2026-04-15 05:25:50] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:25:50] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:25:50] [INFO] [roton] Registrado OK
+[2026-04-15 05:25:50] [INFO] Full sync horario
+[2026-04-15 05:29:37] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:29:37] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:29:37] [DBG] Directorio executable: .
+[2026-04-15 05:29:37] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:29:37] [INFO] Locations loaded from config: 1
+[2026-04-15 05:29:37] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:29:37] [INFO]   [roton] /srv/roton
+[2026-04-15 05:29:37] [DBG] Config saved to: ./config.json
+[2026-04-15 05:29:37] [INFO] Config guardado en: ./config.json
+[2026-04-15 05:29:37] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:29:37] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:29:37] [INFO] [roton] Registrado OK
+[2026-04-15 05:29:37] [INFO] Full sync horario
+[2026-04-15 05:29:52] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:29:52] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:29:52] [DBG] Directorio executable: .
+[2026-04-15 05:29:52] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:29:52] [INFO] Locations loaded from config: 1
+[2026-04-15 05:29:52] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:29:52] [INFO]   [roton] /srv/roton
+[2026-04-15 05:29:52] [DBG] Config saved to: ./config.json
+[2026-04-15 05:29:52] [INFO] Config guardado en: ./config.json
+[2026-04-15 05:29:52] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:29:52] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:29:52] [INFO] [roton] Registrado OK
+[2026-04-15 05:29:52] [INFO] Full sync horario
+[2026-04-15 05:30:16] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:30:16] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:30:16] [DBG] Directorio executable: .
+[2026-04-15 05:30:16] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:30:16] [INFO] Locations loaded from config: 1
+[2026-04-15 05:30:16] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:30:16] [INFO]   [roton] /srv/roton
+[2026-04-15 05:30:16] [DBG] Config saved to: ./config.json
+[2026-04-15 05:30:16] [INFO] Config guardado en: ./config.json
+[2026-04-15 05:30:16] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:30:16] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:30:16] [INFO] [roton] Registrado OK
+[2026-04-15 05:30:16] [INFO] Full sync horario
+[2026-04-15 05:30:29] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:30:29] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:30:29] [DBG] Directorio executable: .
+[2026-04-15 05:30:29] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:30:29] [INFO] Locations loaded from config: 1
+[2026-04-15 05:30:29] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:30:29] [INFO]   [roton] /srv/roton
+[2026-04-15 05:30:29] [DBG] Config saved to: ./config.json
+[2026-04-15 05:30:29] [INFO] Config guardado en: ./config.json
+[2026-04-15 05:30:29] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:30:29] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:30:29] [INFO] [roton] Registrado OK
+[2026-04-15 05:30:29] [INFO] Full sync horario
+[2026-04-15 05:30:50] [INFO] Cambio detectado: CANOTA.DBF
+[2026-04-15 05:30:50] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 05:30:50] [INFO] Sync CANOTA.DBF OK
+[2026-04-15 05:30:50] [INFO] Cambio detectado: CAT_PROD.DBF
+[2026-04-15 05:30:50] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 05:30:50] [INFO] Sync CAT_PROD.DBF OK
+[2026-04-15 05:30:50] [INFO] Cambio detectado: MASTER.DBF
+[2026-04-15 05:30:50] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 05:30:50] [INFO] Sync MASTER.DBF OK
+[2026-04-15 05:30:50] [INFO] Cambio detectado: XCORTE.DBF
+[2026-04-15 05:30:50] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 05:30:50] [INFO] Sync XCORTE.DBF OK
+[2026-04-15 05:31:03] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 05:31:03] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:31:03] [DBG] Directorio executable: .
+[2026-04-15 05:31:03] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 05:31:03] [INFO] Locations loaded from config: 1
+[2026-04-15 05:31:03] [INFO] Sucursales configuradas: 1
+[2026-04-15 05:31:03] [INFO]   [roton] /srv/roton
+[2026-04-15 05:31:03] [DBG] Config saved to: ./config.json
+[2026-04-15 05:31:03] [INFO] Config guardado en: ./config.json
+[2026-04-15 05:31:03] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 05:31:03] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 05:31:03] [INFO] [roton] Registrado OK
+[2026-04-15 05:31:03] [INFO] Iniciando runLoop (poll=300s, fullCheck=3600s)
+[2026-04-15 05:31:03] [INFO] Cache poblado con 4 archivos
+[2026-04-15 05:31:03] [DBG] Loop iteration - checking files...
+[2026-04-15 05:31:03] [INFO] Full sync horario
