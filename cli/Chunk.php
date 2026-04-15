@@ -16,13 +16,19 @@ class Chunk
             return self::MIN_CHUNK;
         }
 
-        $fileSizeF = (float)$fileSize;
-        $targetBlocks = 100.0 + (log($fileSizeF / 1048576.0, 2) * 500.0);
-        $clamped = max(self::MIN_CHUNK, $fileSizeF / $targetBlocks);
-        $finalSize = min(self::MAX_CHUNK, $clamped);
-        $aligned = ceil($finalSize / self::ALIGNMENT) * self::ALIGNMENT;
+        if ($fileSize < Constants::CHUNK_1MB_THRESHOLD) {
+            return self::MIN_CHUNK;
+        }
 
-        return (int)$aligned;
+        if ($fileSize < Constants::CHUNK_10MB_THRESHOLD) {
+            return 65536;
+        }
+
+        if ($fileSize < Constants::CHUNK_100MB_THRESHOLD) {
+            return 262144;
+        }
+
+        return self::MAX_CHUNK;
     }
 
     public static function calculateChunkCount(int $fileSize): int

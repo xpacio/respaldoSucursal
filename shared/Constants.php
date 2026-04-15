@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 class Constants
 {
-    public const CHUNK_MIN_SIZE = 16384;
+    public const CHUNK_MIN_SIZE = 65536;
     public const CHUNK_MAX_SIZE = 1048576;
     public const CHUNK_ALIGNMENT = 4096;
+    public const CHUNK_1MB_THRESHOLD = 1048576;
+    public const CHUNK_10MB_THRESHOLD = 10485760;
+    public const CHUNK_100MB_THRESHOLD = 104857600;
 
     public const SYNC_DELAY_MS = 2000;
     public const RATE_DELAY_MIN_MS = 1000;

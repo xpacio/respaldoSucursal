@@ -79,18 +79,25 @@ function route_ar(Router $r, string $resource): void {
 
 ### 3. Transferencia por Chunks
 
-Archivos grandes se transfieren en chunks de 16KB-1MB:
+Archivos se transfieren en chunks con tamaño adaptativo:
+
+| Tamaño archivo | chunkSize | Chunks (ejemplo) |
+|---------------|-----------|------------------|
+| < 1 MB | 64 KB | 1-16 |
+| 1-10 MB | 64 KB | 16-160 |
+| 10-100 MB | 256 KB | 40-400 |
+| > 100 MB | 1 MB | 100-1024 |
 
 ```
 Cliente                           Servidor
    │                                  │
-   │──── sync (hash completo) ───────>│
-   │<──── needs_upload: [{file, chunk}]│
+   │──── POST / (sync) ─────────────>│ Envía hash completo + hashes de chunks
+   │<──── needs_upload: [{chunks}] ──│ Indica qué chunks faltan
    │                                  │
-   │──── upload (chunk 0) ───────────>│
-   │──── upload (chunk 1) ───────────>│
+   │──── POST / (upload chunk 0) ───>│ Envía chunk en Base64 + hash
+   │──── POST / (upload chunk 1) ───>│
    │   ...                            │
-   │<──── ok + chunk_count ───────────│
+   │<──── ok + chunk ─────────────────│
 ```
 
 ### 4. Autenticación con TOTP
