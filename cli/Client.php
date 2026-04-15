@@ -187,7 +187,7 @@ class Client
                 if (count($locations) >= 20) break;
             }
         } else {
-            $roots = ['/tmp', '/opt', '/home', '/srv', '/var/pvsi', '/srv/pvsi'];
+            $roots = ['/srv'];
             foreach ($roots as $root) {
                 if (!is_dir($root)) continue;
                 $locs = $this->scanPath($root);
@@ -458,7 +458,7 @@ class Client
 
     private function fetchTimestamp(string $rbfid): void
     {
-        $url = $this->serverUrl . '/api/ar';
+        $url = rtrim($this->serverUrl, '/');
         
         $body = json_encode([
             'action' => 'init',
@@ -537,7 +537,9 @@ class Client
         if (!empty($result['files'])) {
             $this->filesToWatch = $result['files'];
             $this->filesVersion = $result['version'];
-            $this->configService->saveLocations($this->configPath, $this->locations, $this->filesVersion, $this->filesToWatch);
+            if (!empty($this->configPath)) {
+                $this->configService->saveLocations($this->configPath, $this->locations, $this->filesVersion, $this->filesToWatch);
+            }
             Logger::info("Lista actualizada: " . count($this->filesToWatch) . " archivos (v{$this->filesVersion})");
         }
 
@@ -840,6 +842,8 @@ class Client
     public function setServerUrl(string $url): void
     {
         $this->serverUrl = $url;
+        $this->regService = new RegistrationService($this->http, $url);
+        $this->syncService = new SyncService($this->http, $this->regService);
     }
 
     public function saveConfig(): void
@@ -858,5 +862,59 @@ class Client
         } catch (Exception $e) {
             Logger::err("Error guardando config: " . $e->getMessage());
         }
+    }
+
+    public function generateApiConfig(string $searchRoot): ?array
+    {
+        $rbfIniPath = $this->findRbfIniFile($searchRoot);
+        
+        if ($rbfIniPath === null) {
+            Logger::err("No se encontró rbf.ini en: $searchRoot");
+            return null;
+        }
+
+        $rbfid = $this->parseRbfIni($rbfIniPath);
+        if ($rbfid === null) {
+            Logger::err("No se pudo leer rbfid de: $rbfIniPath");
+            return null;
+        }
+
+        $parentPath = dirname(dirname($rbfIniPath));
+        
+        Logger::info("rbf.ini encontrado: $rbfIniPath");
+        Logger::info("rbfid: $rbfid");
+        Logger::info("Ruta padre: $parentPath");
+
+        return [
+            'rbfid' => $rbfid,
+            'base_path' => $parentPath,
+        ];
+    }
+
+    private function findRbfIniFile(string $root): ?string
+    {
+        $directPath = $root . DIRECTORY_SEPARATOR . 'rbf' . DIRECTORY_SEPARATOR . 'rbf.ini';
+        if (file_exists($directPath)) {
+            return $directPath;
+        }
+
+        $files = $this->globRecursive($root, 'rbf.ini', 5);
+        return $files[0] ?? null;
+    }
+
+    public function saveApiConfig(string $outputPath, string $rbfid, string $basePath): void
+    {
+        $data = [
+            'rbfid' => $rbfid,
+            'base_path' => $basePath,
+            'generated_at' => date('c'),
+        ];
+
+        $json = json_encode($data, JSON_PRETTY_PRINT);
+        if (file_put_contents($outputPath, $json) === false) {
+            throw new Exception("Cannot write config to: $outputPath");
+        }
+
+        Logger::info("API config guardado en: $outputPath");
     }
 }
