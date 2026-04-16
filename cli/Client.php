@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/Location.php';
+require_once __DIR__ . '/../shared/Services/TimestampManager.php';
 
 class Client
 {
@@ -29,9 +30,20 @@ class Client
 
     public function __construct() {
         $this->serverUrl = Constants::DEFAULT_SERVER_URL;
+        
+        // Crear TimestampManager primero
+        $timestampManager = new TimestampManager();
+        
+        // Crear HttpClient y configurar TimestampManager
         $this->http = new HttpClient();
+        $this->http->setTimestampManager($timestampManager);
+        
         $this->configService = new ConfigService();
+        
+        // Crear RegistrationService y configurar TimestampManager
         $this->regService = new RegistrationService($this->http, $this->serverUrl);
+        $this->regService->setTimestampManager($timestampManager);
+        
         $this->syncService = new SyncService($this->http, $this->regService);
         $this->locationDiscoveryService = new LocationDiscoveryService($this->configService);
     }
@@ -73,7 +85,7 @@ class Client
                     Logger::warn("[{$loc->rbfid}] No se pudo obtener timestamp, saltando registro");
                     continue;
                 }
-                $totp = $this->regService->generateTotp($loc->rbfid, $timestamp);
+                $totp = $this->regService->generateTotp($loc->rbfid);
                 $response = $this->http->registerClient($this->serverUrl, $loc->rbfid, $totp);
                 
                 if (isset($response['ok']) && $response['ok']) {
@@ -127,7 +139,10 @@ class Client
 
                     Logger::info("[{$loc->rbfid}] Cambio detectado: $filename");
                     
-                    if ($this->syncService->syncFile($this->serverUrl, $loc, $filename, $workFile, false)) {
+                    // Obtener timestamp fresco para este cambio
+                    $timestamp = $this->regService->fetchTimestamp($loc->rbfid);
+                    
+                    if ($this->syncService->syncFile($this->serverUrl, $loc, $filename, $workFile, false, $timestamp)) {
                         $this->fileStateCache[$key] = [
                             'mtime' => $stat['mtime'],
                             'size' => $stat['size']
@@ -197,7 +212,7 @@ class Client
         $timestamp = $this->regService->fetchTimestamp($loc->rbfid);
         
         try {
-            $totp = $this->regService->generateTotp($loc->rbfid, $timestamp);
+            $totp = $this->regService->generateTotp($loc->rbfid);
         } catch (Exception $e) {
             Logger::err("generateTotp fallo: {$e->getMessage()}. Saltando.");
             return;
@@ -225,7 +240,7 @@ class Client
 
                 Logger::debug("[{$loc->rbfid}] Evaluando $filename (mtime={$stat['mtime']}, size={$stat['size']})");
                 
-                if ($this->syncService->syncFile($this->serverUrl, $loc, $filename, $workFile, true)) {
+                if ($this->syncService->syncFile($this->serverUrl, $loc, $filename, $workFile, true, $timestamp)) {
                     $key = $this->hashPath($workFile);
                     $this->fileStateCache[$key] = [
                         'mtime' => $stat['mtime'],
@@ -246,185 +261,11 @@ class Client
         Logger::debug("[{$loc->rbfid}] Copying files to work directory: {$loc->work_path}");
     }
 
-    private function syncFileWithRetry(Location $loc, string $filename, string $workFile, int $size): ?bool {
-        return $this->syncFileWithRetryForced($loc, $filename, $workFile, false);
-    }
 
-    private function syncFileWithRetryForced(Location $loc, string $filename, string $workFile, bool $forced): ?bool {
-        try {
-            $this->fetchTimestamp($loc->rbfid);
-        } catch (Exception $e) {
-            Logger::debug("fetchTimestamp fallo: {$e->getMessage()}");
-        }
 
-        try {
-            $this->totp = $this->generateTotp($loc->rbfid);
-        } catch (Exception $e) {
-            Logger::err("generateTotp fallo: {$e->getMessage()}. No se puede continuar sin timestamp.");
-            return null;
-        }
 
-        $retries = 0;
-        $maxRetries = 3;
 
-        while ($retries < $maxRetries) {
-            if (!file_exists($workFile)) {
-                return null;
-            }
 
-            $stat = stat($workFile);
-            if ($stat === false) {
-                return null;
-            }
-
-            try {
-                $hash = $this->hashFile($workFile);
-            } catch (Exception $e) {
-                $retries++;
-                continue;
-            }
-
-            $chunkSize = $forced 
-                ? Chunk::MAX_CHUNK 
-                : Chunk::calculateChunkSize($stat['size']);
-            $chunkCount = Chunk::calculateChunkCount2($stat['size'], $chunkSize);
-
-            $chunkHashes = [];
-            try {
-                $chunkHashes = $this->hashChunks($workFile, $stat['size'], $chunkSize);
-            } catch (Exception $e) {
-                $retries++;
-                continue;
-            }
-
-            $fileData = new FileHashData($filename, $hash, $chunkHashes, (int)$stat['mtime'], (int)$stat['size']);
-
-            try {
-                $response = $this->http->sync($this->serverUrl, $loc->rbfid, $this->totp, [$fileData]);
-            } catch (Exception $e) {
-                $retries++;
-                Logger::debug("Sync $filename retry " . ($retries + 1) . "/3: {$e->getMessage()}");
-                continue;
-            }
-
-            if (empty($response->needs_upload)) {
-                Logger::info("$filename — sin cambios, servidor ya tiene la version actual");
-            } else {
-                $totalChunks = 0;
-                $workPath = '';
-                $destPath = '';
-                $md5Hash = '';
-                foreach ($response->needs_upload as $t) {
-                    $chunkIdx = $t->chunk ?? $t->chunks[0] ?? 0;
-                    $totalChunks = is_array($t->chunks ?? null) ? count($t->chunks) : 1;
-                    $workPath = $t->work_path ?? '';
-                    $destPath = $t->dest_path ?? '';
-                    $md5Hash = $t->md5 ?? '';
-                }
-                Logger::info("$filename → $destPath [ MD5: $md5Hash ] — work: $workPath — enviando $totalChunks/$chunkCount chunks");
-
-                try {
-                    $this->uploadChunks($loc, $filename, $workFile, $stat['size'], $response, $forced);
-                    Logger::info("$filename — sync completo ($totalChunks chunks enviados)");
-                } catch (Exception $e) {
-                    $retries++;
-                    continue;
-                }
-            }
-
-            return true;
-        }
-
-        Logger::err("Sync $filename fallo después de $maxRetries intentos");
-        return false;
-    }
-
-    private function hashFile(string $path): string {
-        require_once __DIR__ . '/../shared/Utilities/StreamHasher.php';
-        return StreamHasher::hashFileEfficient($path, 'xxh3', 5242880);
-    }
-
-    private function hashChunks(string $path, int $fileSize, int $chunkSize): array {
-        $hashes = [];
-        $handle = fopen($path, 'rb');
-        if ($handle === false) {
-            throw new Exception("Cannot open file: $path");
-        }
-
-        $offset = 0;
-        while ($offset < $fileSize) {
-            $size = min($chunkSize, $fileSize - $offset);
-            fseek($handle, $offset);
-            $chunk = fread($handle, $size);
-            if ($chunk === false) {
-                fclose($handle);
-                throw new Exception("Cannot read chunk at offset $offset");
-            }
-            $hashes[] = Hash::compute($chunk)->getHex();
-            $offset += $chunkSize;
-        }
-
-        fclose($handle);
-        return $hashes;
-    }
-
-    private function uploadChunks(Location $loc, string $filename, string $workFile, int $fileSize, SyncResponse $response, bool $forced): void {
-        $chunkSize = Chunk::calculateChunkSize($fileSize);
-
-        try {
-            $this->totp = $this->generateTotp($loc->rbfid);
-        } catch (Exception $e) {
-            Logger::err("generateTotp fallo: {$e->getMessage()}. Abortando upload.");
-            return;
-        }
-
-        $handle = fopen($workFile, 'rb');
-        if ($handle === false) {
-            return;
-        }
-
-        foreach ($response->needs_upload as $target) {
-            $chunkIndices = $target->chunks ?? [$target->chunk ?? 0];
-            foreach ($chunkIndices as $chunkIdx) {
-                $offset = $chunkIdx * $chunkSize;
-                $size = min($chunkSize, $fileSize - $offset);
-
-                fseek($handle, $offset);
-                $data = fread($handle, $size);
-                if ($data === false) {
-                    continue;
-                }
-
-                $chunkHash = Hash::compute($data)->getHex();
-
-                try {
-                    $uploadResult = $this->http->upload(
-                        $this->serverUrl,
-                        $loc->rbfid,
-                        $this->totp,
-                        $filename,
-                        $chunkIdx,
-                        $chunkHash,
-                        $data
-                    );
-                    
-                    Logger::debug("Upload chunk $chunkIdx OK");
-
-                    if (!$forced && ($uploadResult->next_delay > 0 || $response->rate_delay > 0)) {
-                        $delayMs = max($uploadResult->next_delay, $response->rate_delay);
-                        if ($delayMs > 0) {
-                            usleep($delayMs * 1000);
-                        }
-                    }
-                } catch (Exception $e) {
-                    Logger::warn("Upload chunk $chunkIdx fallo: {$e->getMessage()}");
-                    continue;
-                }
-            }
-        }
-
-        fclose($handle);
-    }
 
     private function persistFileList(): void {
         if (empty($this->cfgPath)) {
@@ -449,10 +290,6 @@ class Client
 
     public function setCfgPath(string $path): void {
         $this->cfgPath = $path;
-    }
-
-    public function setLastFullSync(int $timestamp): void {
-        $this->lastFullSync = $timestamp;
     }
 
     public function setFilesVersion(string $version): void {
@@ -481,45 +318,22 @@ class Client
     }
 
     public function generateApiConfig(string $searchRoot): ?array {
-        $rbfIniPath = $this->findRbfIniFile($searchRoot);
-        
-        if ($rbfIniPath === null) {
-            Logger::err("No se encontró rbf.ini en: $searchRoot");
-            return null;
-        }
-
-        $rbfid = $this->parseRbfIni($rbfIniPath);
-        if ($rbfid === null) {
-            Logger::err("No se pudo leer rbfid de: $rbfIniPath");
-            return null;
-        }
-
-        $parentPath = dirname(dirname($rbfIniPath));
-        
-        Logger::info("rbf.ini encontrado: $rbfIniPath");
-        Logger::info("rbfid: $rbfid");
-        Logger::info("Ruta padre: $parentPath");
-
-        return [
-            'rbfid' => $rbfid,
-            'base_path' => $parentPath,
-        ];
+        // Este método parece no usarse en el flujo actual
+        // La lógica de descubrimiento está en LocationDiscoveryService
+        Logger::warn("generateApiConfig está deprecado, usar LocationDiscoveryService");
+        return null;
     }
 
-    private function findRbfIni(string $cfgPath): void
+    public function findRbfIni(string $cfgPath): void
     {
         $this->cfgPath = $cfgPath;
         $this->locations = $this->locationDiscoveryService->findLocations($cfgPath, dirname($_SERVER['argv'][0]));
     }
 
     private function findRbfIniFile(string $root): ?string {
-        $directPath = $root . DIRECTORY_SEPARATOR . 'rbf' . DIRECTORY_SEPARATOR . 'rbf.ini';
-        if (file_exists($directPath)) {
-            return $directPath;
-        }
-
-        $files = $this->globRecursive($root, 'rbf.ini', 5);
-        return $files[0] ?? null;
+        // Este método parece no usarse en el flujo actual
+        // La lógica de descubrimiento está en LocationDiscoveryService
+        return null;
     }
 
     public function saveApiConfig(string $outputPath, string $rbfid, string $basePath): void {

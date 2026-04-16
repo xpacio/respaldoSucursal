@@ -36,11 +36,11 @@ spl_autoload_register(function (string $class) {
     }
     
     // Búsqueda en directorios
-    $dirs = ['Config', 'Services', 'Repositories'];
+    $dirs = ['', 'Config', 'Services', 'Repositories', '../cli'];
     foreach ($dirs as $dir) {
-        $file = __DIR__ . "/{$dir}/{$shortName}.php";
-        if (file_exists($file)) {
-            require_once $file;
+        $filePath = $dir ? __DIR__ . "/{$dir}/{$shortName}.php" : __DIR__ . "/{$shortName}.php";
+        if (file_exists($filePath)) {
+            require_once $filePath;
             return;
         }
     }

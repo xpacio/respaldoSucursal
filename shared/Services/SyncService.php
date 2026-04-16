@@ -22,12 +22,14 @@ class SyncService {
         return StreamHasher::hashFileEfficient($path, 'xxh3', 5242880);
     }
 
-    public function syncFile(string $serverUrl, Location $loc, string $filename, string $workFile, bool $forced): bool {
+    public function syncFile(string $serverUrl, Location $loc, string $filename, string $workFile, bool $forced, int $timestamp = 0): bool {
         $stat = stat($workFile);
         if ($stat === false) return false;
 
-        $timestamp = $this->regService->fetchTimestamp($loc->rbfid);
-        $totp = $this->regService->generateTotp($loc->rbfid, $timestamp);
+        if ($timestamp === 0) {
+            $timestamp = $this->regService->fetchTimestamp($loc->rbfid, false); // Usar cache
+        }
+        $totp = $this->regService->generateTotp($loc->rbfid); // Usará timestamp cacheado
 
         $hash = $this->hashFile($workFile);
         $chunkSize = $forced ? Chunk::MAX_CHUNK : Chunk::calculateChunkSize((int)$stat['size']);
@@ -42,7 +44,7 @@ class SyncService {
             return true;
         }
 
-        return $this->uploadChunks($serverUrl, $loc, $filename, $workFile, (int)$stat['size'], $response, $forced);
+        return $this->uploadChunks($serverUrl, $loc, $filename, $workFile, (int)$stat['size'], $response, $forced, $timestamp);
     }
 
     private function hashChunks(string $path, int $fileSize, int $chunkSize): array {
@@ -62,12 +64,14 @@ class SyncService {
         return $hashes;
     }
 
-    private function uploadChunks(string $serverUrl, Location $loc, string $filename, string $workFile, int $fileSize, $response, bool $forced): bool {
+    private function uploadChunks(string $serverUrl, Location $loc, string $filename, string $workFile, int $fileSize, $response, bool $forced, int $timestamp = 0): bool {
         $chunkSize = Chunk::calculateChunkSize($fileSize);
         $handle = fopen($workFile, 'rb');
         
-        $timestamp = $this->regService->fetchTimestamp($loc->rbfid);
-        $totp = $this->regService->generateTotp($loc->rbfid, $timestamp);
+        if ($timestamp === 0) {
+            $timestamp = $this->regService->fetchTimestamp($loc->rbfid, false); // Usar cache
+        }
+        $totp = $this->regService->generateTotp($loc->rbfid); // Usará timestamp cacheado
 
         foreach ($response->needs_upload as $target) {
             $chunkIndices = $target->chunks ?? [$target->chunk ?? 0];

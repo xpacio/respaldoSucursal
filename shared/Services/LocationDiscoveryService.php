@@ -232,7 +232,8 @@ class LocationDiscoveryService
                 $basePath = dirname($rbfDir);
                 return [$rbfid, $basePath];
             }
-        }\n        return null;
+        }
+        return null;
     }
 
     private function globRecursive(string $dir, string $pattern, int $maxDepth): array

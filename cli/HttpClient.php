@@ -7,11 +7,27 @@ require_once __DIR__ . '/SyncResponse.php';
 require_once __DIR__ . '/UploadResponse.php';
 require_once __DIR__ . '/../shared/Hash.php';
 require_once __DIR__ . '/../shared/Logger.php';
+require_once __DIR__ . '/../shared/Services/TimestampManager.php';
 
 class HttpClient
 {
     private const CONTENT_TYPE = 'application/json';
     private int $timeout = 30;
+    private ?TimestampManager $timestampManager = null;
+    
+    public function setTimestampManager(TimestampManager $manager): void {
+        $this->timestampManager = $manager;
+    }
+    
+    private function updateTimestampFromResponse(string $response, string $rbfid): void {
+        if ($this->timestampManager === null) return;
+        
+        $data = $this->extractJsonFromResponse($response);
+        if ($data !== null && isset($data['timestamp']) && $data['timestamp'] !== '') {
+            $timestamp = (int)$data['timestamp'];
+            $this->timestampManager->update($rbfid, $timestamp);
+        }
+    }
 
     public function setTimeout(int $seconds): void {
         $this->timeout = $seconds;
@@ -36,11 +52,12 @@ class HttpClient
             throw new Exception('Register failed: no response');
         }
 
-        $data = json_decode($response, true);
+        $data = $this->extractJsonFromResponse($response);
         if ($data === null) {
             throw new Exception('Register failed: invalid response');
         }
 
+        $this->updateTimestampFromResponse($response, $rbfid);
         Logger::debug("Register response: " . substr($response, 0, 200));
         return $data;
     }
@@ -63,13 +80,18 @@ class HttpClient
         $response = $this->post($url, $body);
         
         if ($response === null || $response === '') {
+            Logger::debug("fetchFileListVersioned: empty response");
             return ['version' => '', 'files' => []];
         }
 
-        $data = json_decode($response, true);
+        Logger::debug("fetchFileListVersioned response: " . substr($response, 0, 300));
+        $data = $this->extractJsonFromResponse($response);
         if ($data === null) {
+            Logger::debug("fetchFileListVersioned: failed to extract JSON");
             return ['version' => '', 'files' => []];
         }
+        
+        $this->updateTimestampFromResponse($response, $rbfid);
 
         $version = $data['files_version'] ?? '';
         $files = [];
@@ -102,15 +124,17 @@ class HttpClient
         ]);
 
         $response = $this->post($url, $body);
-
+        
         if ($response === null || $response === '') {
             throw new Exception("Sync failed: empty response");
         }
 
-        $data = json_decode($response, true);
+        $data = $this->extractJsonFromResponse($response);
         if ($data === null || !isset($data['ok']) || $data['ok'] !== true) {
             throw new Exception("Sync failed: " . ($data['message'] ?? 'invalid response'));
         }
+        
+        $this->updateTimestampFromResponse($response, $rbfid);
 
         return SyncResponse::fromArray($data);
     }
@@ -147,10 +171,12 @@ class HttpClient
             throw new Exception("Upload failed: empty response");
         }
 
-        $data = json_decode($response, true);
+        $data = $this->extractJsonFromResponse($response);
         if ($data === null || !isset($data['ok']) || $data['ok'] !== true) {
             throw new Exception("Upload failed: " . ($data['message'] ?? 'invalid response'));
         }
+        
+        $this->updateTimestampFromResponse($response, $rbfid);
 
         return UploadResponse::fromArray($data);
     }
@@ -186,5 +212,30 @@ class HttpClient
         }
 
         return $response;
+    }
+    
+    private function extractJsonFromResponse(string $response): ?array
+    {
+        // Extraer JSON de la respuesta (puede contener logs antes del JSON)
+        $jsonStart = strrpos($response, '{');
+        if ($jsonStart !== false) {
+            $jsonStr = substr($response, $jsonStart);
+            $data = json_decode($jsonStr, true);
+            if ($data !== null) {
+                return $data;
+            }
+        }
+        
+        // Intentar decodificar la respuesta completa
+        return json_decode($response, true);
+    }
+    
+    private function extractTimestampFromResponse(string $response): int
+    {
+        $data = $this->extractJsonFromResponse($response);
+        if ($data !== null && isset($data['timestamp']) && $data['timestamp'] !== '') {
+            return (int)$data['timestamp'];
+        }
+        return 0;
     }
 }

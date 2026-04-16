@@ -55,7 +55,12 @@ class Logger
         }
         
         if (!self::$quiet && (self::$verbose || $level === 'ERR' || $level === 'WARN')) {
-            echo $line;
+            if (PHP_SAPI === 'cli' && defined('STDERR')) {
+                fwrite(STDERR, $line);
+            } else {
+                // En entorno web, escribir al error log
+                error_log($line);
+            }
         }
     }
 

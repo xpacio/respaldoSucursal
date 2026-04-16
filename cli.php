@@ -3,78 +3,35 @@
 
 declare(strict_types=1);
 
-define('VERSION', '0.1.0');
-
 require_once __DIR__ . '/shared/autoload.php';
-
-function printHelp(): void
-{
-    echo <<<'HELP'
-AR - Agente de Respaldo
-
-Uso: php cli.php [opciones]
-
-Opciones:
-  -h, --help        Mostrar esta ayuda
-  -v, --version     Mostrar versión
-  -q, --quiet       Solo mostrar info y errores
-  --run-once        Ejecutar sincronización una vez y salir
-  --server URL      Usar servidor alternativo
-
-HELP;
-}
-
-function printVersion(): void
-{
-    echo 'ar ' . VERSION . "\n";
-}
+require_once __DIR__ . '/shared/Utilities/ArgumentParser.php';
+require_once __DIR__ . '/shared/Utilities/CliHelpers.php';
 
 function main(array $argv): void
 {
-    $showHelp = false;
-    $showVersion = false;
-    $runOnce = false;
-    $customServer = null;
-    $verbose = true;
+    $parser = new ArgumentParser();
+    $parser->parse($argv);
 
-    $i = 1;
-    while ($i < count($argv)) {
-        $arg = $argv[$i];
-        
-        if ($arg === '-h' || $arg === '--help') {
-            $showHelp = true;
-        } elseif ($arg === '-v' || $arg === '--version') {
-            $showVersion = true;
-        } elseif ($arg === '-q' || $arg === '--quiet') {
-            $verbose = false;
-        } elseif ($arg === '--run-once') {
-            $runOnce = true;
-        } elseif ($arg === '--server') {
-            $i++;
-            if ($i < count($argv)) {
-                $customServer = $argv[$i];
-            }
-        }
-        
-        $i++;
-    }
-
-    if ($showHelp) {
-        printHelp();
+    if ($parser->hasOption('help')) {
+        CliHelpers::printHelp();
         return;
     }
 
-    if ($showVersion) {
-        printVersion();
+    if ($parser->hasOption('version')) {
+        CliHelpers::printVersion();
         return;
     }
+
+    $verbose = !$parser->hasOption('quiet');
+    $runOnce = $parser->hasOption('run_once');
+    $customServer = $parser->getOption('server');
 
     $exeDir = dirname($_SERVER['argv'][0]);
-
     $logDir = $exeDir . DIRECTORY_SEPARATOR . 'logs';
+    $cfgPath = $exeDir . DIRECTORY_SEPARATOR . 'config.json';
     
     Logger::init($logDir, $verbose);
-    Logger::info("AR - Agente de Respaldo v" . VERSION);
+    Logger::info("AR - Agente de Respaldo");
     Logger::info("Servidor: " . Constants::DEFAULT_SERVER_URL);
 
     if ($customServer !== null) {
@@ -86,38 +43,14 @@ function main(array $argv): void
         $client = Client::init();
         $client->loadState();
         
-        $cfgPath = $exeDir . DIRECTORY_SEPARATOR . 'config.json';
+        $configLoader = new ConfigLoader();
         
-        if (FileUtil::fileExists($cfgPath)) {
-            $content = FileUtil::getContents($cfgPath);
-            $data = $content !== null ? JsonUtil::decode($content, true) : null;
-            
-            if ($data !== null && isset($data['server_url'])) {
-                $client->setServerUrl($data['server_url']);
-            }
-            
-            if ($data !== null && isset($data['locations']) && is_array($data['locations'])) {
-                $client->setConfigPath($cfgPath);
-                foreach ($data['locations'] as $locData) {
-                    if (isset($locData['rbfid']) && isset($locData['base'])) {
-                        $base = $locData['base'];
-                        $work = $locData['work'] ?? ($base . DIRECTORY_SEPARATOR . 'quickbck' . DIRECTORY_SEPARATOR);
-                        $client->locations[] = new Location($locData['rbfid'], $base, $work);
-                    }
-                }
-                if (isset($data['files_version'])) {
-                    $client->setFilesVersion($data['files_version']);
-                }
-                if (isset($data['files']) && is_array($data['files'])) {
-                    $client->setFilesToWatch($data['files']);
-                }
-                Logger::info("Locations loaded from config: " . count($client->locations));
-            } else {
-                Logger::warn("config.json sin locations, escaneando disco...");
-                $client->findRbfIni($exeDir);
-            }
-        } else {
-            $client->findRbfIni($cfgPath);
+        // Intentar cargar configuración existente
+        $configLoaded = $configLoader->loadConfig($cfgPath, $client);
+        
+        if (!$configLoaded) {
+            Logger::warn("config.json sin ubicaciones, escaneando disco...");
+            $client->findRbfIni($exeDir);
         }
         
         if (count($client->locations) === 0) {
@@ -132,7 +65,7 @@ function main(array $argv): void
 
         if (!file_exists($cfgPath)) {
             $firstLoc = $client->locations[0];
-            $client->saveApiConfig($cfgPath, $firstLoc->rbfid, $firstLoc->base_path);
+            $configLoader->createDefaultConfig($cfgPath, $firstLoc->rbfid, $firstLoc->base_path);
         }
 
         try {

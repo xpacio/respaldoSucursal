@@ -632,3 +632,918 @@
 [2026-04-15 05:39:07] [INFO] [roton] Evaluados 94 archivos
 [2026-04-15 05:39:07] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
 [2026-04-15 05:39:07] [INFO] Esperando 300s...
+[2026-04-15 14:07:33] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:07:33] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:07:33] [INFO] Locations loaded from config: 1
+[2026-04-15 14:07:33] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:07:33] [INFO]   [roton] /srv/roton
+[2026-04-15 14:07:33] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:07:33] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:07:33] [INFO] [roton] Registrado OK
+[2026-04-15 14:07:33] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262053, size=512000)
+[2026-04-15 14:07:33] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:07:33] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262053, size=34)
+[2026-04-15 14:07:33] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:07:33] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262053, size=34)
+[2026-04-15 14:07:33] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:07:33] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262053, size=204800)
+[2026-04-15 14:07:33] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:07:33] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:07:33] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 14:07:33] [INFO] Esperando 300s...
+[2026-04-15 14:09:23] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:09:23] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:09:23] [INFO] Locations loaded from config: 1
+[2026-04-15 14:09:23] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:09:23] [INFO]   [roton] /srv/roton
+[2026-04-15 14:09:23] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:09:23] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:09:23] [INFO] [roton] Registrado OK
+[2026-04-15 14:09:23] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262163, size=512000)
+[2026-04-15 14:09:23] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:09:23] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262163, size=34)
+[2026-04-15 14:09:23] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:09:23] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262163, size=34)
+[2026-04-15 14:09:23] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:09:23] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262163, size=204800)
+[2026-04-15 14:09:23] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:09:23] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:09:23] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 14:09:23] [INFO] Esperando 300s...
+[2026-04-15 14:10:12] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:10:12] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:10:12] [INFO] Locations loaded from config: 1
+[2026-04-15 14:10:12] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:10:12] [INFO]   [roton] /srv/roton
+[2026-04-15 14:10:12] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:10:12] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:10:12] [INFO] [roton] Registrado OK
+[2026-04-15 14:10:12] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262212, size=512000)
+[2026-04-15 14:10:13] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:10:13] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262212, size=34)
+[2026-04-15 14:10:13] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:10:13] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262212, size=34)
+[2026-04-15 14:10:13] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:10:13] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262212, size=204800)
+[2026-04-15 14:10:13] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:10:13] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:10:13] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 14:10:13] [INFO] [roton] Cambio detectado: CANOTA.DBF
+[2026-04-15 14:10:13] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:10:13] [INFO] [roton] CANOTA.DBF — sync OK
+[2026-04-15 14:10:13] [INFO] [roton] Cambio detectado: CAT_PROD.DBF
+[2026-04-15 14:10:13] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:10:13] [INFO] [roton] CAT_PROD.DBF — sync OK
+[2026-04-15 14:10:13] [INFO] [roton] Cambio detectado: MASTER.DBF
+[2026-04-15 14:10:13] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:10:13] [INFO] [roton] MASTER.DBF — sync OK
+[2026-04-15 14:10:13] [INFO] [roton] Cambio detectado: XCORTE.DBF
+[2026-04-15 14:10:13] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:10:13] [INFO] [roton] XCORTE.DBF — sync OK
+[2026-04-15 14:10:13] [INFO] Esperando 300s...
+[2026-04-15 14:10:15] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:10:15] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:10:15] [INFO] Locations loaded from config: 1
+[2026-04-15 14:10:15] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:10:15] [INFO]   [roton] /srv/roton
+[2026-04-15 14:10:15] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:10:15] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:10:15] [INFO] [roton] Registrado OK
+[2026-04-15 14:10:15] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262215, size=512000)
+[2026-04-15 14:10:15] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:10:15] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262215, size=34)
+[2026-04-15 14:10:15] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:10:15] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262215, size=34)
+[2026-04-15 14:10:15] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:10:15] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262215, size=204800)
+[2026-04-15 14:10:15] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:10:15] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:10:15] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 14:10:15] [INFO] Esperando 300s...
+[2026-04-15 14:10:19] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:10:19] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:10:19] [INFO] Locations loaded from config: 1
+[2026-04-15 14:10:19] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:10:19] [INFO]   [roton] /srv/roton
+[2026-04-15 14:10:19] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:10:19] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:10:19] [INFO] [roton] Registrado OK
+[2026-04-15 14:10:19] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262219, size=512000)
+[2026-04-15 14:10:19] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:10:19] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262219, size=34)
+[2026-04-15 14:10:19] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:10:19] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262219, size=34)
+[2026-04-15 14:10:19] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:10:19] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262219, size=204800)
+[2026-04-15 14:10:19] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:10:19] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:10:19] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 14:10:19] [INFO] Esperando 300s...
+[2026-04-15 14:10:24] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:10:24] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:10:24] [INFO] Locations loaded from config: 1
+[2026-04-15 14:10:24] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:10:24] [INFO]   [roton] /srv/roton
+[2026-04-15 14:10:24] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:10:24] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:10:24] [INFO] [roton] Registrado OK
+[2026-04-15 14:10:24] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262224, size=512000)
+[2026-04-15 14:10:24] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:10:24] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262224, size=34)
+[2026-04-15 14:10:24] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:10:24] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262224, size=34)
+[2026-04-15 14:10:24] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:10:24] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262224, size=204800)
+[2026-04-15 14:10:24] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:10:24] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:10:24] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 14:10:24] [INFO] Esperando 300s...
+[2026-04-15 14:10:40] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:10:40] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:10:40] [INFO] Locations loaded from config: 1
+[2026-04-15 14:10:40] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:10:40] [INFO]   [roton] /srv/roton
+[2026-04-15 14:10:40] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:10:40] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:10:40] [INFO] [roton] Registrado OK
+[2026-04-15 14:10:40] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262240, size=512000)
+[2026-04-15 14:10:40] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:10:40] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262240, size=34)
+[2026-04-15 14:10:40] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:10:40] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262240, size=34)
+[2026-04-15 14:10:40] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:10:40] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262240, size=204800)
+[2026-04-15 14:10:40] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:10:40] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:10:40] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 14:10:40] [INFO] Esperando 300s...
+[2026-04-15 14:11:01] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:11:01] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:11:01] [INFO] Locations loaded from config: 1
+[2026-04-15 14:11:01] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:11:01] [INFO]   [roton] /srv/roton
+[2026-04-15 14:11:01] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton"}
+[2026-04-15 14:11:01] [DBG] route_ar_register: rbfid=roton
+[2026-04-15 14:11:01] [INFO] route_ar_register: success rbfid=roton
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton"}
+[2026-04-15 14:11:01] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:11:01] [INFO] [roton] Registrado OK
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:11:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262261","enabled":true}
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"w0esx9fFw7c","files_version":"726665cb"}
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-15 14:11:01] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262261, size=512000)
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:11:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262261","enabled":true}
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"w0esx9fFw7c","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776262261,"size":512000}]}
+[2026-04-15 14:11:01] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:11:01] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:11:01] [DBG] route_ar_sync: sync_id=311
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"311","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:11:01] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:11:01] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262261, size=34)
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:11:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262261","enabled":true}
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"w0esx9fFw7c","files":[{"filename":"CAT_PROD.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776262261,"size":34}]}
+[2026-04-15 14:11:01] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:11:01] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:11:01] [DBG] route_ar_sync: sync_id=312
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"312","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:11:01] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:11:01] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262261, size=34)
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:11:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262261","enabled":true}
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"w0esx9fFw7c","files":[{"filename":"MASTER.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776262261,"size":34}]}
+[2026-04-15 14:11:01] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:11:01] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:11:01] [DBG] route_ar_sync: sync_id=313
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"313","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:11:01] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:11:01] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262261, size=204800)
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:11:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262261","enabled":true}
+[2026-04-15 14:11:01] [INFO] === API Request: / ===
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:11:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:11:01] [DBG] route_ar: resource=
+[2026-04-15 14:11:01] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"w0esx9fFw7c","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776262261,"size":204800}]}
+[2026-04-15 14:11:01] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:11:01] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:11:01] [DBG] route_ar_sync: sync_id=314
+[2026-04-15 14:11:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"314","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:11:01] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:11:01] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:11:01] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 14:11:01] [INFO] Esperando 300s...
+[2026-04-15 14:15:45] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:15:45] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:15:45] [INFO] Locations loaded from config: 1
+[2026-04-15 14:15:45] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:15:45] [INFO]   [roton] /srv/roton
+[2026-04-15 14:15:45] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton"}
+[2026-04-15 14:15:45] [DBG] route_ar_register: rbfid=roton
+[2026-04-15 14:15:45] [INFO] route_ar_register: success rbfid=roton
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton"}
+[2026-04-15 14:15:45] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:15:45] [INFO] [roton] Registrado OK
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:15:45] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262545","enabled":true}
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"jdNP9ExRzvg","files_version":"726665cb"}
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-15 14:15:45] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262545, size=512000)
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:15:45] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262545","enabled":true}
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"jdNP9ExRzvg","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776262545,"size":512000}]}
+[2026-04-15 14:15:45] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:15:45] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:15:45] [DBG] route_ar_sync: sync_id=315
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"315","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:15:45] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:15:45] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262545, size=34)
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:15:45] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262545","enabled":true}
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"jdNP9ExRzvg","files":[{"filename":"CAT_PROD.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776262545,"size":34}]}
+[2026-04-15 14:15:45] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:15:45] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:15:45] [DBG] route_ar_sync: sync_id=316
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"316","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:15:45] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:15:45] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262545, size=34)
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:15:45] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262545","enabled":true}
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"jdNP9ExRzvg","files":[{"filename":"MASTER.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776262545,"size":34}]}
+[2026-04-15 14:15:45] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:15:45] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:15:45] [DBG] route_ar_sync: sync_id=317
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"317","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:15:45] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:15:45] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262545, size=204800)
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:15:45] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262545","enabled":true}
+[2026-04-15 14:15:45] [INFO] === API Request: / ===
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:15:45] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:15:45] [DBG] route_ar: resource=
+[2026-04-15 14:15:45] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"jdNP9ExRzvg","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776262545,"size":204800}]}
+[2026-04-15 14:15:45] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:15:45] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:15:45] [DBG] route_ar_sync: sync_id=318
+[2026-04-15 14:15:45] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"318","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:15:45] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:15:45] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:15:45] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 14:15:45] [INFO] Esperando 300s...
+[2026-04-15 14:17:31] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:17:31] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:17:31] [INFO] Locations loaded from config: 1
+[2026-04-15 14:17:31] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:17:31] [INFO]   [roton] /srv/roton
+[2026-04-15 14:17:31] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:17:31] [INFO] === API Request: / ===
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:31] [DBG] route_ar: resource=
+[2026-04-15 14:17:31] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton"}
+[2026-04-15 14:17:31] [DBG] route_ar_register: rbfid=roton
+[2026-04-15 14:17:31] [INFO] route_ar_register: success rbfid=roton
+[2026-04-15 14:17:31] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton"}
+[2026-04-15 14:17:31] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:17:31] [INFO] [roton] Registrado OK
+[2026-04-15 14:17:31] [INFO] === API Request: / ===
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:31] [DBG] route_ar: resource=
+[2026-04-15 14:17:31] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:31] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:31] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262651","enabled":true}
+[2026-04-15 14:17:31] [INFO] === API Request: / ===
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:31] [DBG] route_ar: resource=
+[2026-04-15 14:17:31] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files_version":"726665cb"}
+[2026-04-15 14:17:31] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-15 14:17:31] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262651, size=512000)
+[2026-04-15 14:17:31] [INFO] === API Request: / ===
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:31] [DBG] route_ar: resource=
+[2026-04-15 14:17:31] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:31] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:31] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262651","enabled":true}
+[2026-04-15 14:17:31] [INFO] === API Request: / ===
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:31] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:31] [DBG] route_ar: resource=
+[2026-04-15 14:17:31] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776262651,"size":512000}]}
+[2026-04-15 14:17:31] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:17:31] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:17:31] [DBG] route_ar_sync: sync_id=319
+[2026-04-15 14:17:31] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"319","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:17:31] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:17:31] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262651, size=34)
+[2026-04-15 14:17:32] [INFO] === API Request: / ===
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:32] [DBG] route_ar: resource=
+[2026-04-15 14:17:32] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:32] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:32] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262652","enabled":true}
+[2026-04-15 14:17:32] [INFO] === API Request: / ===
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:32] [DBG] route_ar: resource=
+[2026-04-15 14:17:32] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files":[{"filename":"CAT_PROD.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776262651,"size":34}]}
+[2026-04-15 14:17:32] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:17:32] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:17:32] [DBG] route_ar_sync: sync_id=320
+[2026-04-15 14:17:32] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"320","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:17:32] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:17:32] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262651, size=34)
+[2026-04-15 14:17:32] [INFO] === API Request: / ===
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:32] [DBG] route_ar: resource=
+[2026-04-15 14:17:32] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:32] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:32] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262652","enabled":true}
+[2026-04-15 14:17:32] [INFO] === API Request: / ===
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:32] [DBG] route_ar: resource=
+[2026-04-15 14:17:32] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files":[{"filename":"MASTER.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776262651,"size":34}]}
+[2026-04-15 14:17:32] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:17:32] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:17:32] [DBG] route_ar_sync: sync_id=321
+[2026-04-15 14:17:32] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"321","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:17:32] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:17:32] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262651, size=204800)
+[2026-04-15 14:17:32] [INFO] === API Request: / ===
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:32] [DBG] route_ar: resource=
+[2026-04-15 14:17:32] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:32] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:32] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262652","enabled":true}
+[2026-04-15 14:17:32] [INFO] === API Request: / ===
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:32] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:32] [DBG] route_ar: resource=
+[2026-04-15 14:17:32] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776262651,"size":204800}]}
+[2026-04-15 14:17:32] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:17:32] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:17:32] [DBG] route_ar_sync: sync_id=322
+[2026-04-15 14:17:32] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"322","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:17:32] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:17:32] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 14:17:35] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 14:17:35] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 14:17:35] [INFO] Locations loaded from config: 1
+[2026-04-15 14:17:35] [INFO] Sucursales configuradas: 1
+[2026-04-15 14:17:35] [INFO]   [roton] /srv/roton
+[2026-04-15 14:17:35] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton"}
+[2026-04-15 14:17:35] [DBG] route_ar_register: rbfid=roton
+[2026-04-15 14:17:35] [INFO] route_ar_register: success rbfid=roton
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton"}
+[2026-04-15 14:17:35] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 14:17:35] [INFO] [roton] Registrado OK
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:35] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262655","enabled":true}
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files_version":"726665cb"}
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-15 14:17:35] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776262655, size=512000)
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:35] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262655","enabled":true}
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776262655,"size":512000}]}
+[2026-04-15 14:17:35] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:17:35] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:17:35] [DBG] route_ar_sync: sync_id=323
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"323","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:17:35] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 14:17:35] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776262655, size=34)
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:35] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262655","enabled":true}
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files":[{"filename":"CAT_PROD.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776262655,"size":34}]}
+[2026-04-15 14:17:35] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:17:35] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:17:35] [DBG] route_ar_sync: sync_id=324
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"324","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:17:35] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 14:17:35] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776262655, size=34)
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:35] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262655","enabled":true}
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files":[{"filename":"MASTER.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776262655,"size":34}]}
+[2026-04-15 14:17:35] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:17:35] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:17:35] [DBG] route_ar_sync: sync_id=325
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"325","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:17:35] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 14:17:35] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776262655, size=204800)
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 14:17:35] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776262655","enabled":true}
+[2026-04-15 14:17:35] [INFO] === API Request: / ===
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 14:17:35] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 14:17:35] [DBG] route_ar: resource=
+[2026-04-15 14:17:35] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"WmEruT1m\/iQ","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776262655,"size":204800}]}
+[2026-04-15 14:17:35] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 14:17:35] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 14:17:35] [DBG] route_ar_sync: sync_id=326
+[2026-04-15 14:17:35] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"326","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 14:17:35] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 14:17:35] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 23:20:48] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 23:20:48] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 23:20:48] [INFO] Locations loaded from config: 1
+[2026-04-15 23:20:48] [INFO] Sucursales configuradas: 1
+[2026-04-15 23:20:48] [INFO]   [roton] /srv/roton
+[2026-04-15 23:20:48] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton"}
+[2026-04-15 23:20:48] [DBG] route_ar_register: rbfid=roton
+[2026-04-15 23:20:48] [INFO] route_ar_register: success rbfid=roton
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton"}
+[2026-04-15 23:20:48] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 23:20:48] [INFO] [roton] Registrado OK
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:20:48] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295248","enabled":true}
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"1AT+WXc6oV0","files_version":"726665cb"}
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-15 23:20:48] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295248, size=512000)
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:20:48] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295248","enabled":true}
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"1AT+WXc6oV0","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776295248,"size":512000}]}
+[2026-04-15 23:20:48] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:20:48] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:20:48] [DBG] route_ar_sync: sync_id=327
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"327","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:20:48] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 23:20:48] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776295248, size=34)
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:20:48] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295248","enabled":true}
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"1AT+WXc6oV0","files":[{"filename":"CAT_PROD.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776295248,"size":34}]}
+[2026-04-15 23:20:48] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:20:48] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:20:48] [DBG] route_ar_sync: sync_id=328
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"328","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:20:48] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 23:20:48] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776295248, size=34)
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:20:48] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295248","enabled":true}
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"1AT+WXc6oV0","files":[{"filename":"MASTER.DBF","hash_completo":"v+xudP1l2Rk","chunk_hashes":["v+xudP1l2Rk"],"mtime":1776295248,"size":34}]}
+[2026-04-15 23:20:48] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:20:48] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:20:48] [DBG] route_ar_sync: sync_id=329
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"329","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"v+xudP1l2Rk"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:20:48] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 23:20:48] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776295248, size=204800)
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:20:48] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295248","enabled":true}
+[2026-04-15 23:20:48] [INFO] === API Request: / ===
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:20:48] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:20:48] [DBG] route_ar: resource=
+[2026-04-15 23:20:48] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"1AT+WXc6oV0","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776295248,"size":204800}]}
+[2026-04-15 23:20:48] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:20:48] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:20:48] [DBG] route_ar_sync: sync_id=330
+[2026-04-15 23:20:48] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"330","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:20:48] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 23:20:48] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 23:20:48] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 23:20:48] [INFO] Esperando 300s...
+[2026-04-15 23:26:57] [INFO] AR - Agente de Respaldo v0.1.0
+[2026-04-15 23:26:57] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-15 23:26:57] [INFO] Locations loaded from config: 1
+[2026-04-15 23:26:57] [INFO] Sucursales configuradas: 1
+[2026-04-15 23:26:57] [INFO]   [roton] /srv/roton
+[2026-04-15 23:26:57] [INFO] Registrando 1 ubicaciones...
+[2026-04-15 23:26:57] [INFO] === API Request: / ===
+[2026-04-15 23:26:57] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:57] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:57] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:57] [DBG] route_ar: resource=
+[2026-04-15 23:26:57] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton"}
+[2026-04-15 23:26:57] [DBG] route_ar_register: rbfid=roton
+[2026-04-15 23:26:57] [INFO] route_ar_register: success rbfid=roton
+[2026-04-15 23:26:57] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton"}
+[2026-04-15 23:26:57] [DBG] Register response: {"ok":true,"rbfid":"roton"}
+[2026-04-15 23:26:57] [INFO] [roton] Registrado OK
+[2026-04-15 23:26:57] [INFO] === API Request: / ===
+[2026-04-15 23:26:57] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:57] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:57] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:57] [DBG] route_ar: resource=
+[2026-04-15 23:26:57] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:26:57] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:26:57] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295617","enabled":true}
+[2026-04-15 23:26:57] [INFO] === API Request: / ===
+[2026-04-15 23:26:57] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:57] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:57] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:57] [DBG] route_ar: resource=
+[2026-04-15 23:26:57] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"Yvl7Pjs57z4","files_version":"726665cb"}
+[2026-04-15 23:26:57] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-15 23:26:57] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295617, size=512000)
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:26:58] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295618","enabled":true}
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"Yvl7Pjs57z4","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776295617,"size":512000}]}
+[2026-04-15 23:26:58] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:26:58] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:26:58] [DBG] route_ar_sync: sync_id=331
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"331","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:26:58] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 23:26:58] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776295617, size=78490)
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:26:58] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295618","enabled":true}
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"Yvl7Pjs57z4","files":[{"filename":"CAT_PROD.DBF","hash_completo":"cbJXJPl7dIA","chunk_hashes":["cbJXJPl7dIA"],"mtime":1776295617,"size":78490}]}
+[2026-04-15 23:26:58] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:26:58] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:26:58] [DBG] route_ar_sync: sync_id=332
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"332","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"cbJXJPl7dIA"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:26:58] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 23:26:58] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776295617, size=5098)
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:26:58] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295618","enabled":true}
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"Yvl7Pjs57z4","files":[{"filename":"MASTER.DBF","hash_completo":"CxRi+OBNmLU","chunk_hashes":["CxRi+OBNmLU"],"mtime":1776295617,"size":5098}]}
+[2026-04-15 23:26:58] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:26:58] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:26:58] [DBG] route_ar_sync: sync_id=333
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"333","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"CxRi+OBNmLU"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:26:58] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 23:26:58] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776295617, size=204800)
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:26:58] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295618","enabled":true}
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"Yvl7Pjs57z4","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776295617,"size":204800}]}
+[2026-04-15 23:26:58] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:26:58] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:26:58] [DBG] route_ar_sync: sync_id=334
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"334","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:26:58] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 23:26:58] [INFO] [roton] Evaluados 94 archivos
+[2026-04-15 23:26:58] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-15 23:26:58] [INFO] [roton] Cambio detectado: CANOTA.DBF
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:26:58] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295618","enabled":true}
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"Yvl7Pjs57z4","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["+Zkb\/jGbBjA","ZhFvVGpfhmY","M+1IKSpB4Ig","89UafK5YBTc","2mwVXkHspgE","\/JkasUpTXWQ","\/2LpRRjyfvU","8QHgdtjwZis"],"mtime":1776295618,"size":512000}]}
+[2026-04-15 23:26:58] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:26:58] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:26:58] [DBG] route_ar_sync: sync_id=335
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"335","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:26:58] [INFO] CANOTA.DBF — sin cambios
+[2026-04-15 23:26:58] [INFO] [roton] CANOTA.DBF — sync OK
+[2026-04-15 23:26:58] [INFO] [roton] Cambio detectado: CAT_PROD.DBF
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:26:58] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295618","enabled":true}
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"Yvl7Pjs57z4","files":[{"filename":"CAT_PROD.DBF","hash_completo":"cbJXJPl7dIA","chunk_hashes":["ulXYL5K2wVM","HSPtrGVhNq4"],"mtime":1776295618,"size":78490}]}
+[2026-04-15 23:26:58] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:26:58] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:26:58] [DBG] route_ar_sync: sync_id=336
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"336","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"cbJXJPl7dIA"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:26:58] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-15 23:26:58] [INFO] [roton] CAT_PROD.DBF — sync OK
+[2026-04-15 23:26:58] [INFO] [roton] Cambio detectado: MASTER.DBF
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:26:58] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295618","enabled":true}
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"Yvl7Pjs57z4","files":[{"filename":"MASTER.DBF","hash_completo":"CxRi+OBNmLU","chunk_hashes":["CxRi+OBNmLU"],"mtime":1776295618,"size":5098}]}
+[2026-04-15 23:26:58] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:26:58] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:26:58] [DBG] route_ar_sync: sync_id=337
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"337","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"CxRi+OBNmLU"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:26:58] [INFO] MASTER.DBF — sin cambios
+[2026-04-15 23:26:58] [INFO] [roton] MASTER.DBF — sync OK
+[2026-04-15 23:26:58] [INFO] [roton] Cambio detectado: XCORTE.DBF
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-15 23:26:58] [DBG] route_ar_init: rbfid=roton
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776295618","enabled":true}
+[2026-04-15 23:26:58] [INFO] === API Request: / ===
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router.dispatch: path=/, resource=
+[2026-04-15 23:26:58] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-15 23:26:58] [DBG] route_ar: resource=
+[2026-04-15 23:26:58] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"Yvl7Pjs57z4","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["s7nz5cvJ6kA","OeLcOOT42Bw","PFI9zSh54lQ","ezB1idGJ35M"],"mtime":1776295618,"size":204800}]}
+[2026-04-15 23:26:58] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-15 23:26:58] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-15 23:26:58] [DBG] route_ar_sync: sync_id=338
+[2026-04-15 23:26:58] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"338","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-15 23:26:58] [INFO] XCORTE.DBF — sin cambios
+[2026-04-15 23:26:58] [INFO] [roton] XCORTE.DBF — sync OK
+[2026-04-15 23:26:58] [INFO] Esperando 300s...

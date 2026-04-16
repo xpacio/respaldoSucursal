@@ -1,0 +1,1209 @@
+[2026-04-16 04:36:40] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:36:43] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:37:53] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:37:53] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:38:43] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:38:43] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:38:43] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:38:43] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:38:43] [INFO]   [roton] /srv/roton
+[2026-04-16 04:38:43] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:38:43] [WARN] [roton] No se pudo obtener timestamp, saltando registro
+[2026-04-16 04:38:43] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-16 04:38:43] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-16 04:38:43] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:38:43] [INFO] [roton] Cambio detectado: CANOTA.DBF
+[2026-04-16 04:38:43] [ERR] Error: No timestamp
+[2026-04-16 04:38:46] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:38:46] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:38:46] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:38:46] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:38:46] [INFO]   [roton] /srv/roton
+[2026-04-16 04:38:46] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:38:46] [WARN] [roton] No se pudo obtener timestamp, saltando registro
+[2026-04-16 04:38:46] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-16 04:38:46] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-16 04:38:46] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:38:46] [INFO] [roton] Cambio detectado: CANOTA.DBF
+[2026-04-16 04:38:46] [ERR] Error: No timestamp
+[2026-04-16 04:39:39] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:39:39] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:39:39] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:39:39] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:39:39] [INFO]   [roton] /srv/roton
+[2026-04-16 04:39:39] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:39:39] [WARN] [roton] No se pudo obtener timestamp, saltando registro
+[2026-04-16 04:39:39] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-16 04:39:39] [DBG] Estado guardado para roton
+[2026-04-16 04:40:21] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:40:21] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:40:21] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:40:21] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:40:21] [INFO]   [roton] /srv/roton
+[2026-04-16 04:40:21] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:40:21] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:40:21] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:40:21] [DBG] HTTP Code: 200
+[2026-04-16 04:40:21] [DBG] Response: [2026-04-16 04:40:21] [INFO] === API Request: / ===
+[2026-04-16 04:40:21] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:21] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:21] 
+[2026-04-16 04:40:21] [WARN] [roton] No se pudo obtener timestamp, saltando registro
+[2026-04-16 04:40:21] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:40:21] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:40:21] [DBG] HTTP Code: 200
+[2026-04-16 04:40:21] [DBG] Response: [2026-04-16 04:40:21] [INFO] === API Request: / ===
+[2026-04-16 04:40:21] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:21] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:21] 
+[2026-04-16 04:40:21] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-16 04:40:21] [DBG] Estado guardado para roton
+[2026-04-16 04:40:40] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:40:40] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:40:40] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:40:40] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:40:40] [INFO]   [roton] /srv/roton
+[2026-04-16 04:40:40] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:40:40] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:40:40] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:40:40] [DBG] HTTP Code: 200
+[2026-04-16 04:40:40] [DBG] Response: [2026-04-16 04:40:40] [INFO] === API Request: / ===
+[2026-04-16 04:40:40] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:40] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:40] 
+[2026-04-16 04:40:40] [WARN] [roton] Error en registro: Register failed: invalid response
+[2026-04-16 04:40:40] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:40:40] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:40:40] [DBG] HTTP Code: 200
+[2026-04-16 04:40:40] [DBG] Response: [2026-04-16 04:40:40] [INFO] === API Request: / ===
+[2026-04-16 04:40:40] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:40] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:40] 
+[2026-04-16 04:40:40] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:40:40] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:40:40] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:40:40] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:40:40] [DBG] HTTP Code: 200
+[2026-04-16 04:40:40] [DBG] Response: [2026-04-16 04:40:40] [INFO] === API Request: / ===
+[2026-04-16 04:40:40] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:40] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:40:40] 
+[2026-04-16 04:40:40] [ERR] Error: Sync failed: invalid response
+[2026-04-16 04:42:41] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:42:41] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:42:41] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:42:41] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:42:41] [INFO]   [roton] /srv/roton
+[2026-04-16 04:42:41] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:42:41] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:42:41] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:42:41] [DBG] HTTP Code: 200
+[2026-04-16 04:42:41] [DBG] Response: [2026-04-16 04:42:41] [INFO] === API Request: / ===
+[2026-04-16 04:42:41] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:41] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:41] 
+[2026-04-16 04:42:41] [DBG] Register response: [2026-04-16 04:42:41] [INFO] === API Request: / ===
+[2026-04-16 04:42:41] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:41] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:41] 
+[2026-04-16 04:42:41] [INFO] [roton] Registrado OK - Enabled: Sí
+[2026-04-16 04:42:41] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:42:41] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:42:41] [DBG] HTTP Code: 200
+[2026-04-16 04:42:41] [DBG] Response: [2026-04-16 04:42:41] [INFO] === API Request: / ===
+[2026-04-16 04:42:41] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:41] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:41] 
+[2026-04-16 04:42:41] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:42:41] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:42:41] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:42:41] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:42:41] [DBG] HTTP Code: 200
+[2026-04-16 04:42:41] [DBG] Response: [2026-04-16 04:42:41] [INFO] === API Request: / ===
+[2026-04-16 04:42:41] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:41] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:41] 
+[2026-04-16 04:42:41] [ERR] Error: Sync failed: invalid response
+[2026-04-16 04:42:47] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:42:47] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:42:47] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:42:47] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:42:47] [INFO]   [roton] /srv/roton
+[2026-04-16 04:42:47] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:42:47] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:42:47] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:42:47] [DBG] HTTP Code: 200
+[2026-04-16 04:42:47] [DBG] Response: [2026-04-16 04:42:47] [INFO] === API Request: / ===
+[2026-04-16 04:42:47] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:47] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:47] 
+[2026-04-16 04:42:47] [DBG] Register response: [2026-04-16 04:42:47] [INFO] === API Request: / ===
+[2026-04-16 04:42:47] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:47] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:47] 
+[2026-04-16 04:42:47] [INFO] [roton] Registrado OK - Enabled: Sí
+[2026-04-16 04:42:47] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:42:47] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:42:47] [DBG] HTTP Code: 200
+[2026-04-16 04:42:47] [DBG] Response: [2026-04-16 04:42:47] [INFO] === API Request: / ===
+[2026-04-16 04:42:47] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:47] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:47] 
+[2026-04-16 04:42:47] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:42:47] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:42:47] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:42:47] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:42:47] [DBG] HTTP Code: 200
+[2026-04-16 04:42:47] [DBG] Response: [2026-04-16 04:42:47] [INFO] === API Request: / ===
+[2026-04-16 04:42:47] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:47] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:42:47] 
+[2026-04-16 04:42:47] [ERR] Error: Sync failed: invalid response
+[2026-04-16 04:43:20] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:43:20] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:43:20] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:43:20] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:43:20] [INFO]   [roton] /srv/roton
+[2026-04-16 04:43:20] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:43:20] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:43:20] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:43:20] [DBG] HTTP Code: 200
+[2026-04-16 04:43:20] [DBG] Response: [2026-04-16 04:43:20] [INFO] === API Request: / ===
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] 
+[2026-04-16 04:43:20] [DBG] Register response: [2026-04-16 04:43:20] [INFO] === API Request: / ===
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] 
+[2026-04-16 04:43:20] [INFO] [roton] Registrado OK - Enabled: Sí
+[2026-04-16 04:43:20] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:43:20] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:43:20] [DBG] HTTP Code: 200
+[2026-04-16 04:43:20] [DBG] Response: [2026-04-16 04:43:20] [INFO] === API Request: / ===
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] 
+[2026-04-16 04:43:20] [DBG] fetchFileListVersioned response: [2026-04-16 04:43:20] [INFO] === API Request: / ===
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:43:20] [DBG] route_ar: resource
+[2026-04-16 04:43:20] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:43:20] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:43:20] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:43:20] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:43:20] [DBG] HTTP Code: 200
+[2026-04-16 04:43:20] [DBG] Response: [2026-04-16 04:43:20] [INFO] === API Request: / ===
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:43:20] 
+[2026-04-16 04:43:20] [ERR] Error: Sync failed: invalid response
+[2026-04-16 04:46:07] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:46:07] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:46:07] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:46:07] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:46:07] [INFO]   [roton] /srv/roton
+[2026-04-16 04:46:07] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:46:07] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:46:07] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:46:07] [DBG] route_ar: resource=
+[2026-04-16 04:46:07] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:46:07] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:46:07] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314767","enabled":true}
+[2026-04-16 04:46:07] [DBG] HTTP Code: 200
+[2026-04-16 04:46:07] [DBG] Response: [2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] 
+[2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:46:07] [DBG] route_ar: resource=
+[2026-04-16 04:46:07] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton","totp_token":"ZJmVvXxK6oA"}
+[2026-04-16 04:46:07] [DBG] route_ar_register: rbfid=roton, totp=ZJmVvXxK6oA
+[2026-04-16 04:46:07] [INFO] route_ar_register: success rbfid=roton, enabled=1
+[2026-04-16 04:46:07] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:46:07] [DBG] Register response: [2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] 
+[2026-04-16 04:46:07] [INFO] [roton] Registrado OK - Enabled: Sí
+[2026-04-16 04:46:07] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:46:07] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:46:07] [DBG] route_ar: resource=
+[2026-04-16 04:46:07] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:46:07] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:46:07] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314767","enabled":true}
+[2026-04-16 04:46:07] [DBG] HTTP Code: 200
+[2026-04-16 04:46:07] [DBG] Response: [2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] 
+[2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:46:07] [DBG] route_ar: resource=
+[2026-04-16 04:46:07] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"ZJmVvXxK6oA","files_version":"726665cb"}
+[2026-04-16 04:46:07] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:46:07] [DBG] fetchFileListVersioned response: [2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:46:07] [DBG] route_ar: resource
+[2026-04-16 04:46:07] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:46:07] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:46:07] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:46:07] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:46:07] [DBG] route_ar: resource=
+[2026-04-16 04:46:07] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:46:07] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:46:07] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314767","enabled":true}
+[2026-04-16 04:46:07] [DBG] HTTP Code: 200
+[2026-04-16 04:46:07] [DBG] Response: [2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] 
+[2026-04-16 04:46:07] [INFO] === API Request: / ===
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:46:07] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:46:07] [DBG] route_ar: resource=
+[2026-04-16 04:46:07] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"ZJmVvXxK6oA","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776295618,"size":512000}]}
+[2026-04-16 04:46:07] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:46:07] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:46:07] [DBG] route_ar_sync: sync_id=343
+[2026-04-16 04:46:07] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"343","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:46:07] [ERR] Error: Sync failed: invalid response
+[2026-04-16 04:47:37] [INFO] === API Request: / ===
+[2026-04-16 04:47:43] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:47:43] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:47:43] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:47:43] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:47:43] [INFO]   [roton] /srv/roton
+[2026-04-16 04:47:43] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:47:43] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:47:43] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:47:44] [INFO] === API Request: / ===
+[2026-04-16 04:47:44] [DBG] HTTP Code: 500
+[2026-04-16 04:47:44] [DBG] Response: 
+[2026-04-16 04:47:44] [WARN] [roton] No se pudo obtener timestamp, saltando registro
+[2026-04-16 04:47:44] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:47:44] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:47:44] [INFO] === API Request: / ===
+[2026-04-16 04:47:44] [DBG] HTTP Code: 500
+[2026-04-16 04:47:44] [DBG] Response: 
+[2026-04-16 04:47:44] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-16 04:47:44] [DBG] Estado guardado para roton
+[2026-04-16 04:47:56] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:47:56] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:47:56] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:47:56] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:47:56] [INFO]   [roton] /srv/roton
+[2026-04-16 04:47:56] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:47:56] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:47:56] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:47:56] [INFO] === API Request: / ===
+[2026-04-16 04:47:56] [DBG] HTTP Code: 500
+[2026-04-16 04:47:56] [DBG] Response: 
+[2026-04-16 04:47:56] [WARN] [roton] No se pudo obtener timestamp, saltando registro
+[2026-04-16 04:47:56] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:47:56] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:47:56] [INFO] === API Request: / ===
+[2026-04-16 04:47:56] [DBG] HTTP Code: 500
+[2026-04-16 04:47:56] [DBG] Response: 
+[2026-04-16 04:47:56] [ERR] generateTotp fallo: No timestamp. Saltando.
+[2026-04-16 04:47:56] [DBG] Estado guardado para roton
+[2026-04-16 04:48:18] [INFO] === API Request: / ===
+[2026-04-16 04:48:18] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:18] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:18] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:18] [DBG] route_ar: resource=
+[2026-04-16 04:48:18] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:18] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:18] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314898","enabled":true}
+[2026-04-16 04:48:36] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:48:36] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:36] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:48:36] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:48:36] [INFO]   [roton] /srv/roton
+[2026-04-16 04:48:36] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:48:36] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:36] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [DBG] HTTP Code: 200
+[2026-04-16 04:48:36] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton","totp_token":"aM3GvFQ1Jfg"}
+[2026-04-16 04:48:36] [DBG] route_ar_register: rbfid=roton, totp=aM3GvFQ1Jfg
+[2026-04-16 04:48:36] [INFO] route_ar_register: success rbfid=roton, enabled=1
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:48:36] [DBG] Register response: {"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:48:36] [INFO] [roton] Registrado OK - Enabled: Sí
+[2026-04-16 04:48:36] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:36] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [DBG] HTTP Code: 200
+[2026-04-16 04:48:36] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files_version":"726665cb"}
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:48:36] [DBG] fetchFileListVersioned response: {"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:48:36] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:48:36] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:48:36] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:36] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [DBG] HTTP Code: 200
+[2026-04-16 04:48:36] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776295618,"size":512000}]}
+[2026-04-16 04:48:36] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:48:36] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:48:36] [DBG] route_ar_sync: sync_id=344
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"344","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:48:36] [INFO] CANOTA.DBF — sin cambios
+[2026-04-16 04:48:36] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776295618, size=78490)
+[2026-04-16 04:48:36] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:36] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [DBG] HTTP Code: 200
+[2026-04-16 04:48:36] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"CAT_PROD.DBF","hash_completo":"cbJXJPl7dIA","chunk_hashes":["cbJXJPl7dIA"],"mtime":1776295618,"size":78490}]}
+[2026-04-16 04:48:36] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:48:36] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:48:36] [DBG] route_ar_sync: sync_id=345
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"345","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"cbJXJPl7dIA"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:48:36] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-16 04:48:36] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776295618, size=5098)
+[2026-04-16 04:48:36] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:36] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [DBG] HTTP Code: 200
+[2026-04-16 04:48:36] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"MASTER.DBF","hash_completo":"CxRi+OBNmLU","chunk_hashes":["CxRi+OBNmLU"],"mtime":1776295618,"size":5098}]}
+[2026-04-16 04:48:36] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:48:36] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:48:36] [DBG] route_ar_sync: sync_id=346
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"346","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"CxRi+OBNmLU"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:48:36] [INFO] MASTER.DBF — sin cambios
+[2026-04-16 04:48:36] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776295618, size=204800)
+[2026-04-16 04:48:36] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:36] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:36] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [DBG] HTTP Code: 200
+[2026-04-16 04:48:36] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314916","enabled":true}
+[2026-04-16 04:48:36] [INFO] === API Request: / ===
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:36] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:36] [DBG] route_ar: resource=
+[2026-04-16 04:48:36] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776295618,"size":204800}]}
+[2026-04-16 04:48:36] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:48:36] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:48:36] [DBG] route_ar_sync: sync_id=347
+[2026-04-16 04:48:36] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"347","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:48:36] [INFO] XCORTE.DBF — sin cambios
+[2026-04-16 04:48:36] [INFO] [roton] Evaluados 94 archivos
+[2026-04-16 04:48:36] [DBG] Estado guardado para roton
+[2026-04-16 04:48:42] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:48:42] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:42] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:48:42] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:48:42] [INFO]   [roton] /srv/roton
+[2026-04-16 04:48:42] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:48:42] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:42] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [DBG] HTTP Code: 200
+[2026-04-16 04:48:42] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton","totp_token":"aM3GvFQ1Jfg"}
+[2026-04-16 04:48:42] [DBG] route_ar_register: rbfid=roton, totp=aM3GvFQ1Jfg
+[2026-04-16 04:48:42] [INFO] route_ar_register: success rbfid=roton, enabled=1
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:48:42] [DBG] Register response: {"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:48:42] [INFO] [roton] Registrado OK - Enabled: Sí
+[2026-04-16 04:48:42] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:42] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [DBG] HTTP Code: 200
+[2026-04-16 04:48:42] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files_version":"726665cb"}
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:48:42] [DBG] fetchFileListVersioned response: {"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:48:42] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:48:42] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:48:42] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:42] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [DBG] HTTP Code: 200
+[2026-04-16 04:48:42] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776295618,"size":512000}]}
+[2026-04-16 04:48:42] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:48:42] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:48:42] [DBG] route_ar_sync: sync_id=348
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"348","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:48:42] [INFO] CANOTA.DBF — sin cambios
+[2026-04-16 04:48:42] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776295618, size=78490)
+[2026-04-16 04:48:42] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:42] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [DBG] HTTP Code: 200
+[2026-04-16 04:48:42] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"CAT_PROD.DBF","hash_completo":"cbJXJPl7dIA","chunk_hashes":["cbJXJPl7dIA"],"mtime":1776295618,"size":78490}]}
+[2026-04-16 04:48:42] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:48:42] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:48:42] [DBG] route_ar_sync: sync_id=349
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"349","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"cbJXJPl7dIA"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:48:42] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-16 04:48:42] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776295618, size=5098)
+[2026-04-16 04:48:42] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:42] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [DBG] HTTP Code: 200
+[2026-04-16 04:48:42] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"MASTER.DBF","hash_completo":"CxRi+OBNmLU","chunk_hashes":["CxRi+OBNmLU"],"mtime":1776295618,"size":5098}]}
+[2026-04-16 04:48:42] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:48:42] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:48:42] [DBG] route_ar_sync: sync_id=350
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"350","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"CxRi+OBNmLU"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:48:42] [INFO] MASTER.DBF — sin cambios
+[2026-04-16 04:48:42] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776295618, size=204800)
+[2026-04-16 04:48:42] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:48:42] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:48:42] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [DBG] HTTP Code: 200
+[2026-04-16 04:48:42] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314922","enabled":true}
+[2026-04-16 04:48:42] [INFO] === API Request: / ===
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:48:42] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:48:42] [DBG] route_ar: resource=
+[2026-04-16 04:48:42] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776295618,"size":204800}]}
+[2026-04-16 04:48:42] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:48:42] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:48:42] [DBG] route_ar_sync: sync_id=351
+[2026-04-16 04:48:42] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"351","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:48:42] [INFO] XCORTE.DBF — sin cambios
+[2026-04-16 04:48:42] [INFO] [roton] Evaluados 94 archivos
+[2026-04-16 04:48:42] [DBG] Estado guardado para roton
+[2026-04-16 04:49:05] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:49:05] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:49:05] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:49:05] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:49:05] [INFO]   [roton] /srv/roton
+[2026-04-16 04:49:05] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:49:05] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:49:05] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [DBG] HTTP Code: 200
+[2026-04-16 04:49:05] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton","totp_token":"aM3GvFQ1Jfg"}
+[2026-04-16 04:49:05] [DBG] route_ar_register: rbfid=roton, totp=aM3GvFQ1Jfg
+[2026-04-16 04:49:05] [INFO] route_ar_register: success rbfid=roton, enabled=1
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:49:05] [DBG] Register response: {"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:49:05] [INFO] [roton] Registrado OK - Enabled: Sí
+[2026-04-16 04:49:05] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:49:05] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [DBG] HTTP Code: 200
+[2026-04-16 04:49:05] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files_version":"726665cb"}
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:49:05] [DBG] fetchFileListVersioned response: {"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:49:05] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:49:05] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:49:05] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:49:05] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [DBG] HTTP Code: 200
+[2026-04-16 04:49:05] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776295618,"size":512000}]}
+[2026-04-16 04:49:05] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:49:05] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:49:05] [DBG] route_ar_sync: sync_id=352
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"352","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:49:05] [INFO] CANOTA.DBF — sin cambios
+[2026-04-16 04:49:05] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776295618, size=78490)
+[2026-04-16 04:49:05] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:49:05] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [DBG] HTTP Code: 200
+[2026-04-16 04:49:05] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"CAT_PROD.DBF","hash_completo":"cbJXJPl7dIA","chunk_hashes":["cbJXJPl7dIA"],"mtime":1776295618,"size":78490}]}
+[2026-04-16 04:49:05] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:49:05] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:49:05] [DBG] route_ar_sync: sync_id=353
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"353","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"cbJXJPl7dIA"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:49:05] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-16 04:49:05] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776295618, size=5098)
+[2026-04-16 04:49:05] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:49:05] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [DBG] HTTP Code: 200
+[2026-04-16 04:49:05] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"MASTER.DBF","hash_completo":"CxRi+OBNmLU","chunk_hashes":["CxRi+OBNmLU"],"mtime":1776295618,"size":5098}]}
+[2026-04-16 04:49:05] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:49:05] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:49:05] [DBG] route_ar_sync: sync_id=354
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"354","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"CxRi+OBNmLU"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:49:05] [INFO] MASTER.DBF — sin cambios
+[2026-04-16 04:49:05] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776295618, size=204800)
+[2026-04-16 04:49:05] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:49:05] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:49:05] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [DBG] HTTP Code: 200
+[2026-04-16 04:49:05] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776314945","enabled":true}
+[2026-04-16 04:49:05] [INFO] === API Request: / ===
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:49:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:49:05] [DBG] route_ar: resource=
+[2026-04-16 04:49:05] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"aM3GvFQ1Jfg","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776295618,"size":204800}]}
+[2026-04-16 04:49:05] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:49:05] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:49:05] [DBG] route_ar_sync: sync_id=355
+[2026-04-16 04:49:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"355","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:49:05] [INFO] XCORTE.DBF — sin cambios
+[2026-04-16 04:49:05] [INFO] [roton] Evaluados 94 archivos
+[2026-04-16 04:49:05] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-16 04:49:05] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:49:05] [INFO] Esperando 300s...
+[2026-04-16 04:51:01] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:51:01] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:51:01] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:51:01] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:51:01] [INFO]   [roton] /srv/roton
+[2026-04-16 04:51:01] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:51:01] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:51:01] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [DBG] HTTP Code: 200
+[2026-04-16 04:51:01] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton","totp_token":"a6QZk1RwA9o"}
+[2026-04-16 04:51:01] [DBG] route_ar_register: rbfid=roton, totp=a6QZk1RwA9o
+[2026-04-16 04:51:01] [INFO] route_ar_register: success rbfid=roton, enabled=1
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:51:01] [DBG] Register response: {"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:51:01] [INFO] [roton] Registrado OK - Enabled: Sí
+[2026-04-16 04:51:01] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:51:01] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [DBG] HTTP Code: 200
+[2026-04-16 04:51:01] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"a6QZk1RwA9o","files_version":"726665cb"}
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:51:01] [DBG] fetchFileListVersioned response: {"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:51:01] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:51:01] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:51:01] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:51:01] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [DBG] HTTP Code: 200
+[2026-04-16 04:51:01] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"a6QZk1RwA9o","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776295618,"size":512000}]}
+[2026-04-16 04:51:01] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:51:01] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:51:01] [DBG] route_ar_sync: sync_id=356
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"356","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:51:01] [INFO] CANOTA.DBF — sin cambios
+[2026-04-16 04:51:01] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776295618, size=78490)
+[2026-04-16 04:51:01] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:51:01] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [DBG] HTTP Code: 200
+[2026-04-16 04:51:01] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"a6QZk1RwA9o","files":[{"filename":"CAT_PROD.DBF","hash_completo":"cbJXJPl7dIA","chunk_hashes":["cbJXJPl7dIA"],"mtime":1776295618,"size":78490}]}
+[2026-04-16 04:51:01] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:51:01] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:51:01] [DBG] route_ar_sync: sync_id=357
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"357","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"cbJXJPl7dIA"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:51:01] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-16 04:51:01] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776295618, size=5098)
+[2026-04-16 04:51:01] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:51:01] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [DBG] HTTP Code: 200
+[2026-04-16 04:51:01] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"a6QZk1RwA9o","files":[{"filename":"MASTER.DBF","hash_completo":"CxRi+OBNmLU","chunk_hashes":["CxRi+OBNmLU"],"mtime":1776295618,"size":5098}]}
+[2026-04-16 04:51:01] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:51:01] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:51:01] [DBG] route_ar_sync: sync_id=358
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"358","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"CxRi+OBNmLU"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:51:01] [INFO] MASTER.DBF — sin cambios
+[2026-04-16 04:51:01] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776295618, size=204800)
+[2026-04-16 04:51:01] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:51:01] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:51:01] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [DBG] HTTP Code: 200
+[2026-04-16 04:51:01] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315061","enabled":true}
+[2026-04-16 04:51:01] [INFO] === API Request: / ===
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:51:01] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:51:01] [DBG] route_ar: resource=
+[2026-04-16 04:51:01] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"a6QZk1RwA9o","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776295618,"size":204800}]}
+[2026-04-16 04:51:01] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:51:01] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:51:01] [DBG] route_ar_sync: sync_id=359
+[2026-04-16 04:51:01] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"359","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:51:01] [INFO] XCORTE.DBF — sin cambios
+[2026-04-16 04:51:01] [INFO] [roton] Evaluados 94 archivos
+[2026-04-16 04:51:01] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-16 04:51:01] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:51:01] [INFO] Esperando 300s...
+[2026-04-16 04:56:01] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:56:01] [INFO] Esperando 300s...
+[2026-04-16 04:57:04] [INFO] AR - Agente de Respaldo
+[2026-04-16 04:57:04] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 04:57:04] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 04:57:04] [INFO] Sucursales configuradas: 1
+[2026-04-16 04:57:04] [INFO]   [roton] /srv/roton
+[2026-04-16 04:57:04] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 04:57:04] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:57:04] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:57:05] [INFO] === API Request: / ===
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:57:05] [DBG] route_ar: resource=
+[2026-04-16 04:57:05] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:57:05] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:57:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315425","enabled":true}
+[2026-04-16 04:57:05] [DBG] HTTP Code: 200
+[2026-04-16 04:57:05] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315425","enabled":true}
+[2026-04-16 04:57:05] [INFO] === API Request: / ===
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:57:05] [DBG] route_ar: resource=
+[2026-04-16 04:57:05] [DBG] route_ar: action=register, body={"action":"register","rbfid":"roton","totp_token":"gypCIGJxyRY"}
+[2026-04-16 04:57:05] [DBG] route_ar_register: rbfid=roton, totp=gypCIGJxyRY
+[2026-04-16 04:57:05] [INFO] route_ar_register: success rbfid=roton, enabled=1
+[2026-04-16 04:57:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","enabled":true}
+[2026-04-16 04:57:05] [DBG] Register response: {"ok":true,"rbfid":"roton","enabled":true,"timestamp":"1776315425"}
+[2026-04-16 04:57:05] [INFO] [roton] Registrado OK - Enabled: Sí
+[2026-04-16 04:57:05] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 04:57:05] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 04:57:05] [INFO] === API Request: / ===
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:57:05] [DBG] route_ar: resource=
+[2026-04-16 04:57:05] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 04:57:05] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 04:57:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315425","enabled":true}
+[2026-04-16 04:57:05] [DBG] HTTP Code: 200
+[2026-04-16 04:57:05] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315425","enabled":true}
+[2026-04-16 04:57:05] [INFO] === API Request: / ===
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:57:05] [DBG] route_ar: resource=
+[2026-04-16 04:57:05] [DBG] route_ar: action=config, body={"action":"config","rbfid":"roton","totp_token":"gypCIGJxyRY","files_version":"726665cb"}
+[2026-04-16 04:57:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","files_version":"726665cb"}
+[2026-04-16 04:57:05] [DBG] fetchFileListVersioned response: {"ok":true,"rbfid":"roton","files_version":"726665cb","timestamp":"1776315425"}
+[2026-04-16 04:57:05] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 04:57:05] [DBG] [roton] Evaluando CANOTA.DBF (mtime=1776295618, size=512000)
+[2026-04-16 04:57:05] [INFO] === API Request: / ===
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:57:05] [DBG] route_ar: resource=
+[2026-04-16 04:57:05] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"gypCIGJxyRY","files":[{"filename":"CANOTA.DBF","hash_completo":"GxKcD3+EccI","chunk_hashes":["GxKcD3+EccI"],"mtime":1776295618,"size":512000}]}
+[2026-04-16 04:57:05] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:57:05] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:57:05] [DBG] route_ar_sync: sync_id=360
+[2026-04-16 04:57:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"360","needs_upload":[{"file":"CANOTA.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CANOTA.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CANOTA.DBF","md5":"GxKcD3+EccI"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:57:05] [INFO] CANOTA.DBF — sin cambios
+[2026-04-16 04:57:05] [DBG] [roton] Evaluando CAT_PROD.DBF (mtime=1776295618, size=78490)
+[2026-04-16 04:57:05] [INFO] === API Request: / ===
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:57:05] [DBG] route_ar: resource=
+[2026-04-16 04:57:05] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"gypCIGJxyRY","files":[{"filename":"CAT_PROD.DBF","hash_completo":"cbJXJPl7dIA","chunk_hashes":["cbJXJPl7dIA"],"mtime":1776295618,"size":78490}]}
+[2026-04-16 04:57:05] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:57:05] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:57:05] [DBG] route_ar_sync: sync_id=361
+[2026-04-16 04:57:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"361","needs_upload":[{"file":"CAT_PROD.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/CAT_PROD.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/CAT_PROD.DBF","md5":"cbJXJPl7dIA"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:57:05] [INFO] CAT_PROD.DBF — sin cambios
+[2026-04-16 04:57:05] [DBG] [roton] Evaluando MASTER.DBF (mtime=1776295618, size=5098)
+[2026-04-16 04:57:05] [INFO] === API Request: / ===
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:57:05] [DBG] route_ar: resource=
+[2026-04-16 04:57:05] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"gypCIGJxyRY","files":[{"filename":"MASTER.DBF","hash_completo":"CxRi+OBNmLU","chunk_hashes":["CxRi+OBNmLU"],"mtime":1776295618,"size":5098}]}
+[2026-04-16 04:57:05] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:57:05] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:57:05] [DBG] route_ar_sync: sync_id=362
+[2026-04-16 04:57:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"362","needs_upload":[{"file":"MASTER.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/MASTER.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/MASTER.DBF","md5":"CxRi+OBNmLU"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:57:05] [INFO] MASTER.DBF — sin cambios
+[2026-04-16 04:57:05] [DBG] [roton] Evaluando XCORTE.DBF (mtime=1776295618, size=204800)
+[2026-04-16 04:57:05] [INFO] === API Request: / ===
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 04:57:05] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 04:57:05] [DBG] route_ar: resource=
+[2026-04-16 04:57:05] [DBG] route_ar: action=sync, body={"action":"sync","rbfid":"roton","totp_token":"gypCIGJxyRY","files":[{"filename":"XCORTE.DBF","hash_completo":"U8lQ8M4R6+M","chunk_hashes":["U8lQ8M4R6+M"],"mtime":1776295618,"size":204800}]}
+[2026-04-16 04:57:05] [DBG] route_ar_sync: rbfid=roton, files_count=1
+[2026-04-16 04:57:05] [DBG] route_ar_sync: slots used=0 available=10
+[2026-04-16 04:57:05] [DBG] route_ar_sync: sync_id=363
+[2026-04-16 04:57:05] [DBG] Router.jsonResponse: code=200, data={"ok":true,"sync_id":"363","needs_upload":[{"file":"XCORTE.DBF","chunk":0,"work_path":"\/tmp\/ar\/roton\/XCORTE.DBF","dest_path":"\/srv\/qbck\/tst\/tst02\/roton\/XCORTE.DBF","md5":"U8lQ8M4R6+M"}],"rate_delay":3000,"slots_used":0,"slots_available":10}
+[2026-04-16 04:57:05] [INFO] XCORTE.DBF — sin cambios
+[2026-04-16 04:57:05] [INFO] [roton] Evaluados 94 archivos
+[2026-04-16 04:57:05] [DBG] Estado guardado para roton
+[2026-04-16 05:01:01] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 05:01:01] [INFO] Esperando 300s...
+[2026-04-16 05:05:39] [INFO] AR - Agente de Respaldo
+[2026-04-16 05:05:39] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 05:05:39] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 05:05:39] [INFO] Sucursales configuradas: 1
+[2026-04-16 05:05:39] [INFO]   [roton] /srv/roton
+[2026-04-16 05:05:39] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 05:05:39] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:05:39] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:05:39] [INFO] === API Request: / ===
+[2026-04-16 05:05:39] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:05:39] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:05:39] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:05:39] [DBG] route_ar: resource=
+[2026-04-16 05:05:39] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:05:39] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:05:39] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315939","enabled":true}
+[2026-04-16 05:05:39] [DBG] HTTP Code: 200
+[2026-04-16 05:05:39] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315939","enabled":true}
+[2026-04-16 05:05:39] [WARN] [roton] Error en registro: No timestamp available
+[2026-04-16 05:05:39] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:05:39] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:05:39] [INFO] === API Request: / ===
+[2026-04-16 05:05:39] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:05:39] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:05:39] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:05:39] [DBG] route_ar: resource=
+[2026-04-16 05:05:39] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:05:39] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:05:39] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315939","enabled":true}
+[2026-04-16 05:05:39] [DBG] HTTP Code: 200
+[2026-04-16 05:05:39] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315939","enabled":true}
+[2026-04-16 05:05:39] [ERR] generateTotp fallo: No timestamp available. Saltando.
+[2026-04-16 05:05:39] [DBG] Estado guardado para roton
+[2026-04-16 05:05:46] [INFO] AR - Agente de Respaldo
+[2026-04-16 05:05:46] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 05:05:46] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 05:05:46] [INFO] Sucursales configuradas: 1
+[2026-04-16 05:05:46] [INFO]   [roton] /srv/roton
+[2026-04-16 05:05:46] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 05:05:46] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:05:46] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:05:46] [INFO] === API Request: / ===
+[2026-04-16 05:05:46] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:05:46] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:05:46] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:05:46] [DBG] route_ar: resource=
+[2026-04-16 05:05:46] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:05:46] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:05:46] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315946","enabled":true}
+[2026-04-16 05:05:46] [DBG] HTTP Code: 200
+[2026-04-16 05:05:46] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315946","enabled":true}
+[2026-04-16 05:05:46] [WARN] [roton] Error en registro: No timestamp available
+[2026-04-16 05:05:46] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:05:46] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:05:46] [INFO] === API Request: / ===
+[2026-04-16 05:05:46] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:05:46] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:05:46] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:05:46] [DBG] route_ar: resource=
+[2026-04-16 05:05:46] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:05:46] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:05:46] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315946","enabled":true}
+[2026-04-16 05:05:46] [DBG] HTTP Code: 200
+[2026-04-16 05:05:46] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315946","enabled":true}
+[2026-04-16 05:05:46] [ERR] generateTotp fallo: No timestamp available. Saltando.
+[2026-04-16 05:05:46] [DBG] Estado guardado para roton
+[2026-04-16 05:06:01] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-16 05:06:01] [INFO] Esperando 300s...
+[2026-04-16 05:06:03] [INFO] AR - Agente de Respaldo
+[2026-04-16 05:06:03] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 05:06:03] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 05:06:03] [INFO] Sucursales configuradas: 1
+[2026-04-16 05:06:03] [INFO]   [roton] /srv/roton
+[2026-04-16 05:06:03] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 05:06:03] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:06:03] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:03] [INFO] === API Request: / ===
+[2026-04-16 05:06:03] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:03] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:03] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:06:03] [DBG] route_ar: resource=
+[2026-04-16 05:06:03] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:03] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:06:03] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315963","enabled":true}
+[2026-04-16 05:06:03] [DBG] HTTP Code: 200
+[2026-04-16 05:06:03] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315963","enabled":true}
+[2026-04-16 05:06:03] [WARN] [roton] Error en registro: No timestamp available
+[2026-04-16 05:06:03] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:06:03] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:03] [INFO] === API Request: / ===
+[2026-04-16 05:06:03] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:03] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:03] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:06:03] [DBG] route_ar: resource=
+[2026-04-16 05:06:03] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:03] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:06:03] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315963","enabled":true}
+[2026-04-16 05:06:03] [DBG] HTTP Code: 200
+[2026-04-16 05:06:03] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315963","enabled":true}
+[2026-04-16 05:06:03] [ERR] generateTotp fallo: No timestamp available. Saltando.
+[2026-04-16 05:06:03] [DBG] Estado guardado para roton
+[2026-04-16 05:06:29] [INFO] AR - Agente de Respaldo
+[2026-04-16 05:06:29] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 05:06:29] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 05:06:29] [INFO] Sucursales configuradas: 1
+[2026-04-16 05:06:29] [INFO]   [roton] /srv/roton
+[2026-04-16 05:06:29] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 05:06:29] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:06:29] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:29] [INFO] === API Request: / ===
+[2026-04-16 05:06:29] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:29] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:29] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:06:29] [DBG] route_ar: resource=
+[2026-04-16 05:06:29] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:29] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:06:29] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315989","enabled":true}
+[2026-04-16 05:06:29] [DBG] HTTP Code: 200
+[2026-04-16 05:06:29] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315989","enabled":true}
+[2026-04-16 05:06:29] [WARN] [roton] Error en registro: No timestamp available
+[2026-04-16 05:06:29] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:06:29] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:29] [INFO] === API Request: / ===
+[2026-04-16 05:06:29] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:29] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:29] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:06:29] [DBG] route_ar: resource=
+[2026-04-16 05:06:29] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:29] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:06:29] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776315989","enabled":true}
+[2026-04-16 05:06:29] [DBG] HTTP Code: 200
+[2026-04-16 05:06:29] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776315989","enabled":true}
+[2026-04-16 05:06:29] [ERR] generateTotp fallo: No timestamp available. Saltando.
+[2026-04-16 05:06:29] [DBG] Estado guardado para roton
+[2026-04-16 05:06:46] [INFO] AR - Agente de Respaldo
+[2026-04-16 05:06:46] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-16 05:06:46] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-16 05:06:46] [INFO] Sucursales configuradas: 1
+[2026-04-16 05:06:46] [INFO]   [roton] /srv/roton
+[2026-04-16 05:06:46] [INFO] Registrando 1 ubicaciones...
+[2026-04-16 05:06:46] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-16 05:06:46] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:06:46] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:46] [INFO] === API Request: / ===
+[2026-04-16 05:06:46] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:46] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:46] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:06:46] [DBG] route_ar: resource=
+[2026-04-16 05:06:46] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:46] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:06:46] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776316006","enabled":true}
+[2026-04-16 05:06:46] [DBG] HTTP Code: 200
+[2026-04-16 05:06:46] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776316006","enabled":true}
+[2026-04-16 05:06:46] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-16 05:06:46] [WARN] [roton] Error en registro: No timestamp available
+[2026-04-16 05:06:46] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-16 05:06:46] [DBG] Fetching timestamp from: http://respaldosucursal.servicios.care
+[2026-04-16 05:06:46] [DBG] Request body: {"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:46] [INFO] === API Request: / ===
+[2026-04-16 05:06:46] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:46] [DBG] Router.dispatch: path=/, resource=
+[2026-04-16 05:06:46] [DBG] Router: raíz - procesar acción con ar handler
+[2026-04-16 05:06:46] [DBG] route_ar: resource=
+[2026-04-16 05:06:46] [DBG] route_ar: action=init, body={"action":"init","rbfid":"roton"}
+[2026-04-16 05:06:46] [DBG] route_ar_init: rbfid=roton
+[2026-04-16 05:06:46] [DBG] Router.jsonResponse: code=200, data={"ok":true,"rbfid":"roton","timestamp":"1776316006","enabled":true}
+[2026-04-16 05:06:46] [DBG] HTTP Code: 200
+[2026-04-16 05:06:46] [DBG] Response: {"ok":true,"rbfid":"roton","timestamp":"1776316006","enabled":true}
+[2026-04-16 05:06:46] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-16 05:06:46] [ERR] generateTotp fallo: No timestamp available. Saltando.
+[2026-04-16 05:06:46] [DBG] Estado guardado para roton

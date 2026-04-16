@@ -130,6 +130,15 @@ class Router {
             return;
         }
 
+        $timestamp = time();
+        $timestampStr = (string) $timestamp;
+        
+        // Agregar timestamp a respuestas exitosas (2xx)
+        if ($code >= 200 && $code < 300 && !isset($data['timestamp'])) {
+            $data['timestamp'] = $timestampStr;
+            header('X-Timestamp: ' . $timestampStr);
+        }
+
         http_response_code($code);
         header('Content-Type: application/json');
         echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
