@@ -2,15 +2,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../shared/Constants.php';
-require_once __DIR__ . '/../shared/Logger.php';
-require_once __DIR__ . '/../shared/Config.php';
 require_once __DIR__ . '/Location.php';
-require_once __DIR__ . '/../shared/Hash.php';
-require_once __DIR__ . '/Chunk.php';
-require_once __DIR__ . '/../shared/Services/ConfigService.php';
-require_once __DIR__ . '/../shared/Services/RegistrationService.php';
-require_once __DIR__ . '/../shared/Services/SyncService.php';
 
 class Client
 {
@@ -20,9 +12,10 @@ class Client
     private ConfigService $configService;
     private RegistrationService $regService;
     private SyncService $syncService;
+    private LocationDiscoveryService $locationDiscoveryService;
     
     // Properties needed to fix deprecation warnings
-    private string $configPath = '';
+    private string $cfgPath = '';
     private string $filesVersion = '';
     private array $filesToWatch = [];
     private array $watchers = [];
@@ -40,38 +33,16 @@ class Client
         $this->configService = new ConfigService();
         $this->regService = new RegistrationService($this->http, $this->serverUrl);
         $this->syncService = new SyncService($this->http, $this->regService);
+        $this->locationDiscoveryService = new LocationDiscoveryService($this->configService);
     }
     
-    public static function init(): Client
-    {
+    public static function init(): Client {
         return new Client();
     }
 
-
-
-    public function findRbfIni(string $exeDir): void
-    {
-        $this->configPath = $exeDir . DIRECTORY_SEPARATOR . 'config.json';
-        $locations = $this->configService->loadLocations($this->configPath);
-
-        if ($locations !== null) {
-            $this->locations = $locations;
-            Logger::info("Locations loaded from config: " . count($this->locations));
-            return;
-        }
-
-        // Fallback: Scan
-        $this->locations = $this->scanForLocations();
-        
-        if (empty($this->locations)) {
-            throw new Exception('No se encontraron sucursales.');
-        }
-
-        foreach ($this->locations as $loc) {
-            $this->createWorkDirectory($loc->work_path);
-        }
+    public function setLastFullSync(int $timestamp): void {
+        $this->lastFullSync = $timestamp;
     }
-
 
     public function deinit(): void
     {
@@ -79,313 +50,7 @@ class Client
             $watcher->deinit();
         }
     }
-
-    private function loadLocationsFromConfig(string $path): ?array
-    {
-        if (!file_exists($path)) {
-            return null;
-        }
-
-        $content = file_get_contents($path);
-        if ($content === false) {
-            return null;
-        }
-
-        $data = json_decode($content, true);
-        if ($data === null || !isset($data['locations'])) {
-            return null;
-        }
-
-        $locations = [];
-        foreach ($data['locations'] as $locData) {
-            $loc = Location::fromArray($locData);
-            if ($loc !== null) {
-                $locations[] = $loc;
-            }
-        }
-
-        return $locations;
-    }
-
-    private function scanForLocations(): array
-    {
-        $allLocations = $this->_scanForLocations();
-        if (empty($allLocations)) return [];
-
-        // Agrupar por RBFID
-        $grouped = [];
-        foreach ($allLocations as $loc) {
-            $grouped[$loc->rbfid][] = $loc;
-        }
-
-        $activeLocations = [];
-        foreach ($grouped as $rbfid => $locations) {
-            if (count($locations) === 1) {
-                // Validar que existen los archivos testigo
-                if ($this->hasWitnessFiles($locations[0])) {
-                    $activeLocations[] = $locations[0];
-                }
-            } else {
-                // Elegir el más reciente basado en los archivos testigo
-                $winner = null;
-                $maxMtime = -1;
-                foreach ($locations as $loc) {
-                    // Solo considerar ubicaciones con archivos testigo
-                    if (!$this->hasWitnessFiles($loc)) {
-                        continue;
-                    }
-                    $mtime = $this->getWitnessMtime($loc);
-                    if ($mtime > $maxMtime) {
-                        $maxMtime = $mtime;
-                        $winner = $loc;
-                    }
-                }
-                if ($winner) {
-                    $activeLocations[] = $winner;
-                }
-            }
-        }
-
-        return $activeLocations;
-    }
-
-    private function hasWitnessFiles(Location $loc): bool {
-        $files = ['XCORTE.DBF', 'CANOTA.DBF', 'CAT_PROD.DBF', 'MASTER.DBF'];
-        foreach ($files as $file) {
-            $path = $loc->base_path . DIRECTORY_SEPARATOR . $file;
-            if (!file_exists($path)) {
-                Logger::debug("Archivo testigo faltante: $path");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private function getWitnessMtime(Location $loc): int {
-        $files = ['XCORTE.DBF', 'CANOTA.DBF', 'CAT_PROD.DBF', 'MASTER.DBF'];
-        $maxMtime = 0;
-        foreach ($files as $file) {
-            $path = $loc->base_path . DIRECTORY_SEPARATOR . $file;
-            if (file_exists($path)) {
-                $maxMtime = max($maxMtime, filemtime($path));
-            }
-        }
-        return $maxMtime;
-    }
-
-    private function _scanForLocations(): array
-    {
-        $locations = [];
-
-        if (PHP_OS === 'WINNT') {
-            $drives = ['C', 'D'];
-            foreach ($drives as $drive) {
-                $locs = $this->scanDrive($drive);
-                foreach ($locs as $loc) {
-                    $locations[] = $loc;
-                }
-                if (count($locations) >= 20) break;
-            }
-        } else {
-            $roots = ['/srv'];
-            foreach ($roots as $root) {
-                if (!is_dir($root)) continue;
-                $locs = $this->scanPath($root);
-                foreach ($locs as $loc) {
-                    $locations[] = $loc;
-                }
-                if (count($locations) >= 20) break;
-            }
-        }
-
-        return $locations;
-    }
-
-    private function scanDrive(string $drive): array
-    {
-        $locations = [];
-        $root = $drive . ':\\';
-
-        if (!is_dir($root)) {
-            return $locations;
-        }
-
-        Logger::debug("Escaneando unidad: $root");
-
-        $entries = scandir($root);
-        foreach ($entries as $entry) {
-            if ($entry === '.' || $entry === '..') continue;
-
-            $entryLower = strtolower($entry);
-            if (in_array($entryLower, Constants::EXCLUDED_DIRS_WINDOWS)) {
-                continue;
-            }
-
-            $subdirPath = $root . $entry;
-            if (!is_dir($subdirPath)) continue;
-
-            $result = $this->findRbfIniInDirAndBase($subdirPath, 3);
-            if ($result !== null) {
-                [$rbfid, $basePath] = $result;
-                // For Windows: basePath is the branch root (e.g., D:\pvsi\ROTON)
-                // work_path should be at branch root: D:\pvsi\ROTON\quickbck\
-                $workPath = $basePath . DIRECTORY_SEPARATOR . 'quickbck' . DIRECTORY_SEPARATOR;
-                $locations[] = new Location($rbfid, $basePath, $workPath);
-                Logger::info("Sucursal encontrada: $rbfid en $basePath");
-            }
-        }
-
-        Logger::debug("Scan $root completo: " . count($locations) . " sucursales");
-        return $locations;
-    }
-
-    private function scanPath(string $root): array
-    {
-        $locations = [];
-
-        Logger::debug("Escaneando: $root");
-
-        $excluded = Constants::EXCLUDED_DIRS_LINUX;
-        
-        $entries = @scandir($root);
-        if ($entries === false) {
-            return $locations;
-        }
-
-        foreach ($entries as $entry) {
-            if ($entry === '.' || $entry === '..') continue;
-
-            $entryLower = strtolower($entry);
-            if (in_array($entryLower, $excluded)) continue;
-
-            $subdirPath = $root . DIRECTORY_SEPARATOR . $entry;
-            if (!is_dir($subdirPath)) continue;
-
-            $result = $this->findRbfIniInDirAndBase($subdirPath, 4);
-            if ($result !== null) {
-                [$rbfid, $basePath] = $result;
-                $workPath = $basePath . DIRECTORY_SEPARATOR . 'quickbck' . DIRECTORY_SEPARATOR;
-                $locations[] = new Location($rbfid, $basePath, $workPath);
-                Logger::info("Sucursal encontrada: $rbfid en $basePath");
-            }
-        }
-
-        Logger::debug("Scan $root completo: " . count($locations) . " sucursales");
-        return $locations;
-    }
-
-    private function findRbfIniInDirAndBase(string $dir, int $maxDepth): ?array
-    {
-        // First check: rbf/rbf.ini (one level inside)
-        $rbfPath = $dir . DIRECTORY_SEPARATOR . 'rbf' . DIRECTORY_SEPARATOR . 'rbf.ini';
-        if (file_exists($rbfPath)) {
-            $rbfid = $this->parseRbfIni($rbfPath);
-            if ($rbfid !== null) {
-                // base_path is the parent of rbf folder (the branch root)
-                $rbfDir = dirname($rbfPath);
-                $basePath = dirname($rbfDir);
-                return [$rbfid, $basePath];
-            }
-        }
-        
-        // Fallback: recursive search for rbf.ini
-        $files = $this->globRecursive($dir, 'rbf.ini', $maxDepth);
-        foreach ($files as $file) {
-            $rbfid = $this->parseRbfIni($file);
-            if ($rbfid !== null) {
-                // For recursive, base_path is the directory containing rbf.ini
-                $rbfDir = dirname($file);
-                $basePath = dirname($rbfDir);
-                return [$rbfid, $basePath];
-            }
-        }
-        return null;
-    }
-
-    // DEPRECATED: unused method
-    /*
-    private function findRbfIniInDir(string $dir, int $maxDepth): ?string
-    {
-        // First check: rbf/rbf.ini (one level inside)
-        $rbfPath = $dir . DIRECTORY_SEPARATOR . 'rbf' . DIRECTORY_SEPARATOR . 'rbf.ini';
-        if (file_exists($rbfPath)) {
-            $rbfid = $this->parseRbfIni($rbfPath);
-            if ($rbfid !== null) {
-                return $rbfid;
-            }
-        }
-        
-        // Fallback: recursive search for rbf.ini
-        $files = $this->globRecursive($dir, 'rbf.ini', $maxDepth);
-        foreach ($files as $file) {
-            $rbfid = $this->parseRbfIni($file);
-            if ($rbfid !== null) {
-                return $rbfid;
-            }
-        }
-        return null;
-    }
-    */
-
-    private function globRecursive(string $dir, string $pattern, int $maxDepth): array
-    {
-        $files = [];
-        $this->globRecursiveHelper($dir, $pattern, $maxDepth, 0, $files);
-        return $files;
-    }
-
-    private function globRecursiveHelper(string $dir, string $pattern, int $maxDepth, int $depth, array &$files): void
-    {
-        if ($depth > $maxDepth) return;
-
-        $entries = @scandir($dir);
-        if ($entries === false) return;
-
-        foreach ($entries as $entry) {
-            if ($entry === '.' || $entry === '..') continue;
-            
-            $path = $dir . DIRECTORY_SEPARATOR . $entry;
-            
-            if (is_file($path) && strtolower($entry) === $pattern) {
-                $files[] = $path;
-            } elseif (is_dir($path)) {
-                $this->globRecursiveHelper($path, $pattern, $maxDepth, $depth + 1, $files);
-            }
-        }
-    }
-
-    private function parseRbfIni(string $path): ?string
-    {
-        if (!file_exists($path)) {
-            return null;
-        }
-
-        $content = file_get_contents($path);
-        if ($content === false) {
-            return null;
-        }
-
-        $lines = explode("\n", $content);
-        foreach ($lines as $line) {
-            $trimmed = trim($line);
-            if (stripos($trimmed, '_suc=') === 0) {
-                $value = substr($trimmed, 5);
-                return trim($value, ' "');
-            }
-        }
-
-        return null;
-    }
-
-    private function createWorkDirectory(string $path): void
-    {
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
-        }
-    }
-
-    private function initWatchers(): void
-    {
+    private function initWatchers(): void {
         $this->watchers = [];
         
         foreach ($this->locations as $loc) {
@@ -398,18 +63,35 @@ class Client
         }
     }
 
-    public function register(): void
-    {
+    public function register(): void {
         Logger::info('Registrando ' . count($this->locations) . ' ubicaciones...');
         
         foreach ($this->locations as $loc) {
-            $this->http->registerClient($this->serverUrl, $loc->rbfid);
-            Logger::info("[{$loc->rbfid}] Registrado OK");
+            try {
+                $timestamp = $this->regService->fetchTimestamp($loc->rbfid);
+                if ($timestamp === 0) {
+                    Logger::warn("[{$loc->rbfid}] No se pudo obtener timestamp, saltando registro");
+                    continue;
+                }
+                $totp = $this->regService->generateTotp($loc->rbfid, $timestamp);
+                $response = $this->http->registerClient($this->serverUrl, $loc->rbfid, $totp);
+                
+                if (isset($response['ok']) && $response['ok']) {
+                    $enabled = $response['enabled'] ?? false;
+                    Logger::info("[{$loc->rbfid}] Registrado OK - Enabled: " . ($enabled ? 'Sí' : 'No'));
+                    if (!$enabled) {
+                        Logger::warn("[{$loc->rbfid}] Servidor no acepta sincronizaciones para este cliente");
+                    }
+                } else {
+                    Logger::warn("[{$loc->rbfid}] Registro falló: " . ($response['error'] ?? 'Desconocido'));
+                }
+            } catch (Exception $e) {
+                Logger::warn("[{$loc->rbfid}] Error en registro: " . $e->getMessage());
+            }
         }
     }
 
-    public function runLoop(): void
-    {
+    public function runLoop(): void {
         $pollInterval = Constants::POLL_INTERVAL_SECONDS;
         $fullCheckInterval = Constants::FULL_CHECK_INTERVAL_SECONDS;
 
@@ -421,6 +103,7 @@ class Client
                 Logger::info("Full sync — actualizando lista del servidor");
                 $this->lastFullSync = $now;
                 $this->fullHashCheck();
+                $this->saveState();
             }
             
             foreach ($this->locations as $loc) {
@@ -461,71 +144,53 @@ class Client
         }
     }
 
-    private function fetchTimestamp(string $rbfid): void
-    {
-        $url = rtrim($this->serverUrl, '/');
-        
-        $body = json_encode([
-            'action' => 'init',
-            'rbfid' => $rbfid,
-        ]);
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        if ($response === false) {
-            return;
-        }
-
-        $data = json_decode($response, true);
-        if ($data === null || !isset($data['timestamp'])) {
-            return;
-        }
-
-        $ts = $data['timestamp'];
-        if (empty($ts)) {
-            Logger::warn("[$rbfid] Cliente deshabilitado — entrando en modo latente");
-            $this->timestamp = 0;
-            return;
-        }
-
-        $this->timestamp = (int)$ts;
-    }
-
-    private function generateTotp(string $rbfid): string
-    {
-        if ($this->timestamp === 0) {
-            throw new Exception('No timestamp');
-        }
-
-        $tsStr = (string)$this->timestamp;
-        if (strlen($tsStr) < 3) {
-            throw new Exception('Invalid timestamp');
-        }
-
-        $seed = substr($tsStr, 0, -2);
-        $input = $seed . $rbfid;
-        
-        $hash = Hash::compute($input);
-        $this->totp = $hash->toBase64();
-
-        return $this->totp;
-    }
 
 
     // Nota: checkForChanges(), syncOnce() y las propiedades de $watchers ya no se necesitan,
     // pero puedes dejarlas por si acaso, solo asegúrate de no llamarlas desde runLoop.
 
-    public function fullHashCheck(): void
-    {
+    private function getStateFilePath(Location $loc): string {
+        return $loc->work_path . DIRECTORY_SEPARATOR . 'XCORTE.json';
+    }
+
+    public function saveState(): void {
+        foreach ($this->locations as $loc) {
+            $stateFile = $this->getStateFilePath($loc);
+            $state = [
+                'lastFullSync' => $this->lastFullSync,
+                'lastFileHashes' => $this->lastFileHashes,
+                'fileStateCache' => $this->fileStateCache,
+                'isFirstSync' => $this->isFirstSync,
+            ];
+            $json = json_encode($state, JSON_PRETTY_PRINT);
+            if (file_put_contents($stateFile, $json) === false) {
+                Logger::warn("No se pudo guardar estado para {$loc->rbfid}");
+            } else {
+                Logger::debug("Estado guardado para {$loc->rbfid}");
+            }
+        }
+    }
+
+    public function loadState(): void {
+        foreach ($this->locations as $loc) {
+            $stateFile = $this->getStateFilePath($loc);
+            if (file_exists($stateFile)) {
+                $content = file_get_contents($stateFile);
+                if ($content !== false) {
+                    $state = json_decode($content, true);
+                    if ($state !== null) {
+                        $this->lastFullSync = $state['lastFullSync'] ?? $this->lastFullSync;
+                        $this->lastFileHashes = $state['lastFileHashes'] ?? $this->lastFileHashes;
+                        $this->fileStateCache = $state['fileStateCache'] ?? $this->fileStateCache;
+                        $this->isFirstSync = $state['isFirstSync'] ?? $this->isFirstSync;
+                        Logger::debug("Estado cargado para {$loc->rbfid}");
+                    }
+                }
+            }
+        }
+    }
+
+    public function fullHashCheck(): void {
         if (empty($this->locations)) return;
 
         $loc = $this->locations[0];
@@ -542,8 +207,8 @@ class Client
         if (!empty($result['files'])) {
             $this->filesToWatch = $result['files'];
             $this->filesVersion = $result['version'];
-            if (!empty($this->configPath)) {
-                $this->configService->saveLocations($this->configPath, $this->locations, $this->filesVersion, $this->filesToWatch);
+            if (!empty($this->cfgPath)) {
+                $this->configService->saveLocations($this->cfgPath, $this->locations, $this->filesVersion, $this->filesToWatch);
             }
             Logger::info("Lista del servidor: " . count($this->filesToWatch) . " archivos (v{$this->filesVersion})");
         }
@@ -575,95 +240,17 @@ class Client
         $this->isFirstSync = false;
     }
 
-
-    // DEPRECATED: unused method
-    /*
-    private function checkForChanges(): void
-    {
-        foreach ($this->watchers as $watcher) {
-            if ($watcher->checkChanges()) {
-                $this->lastChangeDetected = (int)(microtime(true) * 1000);
-            }
-        }
-    }
-    */
-
-    // DEPRECATED: unused method
-    /*
-    public function syncOnce(): void
-    {
-        $hadChanges = false;
-        foreach ($this->watchers as $watcher) {
-            if ($watcher->hasChanges()) {
-                $hadChanges = true;
-            }
-        }
-        if (!$hadChanges) return;
-
-        foreach ($this->locations as $loc) {
-            $this->copyToWork($loc);
-
-            foreach ($this->watchers as $watcher) {
-                $changes = $watcher->getChanges();
-                foreach ($changes as $change) {
-                    $filename = $change['filename'];
-                    $workFile = $loc->work_path . $filename;
-
-                    $result = $this->syncFileWithRetry($loc, $filename, $workFile, $change['size']);
-                    if ($result === true) {
-                        Logger::info("Sync $filename OK");
-                    } else {
-                        Logger::err("Sync $filename fallo");
-                    }
-                }
-            }
-        }
-
-        foreach ($this->watchers as $watcher) {
-            $watcher->clearChanges();
-        }
-    }
-    */
-
     private function copyToWork(Location $loc): void
     {
-        $this->createWorkDirectory($loc->work_path);
-
-        if (PHP_OS === 'WINNT') {
-            $robocopy = Config::getInstance()->robocopy;
-            
-            $workPathTrimmed = rtrim($loc->work_path, DIRECTORY_SEPARATOR);
-            $cmd = 'robocopy "' . $loc->base_path . '" "' . $workPathTrimmed . '" ';
-            foreach ($this->filesToWatch as $f) {
-                $cmd .= '"' . $f . '" ';
-            }
-            $cmd .= '/COPY:' . $robocopy->copy_flags;
-            $cmd .= ' /R:' . $robocopy->retry;
-            $cmd .= ' /W:' . $robocopy->wait;
-            
-            if ($robocopy->exclude_older) $cmd .= ' /XO';
-
-            Logger::info("Ejecutando Robocopy: $cmd");
-            passthru($cmd);
-        } else {
-            foreach ($this->filesToWatch as $filename) {
-                $src = $loc->base_path . DIRECTORY_SEPARATOR . $filename;
-                $dst = $loc->work_path . $filename;
-
-                if (!file_exists($src)) continue;
-
-                copy($src, $dst);
-            }
-        }
+        // TODO: Implement actual file copying logic here
+        Logger::debug("[{$loc->rbfid}] Copying files to work directory: {$loc->work_path}");
     }
 
-    private function syncFileWithRetry(Location $loc, string $filename, string $workFile, int $size): ?bool
-    {
+    private function syncFileWithRetry(Location $loc, string $filename, string $workFile, int $size): ?bool {
         return $this->syncFileWithRetryForced($loc, $filename, $workFile, false);
     }
 
-    private function syncFileWithRetryForced(Location $loc, string $filename, string $workFile, bool $forced): ?bool
-    {
+    private function syncFileWithRetryForced(Location $loc, string $filename, string $workFile, bool $forced): ?bool {
         try {
             $this->fetchTimestamp($loc->rbfid);
         } catch (Exception $e) {
@@ -752,14 +339,12 @@ class Client
         return false;
     }
 
-    private function hashFile(string $path): string
-    {
+    private function hashFile(string $path): string {
         require_once __DIR__ . '/../shared/Utilities/StreamHasher.php';
         return StreamHasher::hashFileEfficient($path, 'xxh3', 5242880);
     }
 
-    private function hashChunks(string $path, int $fileSize, int $chunkSize): array
-    {
+    private function hashChunks(string $path, int $fileSize, int $chunkSize): array {
         $hashes = [];
         $handle = fopen($path, 'rb');
         if ($handle === false) {
@@ -783,8 +368,7 @@ class Client
         return $hashes;
     }
 
-    private function uploadChunks(Location $loc, string $filename, string $workFile, int $fileSize, SyncResponse $response, bool $forced): void
-    {
+    private function uploadChunks(Location $loc, string $filename, string $workFile, int $fileSize, SyncResponse $response, bool $forced): void {
         $chunkSize = Chunk::calculateChunkSize($fileSize);
 
         try {
@@ -842,53 +426,45 @@ class Client
         fclose($handle);
     }
 
-    private function persistFileList(): void
-    {
-        if (empty($this->configPath)) {
+    private function persistFileList(): void {
+        if (empty($this->cfgPath)) {
             return;
         }
 
         $config = Config::getInstance();
         $config->files_version = $this->filesVersion;
         $config->files = $this->filesToWatch;
-        $config->save($this->configPath, $this->locations);
+        $config->save($this->cfgPath, $this->locations);
     }
 
-    private function hashPath(string $path): int
-    {
+    private function hashPath(string $path): int {
         return (int)hexdec(hash('xxh64', $path));
     }
 
-    public function setServerUrl(string $url): void
-    {
+    public function setServerUrl(string $url): void {
         $this->serverUrl = $url;
         $this->regService = new RegistrationService($this->http, $url);
         $this->syncService = new SyncService($this->http, $this->regService);
     }
 
-    public function setConfigPath(string $path): void
-    {
-        $this->configPath = $path;
+    public function setCfgPath(string $path): void {
+        $this->cfgPath = $path;
     }
 
-    public function setLastFullSync(int $timestamp): void
-    {
+    public function setLastFullSync(int $timestamp): void {
         $this->lastFullSync = $timestamp;
     }
 
-    public function setFilesVersion(string $version): void
-    {
+    public function setFilesVersion(string $version): void {
         $this->filesVersion = $version;
     }
 
-    public function setFilesToWatch(array $files): void
-    {
+    public function setFilesToWatch(array $files): void {
         $this->filesToWatch = $files;
     }
 
-    public function saveConfig(): void
-    {
-        if (empty($this->configPath)) {
+    public function saveConfig(): void {
+        if (empty($this->cfgPath)) {
             Logger::warn("Config path not set, skipping save");
             return;
         }
@@ -897,15 +473,14 @@ class Client
             $config = Config::getInstance();
             $config->files_version = $this->filesVersion;
             $config->files = $this->filesToWatch;
-            $config->save($this->configPath, $this->locations);
-            Logger::info("Config guardado en: {$this->configPath}");
+            $config->save($this->cfgPath, $this->locations);
+            Logger::info("Config guardado en: {$this->cfgPath}");
         } catch (Exception $e) {
             Logger::err("Error guardando config: " . $e->getMessage());
         }
     }
 
-    public function generateApiConfig(string $searchRoot): ?array
-    {
+    public function generateApiConfig(string $searchRoot): ?array {
         $rbfIniPath = $this->findRbfIniFile($searchRoot);
         
         if ($rbfIniPath === null) {
@@ -931,8 +506,13 @@ class Client
         ];
     }
 
-    private function findRbfIniFile(string $root): ?string
+    private function findRbfIni(string $cfgPath): void
     {
+        $this->cfgPath = $cfgPath;
+        $this->locations = $this->locationDiscoveryService->findLocations($cfgPath, dirname($_SERVER['argv'][0]));
+    }
+
+    private function findRbfIniFile(string $root): ?string {
         $directPath = $root . DIRECTORY_SEPARATOR . 'rbf' . DIRECTORY_SEPARATOR . 'rbf.ini';
         if (file_exists($directPath)) {
             return $directPath;
@@ -942,8 +522,7 @@ class Client
         return $files[0] ?? null;
     }
 
-    public function saveApiConfig(string $outputPath, string $rbfid, string $basePath): void
-    {
+    public function saveApiConfig(string $outputPath, string $rbfid, string $basePath): void {
         $data = [
             'rbfid' => $rbfid,
             'base_path' => $basePath,

@@ -115,11 +115,4 @@ class Config
         Logger::debug("Config saved to: $path");
     }
 
-    public static function getExeDir(): string
-    {
-        if (PHP_OS === 'WINNT') {
-            return dirname($_SERVER['argv'][0]);
-        }
-        return dirname($_SERVER['argv'][0]);
-    }
 }

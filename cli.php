@@ -5,10 +5,7 @@ declare(strict_types=1);
 
 define('VERSION', '0.1.0');
 
-require_once __DIR__ . '/shared/Logger.php';
-require_once __DIR__ . '/shared/Constants.php';
-require_once __DIR__ . '/shared/Config.php';
-require_once __DIR__ . '/cli/Client.php';
+require_once __DIR__ . '/shared/autoload.php';
 
 function printHelp(): void
 {
@@ -72,7 +69,8 @@ function main(array $argv): void
         return;
     }
 
-    $exeDir = Config::getExeDir();
+    $exeDir = dirname($_SERVER['argv'][0]);
+
     $logDir = $exeDir . DIRECTORY_SEPARATOR . 'logs';
     
     Logger::init($logDir, $verbose);
@@ -86,19 +84,20 @@ function main(array $argv): void
 
     try {
         $client = Client::init();
+        $client->loadState();
         
-        $apiConfigPath = $exeDir . DIRECTORY_SEPARATOR . 'config.json';
+        $cfgPath = $exeDir . DIRECTORY_SEPARATOR . 'config.json';
         
-        if (file_exists($apiConfigPath)) {
-            $content = file_get_contents($apiConfigPath);
-            $data = $content !== false ? json_decode($content, true) : null;
+        if (FileUtil::fileExists($cfgPath)) {
+            $content = FileUtil::getContents($cfgPath);
+            $data = $content !== null ? JsonUtil::decode($content, true) : null;
             
             if ($data !== null && isset($data['server_url'])) {
                 $client->setServerUrl($data['server_url']);
             }
             
             if ($data !== null && isset($data['locations']) && is_array($data['locations'])) {
-                $client->setConfigPath($apiConfigPath);
+                $client->setConfigPath($cfgPath);
                 foreach ($data['locations'] as $locData) {
                     if (isset($locData['rbfid']) && isset($locData['base'])) {
                         $base = $locData['base'];
@@ -118,7 +117,7 @@ function main(array $argv): void
                 $client->findRbfIni($exeDir);
             }
         } else {
-            $client->findRbfIni($exeDir);
+            $client->findRbfIni($cfgPath);
         }
         
         if (count($client->locations) === 0) {
@@ -131,9 +130,9 @@ function main(array $argv): void
             Logger::info("  [{$loc->rbfid}] {$loc->base_path}");
         }
 
-        if (!file_exists($apiConfigPath)) {
+        if (!file_exists($cfgPath)) {
             $firstLoc = $client->locations[0];
-            $client->saveApiConfig($apiConfigPath, $firstLoc->rbfid, $firstLoc->base_path);
+            $client->saveApiConfig($cfgPath, $firstLoc->rbfid, $firstLoc->base_path);
         }
 
         try {
@@ -144,6 +143,7 @@ function main(array $argv): void
 
         if ($runOnce) {
             $client->fullHashCheck();
+            $client->saveState();
         } else {
             $client->fullHashCheck();
             $client->setLastFullSync(time());

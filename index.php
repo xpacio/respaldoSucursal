@@ -11,7 +11,7 @@ require_once __DIR__ . '/shared/Constants.php';
 $logDir = __DIR__ . '/logs';
 $verbose = !isset($_GET['quiet']) || $_GET['quiet'] !== '1';
 Logger::init($logDir, $verbose);
-Logger::setQuiet(true);
+//Logger::setQuiet(true);
 
 Logger::info("=== API Request: " . ($_SERVER['REQUEST_URI'] ?? 'unknown') . " ===");
 

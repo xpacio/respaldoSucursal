@@ -10,16 +10,24 @@ require_once __DIR__ . '/../shared/Logger.php';
 
 class HttpClient
 {
-    private const TIMEOUT = 30;
     private const CONTENT_TYPE = 'application/json';
+    private int $timeout = 30;
 
-    public function registerClient(string $serverUrl, string $rbfid): void
-    {
+    public function setTimeout(int $seconds): void {
+        $this->timeout = $seconds;
+    }
+
+    public function increaseTimeout(): void {
+        $this->timeout = min($this->timeout * 2, 300); // Max 5 min
+    }
+
+    public function registerClient(string $serverUrl, string $rbfid, string $totp): array {
         $url = rtrim($serverUrl, '/');
         
         $body = json_encode([
             'action' => 'register',
             'rbfid' => $rbfid,
+            'totp_token' => $totp,
         ]);
 
         $response = $this->post($url, $body);
@@ -28,7 +36,13 @@ class HttpClient
             throw new Exception('Register failed: no response');
         }
 
+        $data = json_decode($response, true);
+        if ($data === null) {
+            throw new Exception('Register failed: invalid response');
+        }
+
         Logger::debug("Register response: " . substr($response, 0, 200));
+        return $data;
     }
 
     public function fetchFileListVersioned(
@@ -149,7 +163,7 @@ class HttpClient
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, self::TIMEOUT);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: ' . self::CONTENT_TYPE,
             'Accept: ' . self::CONTENT_TYPE,

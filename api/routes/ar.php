@@ -134,7 +134,8 @@ function route_ar_init(Router $r, array $body): void {
 
 function route_ar_register(Router $r, array $body): void {
     $rbfid = $body['rbfid'] ?? '';
-    Logger::debug("route_ar_register: rbfid=$rbfid");
+    $totp = $body['totp_token'] ?? '';
+    Logger::debug("route_ar_register: rbfid=$rbfid, totp=$totp");
 
     if (empty($rbfid)) {
         Logger::warn("route_ar_register: RBFID requerido");
@@ -142,11 +143,28 @@ function route_ar_register(Router $r, array $body): void {
         return;
     }
 
+    if (empty($totp)) {
+        Logger::warn("route_ar_register: TOTP requerido");
+        $r->jsonResponse(['ok' => false, 'error' => 'TOTP requerido', 'code' => 'MISSING_TOTP'], 400);
+        return;
+    }
+
+    // Validate TOTP
+    require_once __DIR__ . '/../../shared/TotpValidator.php';
+    $validation = validateTotp($r->db, $rbfid, $totp);
+    if (!$validation['ok']) {
+        Logger::warn("route_ar_register: " . $validation['error']);
+        $r->jsonResponse(['ok' => false, 'error' => $validation['error'], 'code' => $validation['code']], 401);
+        return;
+    }
+
     try {
         $ar = ArCore::getInstance($r);
         $ar->client->registerClient($rbfid);
-        Logger::info("route_ar_register: success rbfid=$rbfid");
-        $r->jsonResponse(['ok' => true, 'rbfid' => $rbfid]);
+        $client = $r->clientService->getClientStatus($rbfid);
+        $enabled = $client ? $client['enabled'] : false;
+        Logger::info("route_ar_register: success rbfid=$rbfid, enabled=$enabled");
+        $r->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'enabled' => $enabled]);
     } catch (Exception $e) {
         Logger::err("route_ar_register: error " . $e->getMessage());
         $r->jsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
