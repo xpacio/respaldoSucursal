@@ -50,10 +50,12 @@ class Log
     {
         if (empty(self::$buffer))
             return;
+        if (!is_dir(self::$dir))
+            @mkdir(self::$dir, 0777, true);
         $toPersist = (PHP_SAPI === 'cli') ? self::$buffer : array_filter(self::$buffer, fn($l) => str_contains($l, '[ERROR]'));
         if (!empty($toPersist)) {
             $f = self::$dir . '/' . self::$prefix . '-' . date('Y-m-d') . '.log';
-            file_put_contents($f, implode(PHP_EOL, $toPersist) . PHP_EOL, FILE_APPEND | LOCK_EX);
+            @file_put_contents($f, implode(PHP_EOL, $toPersist) . PHP_EOL, FILE_APPEND | LOCK_EX);
         }
         self::$buffer = [];
     }
