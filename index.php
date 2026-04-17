@@ -108,9 +108,11 @@ class Server
                 if (!$srv || $srv['hash_xxh3'] !== $hash) {
                     $cnt = max(1, count($f['chunk_hashes'] ?? []));
                     Log::info("Sync: File $name needs update ($cnt chunks)");
-                    $this->db->exec("INSERT INTO ar_files (rbfid, file_name, chunk_count, hash_esperado, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :h, NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, hash_xxh3 = NULL, hash_esperado = :h, updated_at = NOW()", [':r' => $r, ':n' => $name, ':c' => $cnt, ':h' => $hash, ':s' => $f['size'], ':m' => $f['mtime']]);
-                    foreach ($f['chunk_hashes'] ?? [] as $idx => $ch)
-                        $this->db->exec("INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW()) ON CONFLICT (rbfid, file_name, chunk_index) DO UPDATE SET hash_xxh3 = EXCLUDED.hash_xxh3, status = CASE WHEN ar_file_hashes.hash_xxh3 = EXCLUDED.hash_xxh3 THEN ar_file_hashes.status ELSE 'pending' END, updated_at = NOW()", [':rbfid' => $r, ':file' => $name, ':idx' => $idx, ':hash' => $ch]);
+                    // Eliminar registros antiguos de ar_file_hashes para este archivo antes de insertar uno nuevo
+                    $this->db->exec("DELETE FROM ar_file_hashes WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
+                    $this->db->exec("INSERT INTO ar_files (rbfid, file_name, chunk_count, chunk_pending, hash_esperado, status, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :c, :h, 'pending', NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, chunk_pending = :c, hash_xxh3 = NULL, hash_esperado = :h, status = 'pending', updated_at = NOW()", [':r' => $r, ':n' => $name, ':c' => $cnt, ':h' => $hash, ':s' => $f['size'], ':m' => $f['mtime']]);
+                    // Un solo registro por archivo con el primer chunk pendiente
+                    $this->db->exec("INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, 0, :hash, 'pending', NOW())", [':rbfid' => $r, ':file' => $name, ':hash' => $f['chunk_hashes'][0] ?? '']);
                 }
                 $nx = $this->db->q("SELECT chunk_index FROM ar_file_hashes WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index LIMIT 1", [':r' => $r, ':n' => $name]);
                 if ($nx) {
@@ -152,20 +154,34 @@ class Server
                 self::err('Save failed');
             }
             if (hash('xxh3', $data) !== $hash) {
-                $this->db->exec("UPDATE ar_file_hashes SET status='failed' WHERE rbfid=:r AND file_name=:f AND chunk_index=:i", [':r' => $r, ':f' => $file, ':i' => $idx]);
+                $this->db->exec("UPDATE ar_file_hashes SET status='failed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
                 $this->db->commit();
                 Log::error("Chunk $idx hash mismatch for $file");
                 self::json(['ok' => true, 'status' => 'failed']);
             }
-            $this->db->exec("UPDATE ar_file_hashes SET status='received' WHERE rbfid=:r AND file_name=:f AND chunk_index=:i", [':r' => $r, ':f' => $file, ':i' => $idx]);
-            $nx = $this->db->q("SELECT chunk_index FROM ar_file_hashes WHERE rbfid=:r AND file_name=:f AND status!='received' LIMIT 1", [':r' => $r, ':f' => $file]);
-            if ($nx) {
+            // Obtener el chunk_count esperado para este archivo
+            $fileInfo = $this->db->q("SELECT chunk_count, chunk_pending FROM ar_files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
+            $totalChunks = $fileInfo['chunk_count'] ?? 1;
+            $currentPending = $fileInfo['chunk_pending'] ?? 1;
+            
+            // Decrementar chunk_pending al recibir un chunk exitoso
+            $newPending = max(0, $currentPending - 1);
+            $nextChunk = $idx + 1;
+            
+            // Si hay más chunks pendientes, actualizar el índice del chunk pendiente
+            if ($nextChunk < $totalChunks) {
+                $this->db->exec("UPDATE ar_file_hashes SET chunk_index=:i, status='pending', updated_at=NOW() WHERE rbfid=:r AND file_name=:f", [':i' => $nextChunk, ':r' => $r, ':f' => $file]);
+                $this->db->exec("UPDATE ar_files SET chunk_pending=:p WHERE rbfid=:r AND file_name=:f", [':p' => $newPending, ':r' => $r, ':f' => $file]);
                 $this->db->commit();
-                Log::debug("Chunk $idx received ($file)");
-                self::json(['ok' => true, 'status' => 'received', 'next_chunk' => (int) $nx['chunk_index']]);
+                Log::debug("Chunk $idx received ($file), next: $nextChunk, pending: $newPending");
+                self::json(['ok' => true, 'status' => 'received', 'next_chunk' => $nextChunk]);
+            } else {
+                // Último chunk recibido, marcar como recibido para proceder a finalizar
+                $this->db->exec("UPDATE ar_file_hashes SET status='received', updated_at=NOW() WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
+                $this->db->exec("UPDATE ar_files SET chunk_pending=0, status='completed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
+                $this->finalize($r, $file, $paths);
+                $this->db->commit();
             }
-            $this->finalize($r, $file, $paths);
-            $this->db->commit();
         } catch (\Throwable $e) {
             $this->db->rollBack();
             self::err("Upload Error: " . $e->getMessage());
