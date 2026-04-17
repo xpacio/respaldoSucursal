@@ -2,5 +2,7 @@ clear
 git pull
 git push
 git status
-chmod -Rv a+w logs/*.log
+if [ -d "logs" ]; then
+    chmod -Rv a+w logs/*.log
+fi
 chmod -Rv a+w *
