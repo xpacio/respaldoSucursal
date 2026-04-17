@@ -2,19 +2,22 @@
 /**
  * Project-specific server entry point (Consolidated)
  */
-require_once __DIR__ . '/shared.php';
+
+namespace {
+    require_once __DIR__ . '/shared.php';
+}
 
 namespace App\Api {
     use App\Services\StorageService;
     use App\Services\DatabaseService;
     use App\Traits\ResponseTrait;
-    use App\Traits\LoggingTrait;
     use App\TotpValidator;
+    use App\Utilities\Chunk;
     use App\Hash;
     use Exception;
 
     class ArCore {
-        use ResponseTrait, LoggingTrait;
+        use ResponseTrait;
         private static ?ArCore $instance = null;
         public StorageService $storage;
         public DatabaseService $db;
@@ -55,7 +58,7 @@ namespace App\Api {
                 if (empty($rbfid) || empty($token)) $this->jsonResponse(['ok' => false, 'error' => 'Auth required'], 401);
                 $ts = $_SERVER['HTTP_X_TIMESTAMP'] ?? ($body['timestamp'] ?? '');
                 if (!empty($ts)) {
-                    $expected = Hash::compute(substr((string)$ts, 0, -2) . $rbfid)->toBase64();
+                    $expected = TotpValidator::generate($rbfid, (int)$ts);
                     if ($token !== $expected) $this->jsonResponse(['ok' => false, 'error' => 'Token dinamico invalido'], 401);
                 } else {
                     $val = TotpValidator::validate($this->db->getDb(), $rbfid, $token);
@@ -181,7 +184,7 @@ namespace App\Api {
             $bin = base64_decode($data); if (!$bin) throw new Exception('Invalid data');
             $f = $this->db->fetchOne("SELECT file_size FROM ar_files WHERE rbfid = :rbfid AND file_name = :file", [':rbfid' => $rbfid, ':file' => $file]);
             $sz = (int)($f['file_size'] ?? strlen($bin));
-            $chunkSz = \App\Cli\Chunk::calculateChunkSize($sz); $off = $idx * $chunkSz;
+            $chunkSz = Chunk::calculateChunkSize($sz); $off = $idx * $chunkSz;
             if (!$this->storage->saveChunk($paths['work_dir'], $file, $idx, $off, $bin)) throw new Exception('Save failed');
             if (hash('xxh3', $bin) !== $this->db->fetchOne("SELECT hash_xxh3 FROM ar_file_hashes WHERE rbfid = :rbfid AND file_name = :file AND chunk_index = :idx", [':rbfid' => $rbfid, ':file' => $file, ':idx' => $idx])['hash_xxh3']) {
                 $this->db->execute("UPDATE ar_file_hashes SET status = 'failed' WHERE rbfid = :rbfid AND file_name = :file AND chunk_index = :idx", [':rbfid' => $rbfid, ':file' => $file, ':idx' => $idx]);

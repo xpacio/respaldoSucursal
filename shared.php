@@ -224,9 +224,6 @@ class Database {
 
 // --- Traits ---
 namespace App\Traits;
-trait LoggingTrait {
-    public function log(string $message): void { error_log("AR: " . $message); }
-}
 trait ResponseTrait {
     public function jsonResponse(array $data, int $code = 200): void {
         $ts = (string)time();
@@ -241,6 +238,20 @@ trait ResponseTrait {
 
 // --- Utilities ---
 namespace App\Utilities;
+
+class Chunk {
+    public static function calculateChunkSize(int $sz): int {
+        if ($sz < \App\Constants::CHUNK_1MB_THRESHOLD) return \App\Constants::CHUNK_MIN_SIZE;
+        if ($sz < \App\Constants::CHUNK_10MB_THRESHOLD) return 65536;
+        if ($sz < \App\Constants::CHUNK_100MB_THRESHOLD) return 262144;
+        return \App\Constants::CHUNK_MAX_SIZE;
+    }
+    public static function getChunkRange(int $sz, int $idx): array {
+        $cs = self::calculateChunkSize($sz); $off = $idx * $cs;
+        return ['offset' => $off, 'size' => (int)min($cs, $sz - $off)];
+    }
+}
+
 class ArgumentParser {
     private array $options = ['help' => false, 'version' => false, 'quiet' => false, 'run_once' => false, 'server' => null];
     public function parse(array $argv): void {
@@ -255,13 +266,6 @@ class ArgumentParser {
     public function hasOption(string $n): bool { return !empty($this->options[$n]); }
     public function getOption(string $n) { return $this->options[$n] ?? null; }
 }
-class FileUtil {
-    public static function fileExists($p) { return file_exists($p); }
-    public static function getContents($p) { return @file_get_contents($p) ?: null; }
-}
-class JsonUtil {
-    public static function decode($j, $a = false) { return json_decode($j, $a); }
-}
 class StreamHasher {
     public static function hashFileEfficient($p, $a = 'xxh3', $t = 5242880) {
         $sz = @filesize($p) ?: 0;
@@ -269,6 +273,16 @@ class StreamHasher {
         $ctx = hash_init($a); $fh = fopen($p, 'rb');
         while (!feof($fh)) hash_update($ctx, fread($fh, 8192));
         fclose($fh); return hash_final($ctx);
+    }
+}
+class CliHelpers {
+    public static function printHelp() {
+        echo "Uso: php cli.php [opciones]\n";
+        echo "Opciones:\n";
+        echo "  -h, --help      Muestra esta ayuda\n";
+        echo "  -v, --version   Muestra versi\u00f3n\n";
+        echo "  -q, --quiet     Modo silencioso\n";
+        echo "  --run-once      Sincroniza una vez y sale\n";
     }
 }
 
@@ -293,13 +307,16 @@ class DatabaseService {
 namespace App;
 use App\Config\Database;
 class TotpValidator {
+    public static function generate(string $rbfid, int $ts): string {
+        return Hash::compute(substr((string)$ts, 0, -2) . $rbfid)->toBase64();
+    }
     public static function validate(Database $db, string $rbfid, string $token): array {
         $c = $db->fetchOne("SELECT enabled FROM clients WHERE rbfid = :rbfid", [':rbfid' => $rbfid]);
         if (!$c) return ['ok' => false, 'error' => 'No encontrado'];
         if ($c['enabled'] !== true && $c['enabled'] !== 't') return ['ok' => false, 'error' => 'Deshabilitado'];
         $now = time();
         for ($d = -30; $d <= 30; $d++) {
-            $expected = Hash::compute(substr((string)($now + $d), 0, -2) . $rbfid)->toBase64();
+            $expected = self::generate($rbfid, $now + $d);
             if (hash_equals($expected, $token)) return ['ok' => true];
         }
         return ['ok' => false, 'error' => 'Token invalido'];

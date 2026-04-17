@@ -2,7 +2,9 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/shared.php';
+namespace {
+    require_once __DIR__ . '/shared.php';
+}
 
 namespace App\Cli {
     use App\Constants;
@@ -12,20 +14,9 @@ namespace App\Cli {
     use App\Services\RegistrationService;
     use App\Services\SyncService;
     use App\Services\LocationDiscoveryService;
+    use App\Utilities\Chunk;
+    use App\TotpValidator;
     use Exception;
-
-    class Chunk {
-        public static function calculateChunkSize(int $sz): int {
-            if ($sz < Constants::CHUNK_1MB_THRESHOLD) return Constants::CHUNK_MIN_SIZE;
-            if ($sz < Constants::CHUNK_10MB_THRESHOLD) return 65536;
-            if ($sz < Constants::CHUNK_100MB_THRESHOLD) return 262144;
-            return Constants::CHUNK_MAX_SIZE;
-        }
-        public static function getChunkRange(int $sz, int $idx): array {
-            $cs = self::calculateChunkSize($sz); $off = $idx * $cs;
-            return ['offset' => $off, 'size' => (int)min($cs, $sz - $off)];
-        }
-    }
 
     class Client {
         public array $locations = [];
@@ -72,14 +63,14 @@ namespace App\Cli {
             foreach ($this->locations as $l) {
                 try {
                     $ts = $this->regSvc->fetchTimestamp($l->rbfid);
-                    if ($ts) $this->http->registerClient($this->url, $l->rbfid, $this->regSvc->generateTotp($l->rbfid));
+                    if ($ts) $this->http->registerClient($this->url, $l->rbfid, TotpValidator::generate($l->rbfid, $ts));
                 } catch (Exception $e) { Logger::warn("Reg Error: ".$e->getMessage()); }
             }
         }
 
         public function fullHashCheck() {
             if (!$this->locations) return; $l = $this->locations[0];
-            $res = $this->http->fetchFileListVersioned($this->url, $l->rbfid, $this->regSvc->generateTotp($l->rbfid), $this->v);
+            $res = $this->http->fetchFileListVersioned($this->url, $l->rbfid, TotpValidator::generate($l->rbfid, $this->regSvc->fetchTimestamp($l->rbfid) ?: (int)time()), $this->v);
             if (!empty($res['files'])) { $this->files = $res['files']; $this->v = $res['version']; }
             foreach ($this->locations as $loc) {
                 $this->copyToWork($loc);
@@ -178,13 +169,14 @@ namespace App\Services {
         public function __construct($h, $u) { $this->http = $h; $this->url = $u; }
         public function setTimestampManager($m) { $this->tm = $m; }
         public function fetchTimestamp($id) { 
-            $res = file_get_contents(rtrim($this->url,'/').'/health');
+            $res = @file_get_contents(rtrim($this->url,'/').'/health');
+            if ($res === false) return 0;
             $data = json_decode($res, true); $ts = (int)($data['timestamp']??0);
             if ($ts) $this->tm->update($id, $ts); return $ts;
         }
         public function generateTotp($id) {
             $ts = $this->tm->get($id); if (!$ts) throw new \Exception('No TS');
-            return \App\Hash::compute(substr((string)$ts, 0, -2).$id)->toBase64();
+            return TotpValidator::generate($id, $ts);
         }
     }
 
