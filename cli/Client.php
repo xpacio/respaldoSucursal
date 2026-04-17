@@ -2,6 +2,18 @@
 
 declare(strict_types=1);
 
+namespace App\Cli;
+
+use App\Constants;
+use App\Logger;
+use App\Config;
+use App\Services\TimestampManager;
+use App\Services\ConfigService;
+use App\Services\RegistrationService;
+use App\Services\SyncService;
+use App\Services\LocationDiscoveryService;
+use Exception;
+
 require_once __DIR__ . '/Location.php';
 require_once __DIR__ . '/../shared/Services/TimestampManager.php';
 

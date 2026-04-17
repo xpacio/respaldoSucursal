@@ -41,16 +41,12 @@ class RegistrationService {
             }
         }
         
-        $url = rtrim($this->serverUrl, '/');
-        $body = json_encode(['action' => 'init', 'rbfid' => $rbfid]);
+        $url = rtrim($this->serverUrl, '/') . '/health';
         
-        Logger::debug("Fetching timestamp from: $url");
-        Logger::debug("Request body: $body");
+        Logger::debug("Fetching timestamp from health endpoint: $url");
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);

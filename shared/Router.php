@@ -2,13 +2,22 @@
 
 namespace App;
 
+use App\Traits\ResponseTrait;
+
 /**
- * Router - Convención por recurso
+ * Router simplificado
  * 
- * URL /{resource} → carga routes/{resource}.php → llama route_{resource}()
- * El handler extrae todo del JSON body.
+ * Solo maneja health check y rechaza otros recursos.
+ * La funcionalidad principal está en ArCore con acciones en body JSON.
  */
+
+if (!defined('TEST_MODE')) {
+    define('TEST_MODE', false);
+}
+
 class Router {
+    use ResponseTrait;
+    
     private static $instance = null;
 
     // Dependencias globales (accesibles desde handlers)
@@ -17,14 +26,7 @@ class Router {
     public $testResponse;
 
     // Mapeo: primer segmento de URL → archivo de handler
-    private array $resourceMap = [
-        'ar'          => 'ar',
-        'backup'      => 'backup',
-        'client'      => 'atomic',
-        'job'         => 'atomic',
-        'public'      => 'atomic',
-        'heartbeat'   => 'heartbeat',
-    ];
+    private array $resourceMap = [];
 
     private function __construct() {}
 
@@ -62,68 +64,35 @@ class Router {
 
         Logger::debug("Router.dispatch: path=$path, resource=$resource");
 
-        // Si es raíz, procesar acción del body directamente con ar.php
+        // Si es raíz, retornar health check
         if (!$resource || $path === '/' || $path === '') {
-            Logger::debug('Router: raíz - procesar acción con ar handler');
-            $body = $this->getBody();
-            $action = $body['action'] ?? '';
-            
-            if (empty($action)) {
-                $this->jsonResponse(['ok' => true, 'status' => 'healthy']);
-                return;
-            }
-            
-            $file = __DIR__ . '/../api/routes/ar.php';
-            if (!file_exists($file)) {
-                Logger::err("Router: handler ar.php no encontrado");
-                $this->jsonResponse(['ok' => false, 'error' => 'Handler no encontrado', 'code' => 'HANDLER_MISSING'], 500);
-                return;
-            }
-            
-            require_once $file;
-            route_ar($this, '');
-            return;
-        }
-
-        // Health check
-        if ($resource === 'health') {
-            Logger::debug('Router: health check');
+            Logger::debug('Router: raíz - health check');
             $this->jsonResponse(['ok' => true, 'status' => 'healthy']);
             return;
         }
 
-        // Buscar handler por convención
-        $handler = $this->resourceMap[$resource] ?? null;
-        if (!$handler) {
-            Logger::warn("Router: recurso no existe: $resource");
-            $this->jsonResponse(['ok' => false, 'error' => 'Recurso no existe: ' . $resource, 'code' => 'NOT_FOUND'], 404);
+        // Health check - primer punto de contacto para timestamp
+        if ($resource === 'health') {
+            Logger::debug('Router: health check with timestamp');
+            $timestamp = time();
+            $timestampStr = (string) $timestamp;
+            $this->jsonResponse([
+                'ok' => true, 
+                'status' => 'healthy',
+                'timestamp' => $timestampStr,
+                'message' => 'Use este timestamp para generar TOTP'
+            ]);
             return;
         }
 
-        $file = __DIR__ . "/../api/routes/{$handler}.php";
-        if (!file_exists($file)) {
-            Logger::err("Router: handler no encontrado: $file");
-            $this->jsonResponse(['ok' => false, 'error' => 'Handler no encontrado', 'code' => 'HANDLER_MISSING'], 500);
-            return;
-        }
-
-        require_once $file;
-
-        $fn = "route_{$handler}";
-        if (!function_exists($fn)) {
-            Logger::err("Router: función no definida: $fn");
-            $this->jsonResponse(['ok' => false, 'error' => "Función route_{$handler} no definida", 'code' => 'HANDLER_INVALID'], 500);
-            return;
-        }
-
-        $body = $this->getBody();
-        Logger::debug("Router: body=" . json_encode($body));
-
-        $fn($this, $resource);
+        // Recurso no encontrado
+        Logger::warn("Router: recurso no existe: $resource");
+        $this->jsonResponse(['ok' => false, 'error' => 'Recurso no existe: ' . $resource, 'code' => 'NOT_FOUND'], 404);
+        return;
     }
 
     /**
-     * Respuesta JSON estándar
+     * Respuesta JSON estándar (extiende el trait para logging)
      */
     public function jsonResponse(array $data, int $code = 200): void {
         Logger::debug("Router.jsonResponse: code=$code, data=" . json_encode($data));
@@ -133,6 +102,7 @@ class Router {
             return;
         }
 
+        // Usar el trait directamente
         $timestamp = time();
         $timestampStr = (string) $timestamp;
         
@@ -141,9 +111,9 @@ class Router {
             $data['timestamp'] = $timestampStr;
             header('X-Timestamp: ' . $timestampStr);
         }
-
-        http_response_code($code);
+        
         header('Content-Type: application/json');
+        http_response_code($code);
         echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }

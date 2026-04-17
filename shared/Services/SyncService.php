@@ -1,6 +1,17 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Services;
+
+use App\Cli\HttpClient;
+use App\Cli\Chunk;
+use App\Cli\FileHashData;
+use App\Cli\Location;
+use App\Logger;
+use App\Hash;
+use App\Utilities\StreamHasher;
+use Exception;
+
 require_once __DIR__ . '/../Logger.php';
 require_once __DIR__ . '/../Hash.php';
 require_once __DIR__ . '/../../cli/Chunk.php';

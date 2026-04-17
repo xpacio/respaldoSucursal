@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+namespace App\Cli;
+
+use App\Hash;
+
 require_once __DIR__ . '/../shared/Hash.php';
 
 class FileHashData

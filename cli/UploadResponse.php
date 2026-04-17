@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Cli;
+
 class UploadResponse
 {
     public bool $ok;

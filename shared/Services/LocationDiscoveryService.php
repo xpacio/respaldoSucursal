@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+namespace App\Services;
+
+use App\Constants;
+use App\Logger;
+use App\Cli\Location;
+use Exception;
+
 require_once __DIR__ . '/../Constants.php';
 require_once __DIR__ . '/../Logger.php';
 require_once __DIR__ . '/../Config.php';

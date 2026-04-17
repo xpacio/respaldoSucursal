@@ -90,20 +90,14 @@ class ArCore {
         if (!$client) {
             $this->db->execute("INSERT INTO ar_clients (rbfid, enabled, registered_at) VALUES (:rbfid, false, NOW())", [':rbfid' => $rbfid]);
             $this->db->execute("INSERT INTO clients (rbfid, enabled, created_at) VALUES (:rbfid, false, NOW())", [':rbfid' => $rbfid]);
-            header('X-Timestamp: ');
-            $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'timestamp' => '', 'enabled' => false, 'latent' => true]);
+            $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'enabled' => false, 'latent' => true]);
         }
-        
-        $timestamp = time();
-        $timestampStr = (string)$timestamp;
 
         if (!$client['enabled']) {
-            header('X-Timestamp: ');
-            $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'timestamp' => '', 'enabled' => false, 'latent' => true]);
+            $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'enabled' => false, 'latent' => true]);
         }
 
-        header('X-Timestamp: ' . $timestampStr);
-        $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'timestamp' => $timestampStr, 'enabled' => true]);
+        $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'enabled' => true]);
     }
 
     private function handleRegister(array $body): void {
