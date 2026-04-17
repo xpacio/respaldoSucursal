@@ -209,6 +209,6 @@ class Server
 try {
     (new Server())->route();
 } catch (\Throwable $e) {
-    \App\Log::add('Fatal: ' . $e->getMessage());
+    \App\Log::error("FATAL: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
     \App\Api\Server::err('Internal Server Error', 500);
 }
