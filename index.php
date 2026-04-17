@@ -32,10 +32,14 @@ class Server
         $token = $_SERVER['HTTP_X_TOTP_TOKEN'] ?? ($_SERVER['HTTP_X_TOKEN'] ?? ($body['totp_token'] ?? ''));
         Log::add("Action: $action | RBFID: $rbfid | Path: $path");
 
-        if ($action !== 'health' && (empty($rbfid) || empty($token)))
+        if ($action !== 'health' && (empty($rbfid) || empty($token))) {
+            Log::error("Auth failed: Missing RBFID or Token");
             self::err('Auth required', 401);
-        if ($action !== 'health' && !Totp::verify($this->db, $rbfid, $token))
+        }
+        if ($action !== 'health' && !Totp::verify($this->db, $rbfid, $token)) {
+            Log::error("Auth failed: Invalid TOTP token for $rbfid");
             self::err('Token dinamico invalido', 401);
+        }
 
         match ($action) {
             'health' => self::json(['ok' => true, 'status' => 'healthy']),
@@ -61,7 +65,7 @@ class Server
             Log::info("Client $r auto-registered (latent)");
             self::json(['ok' => true, 'rbfid' => $r, 'enabled' => false, 'latent' => true]);
         }
-        Log::info("Client $r initialized");
+        Log::info("Client $r initialized (exists: " . ($c ? 'yes' : 'no') . ")");
         self::json(['ok' => true, 'rbfid' => $r, 'enabled' => (bool) ($c['enabled'] ?? false)]);
     }
     private function register(string $r): void
@@ -75,9 +79,13 @@ class Server
         $files = array_column($this->db->qa("SELECT file_name FROM ar_global_files WHERE enabled = true"), 'file_name');
         $sv = substr(md5(implode(',', $files)), 0, 8);
         $res = ['ok' => true, 'rbfid' => $r, 'files_version' => $sv];
-        if (($b['files_version'] ?? '') !== $sv)
+        if (($b['files_version'] ?? '') !== $sv) {
+            Log::debug("Config: Versions mismatch (sent: {$b['files_version']}, current: $sv). Sending " . count($files) . " files.");
             $res['files'] = $files;
-        Log::add("Config sent (v: $sv)");
+        } else {
+            Log::debug("Config: Versions match ($sv). No files sent.");
+        }
+        Log::info("Config sent to $r (v: $sv)");
         self::json($res);
     }
     private function sync(string $r, array $b): void
@@ -93,20 +101,25 @@ class Server
                 if (!$name || !$hash)
                     continue;
                 $srv = $this->db->q("SELECT hash_xxh3, file_mtime FROM ar_files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
-                if ($srv && !empty($f['mtime']) && (int) $srv['file_mtime'] > (int) $f['mtime'])
+                if ($srv && !empty($f['mtime']) && (int) $srv['file_mtime'] > (int) $f['mtime']) {
+                    Log::debug("Sync: Skipping $name (server file is newer: {$srv['file_mtime']} > {$f['mtime']})");
                     continue;
+                }
                 if (!$srv || $srv['hash_xxh3'] !== $hash) {
                     $cnt = max(1, count($f['chunk_hashes'] ?? []));
+                    Log::info("Sync: File $name needs update ($cnt chunks)");
                     $this->db->exec("INSERT INTO ar_files (rbfid, file_name, chunk_count, hash_esperado, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :h, NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, hash_xxh3 = NULL, hash_esperado = :h, updated_at = NOW()", [':r' => $r, ':n' => $name, ':c' => $cnt, ':h' => $hash, ':s' => $f['size'], ':m' => $f['mtime']]);
                     foreach ($f['chunk_hashes'] ?? [] as $idx => $ch)
                         $this->db->exec("INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW()) ON CONFLICT (rbfid, file_name, chunk_index) DO UPDATE SET hash_xxh3 = EXCLUDED.hash_xxh3, status = CASE WHEN ar_file_hashes.hash_xxh3 = EXCLUDED.hash_xxh3 THEN ar_file_hashes.status ELSE 'pending' END, updated_at = NOW()", [':rbfid' => $r, ':file' => $name, ':idx' => $idx, ':hash' => $ch]);
                 }
                 $nx = $this->db->q("SELECT chunk_index FROM ar_file_hashes WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index LIMIT 1", [':r' => $r, ':n' => $name]);
-                if ($nx)
+                if ($nx) {
+                    Log::debug("Sync: Requesting chunk {$nx['chunk_index']} for $name");
                     $needs[] = ['file' => $name, 'chunk' => (int) $nx['chunk_index'], 'work_path' => $paths['work'] . '/' . $name, 'dest_path' => $paths['base'] . '/' . $name, 'md5' => $hash];
+                }
             }
             $this->db->commit();
-            Log::info("Sync complete. Pending: " . count($needs));
+            Log::info("Sync complete for $r. Pending files: " . count($needs));
             self::json(['ok' => true, 'sync_id' => $syncId, 'needs_upload' => $needs, 'rate_delay' => 3000]);
         } catch (\Throwable $e) {
             $this->db->rollBack();
@@ -129,10 +142,15 @@ class Server
             if (strlen($data) > 10485760)
                 self::err('Chunk too large');
             $paths = $this->paths($r);
-            if (!$paths)
+            if (!$paths) {
+                Log::error("Upload: Paths not found for $r");
                 self::err('Client not found', 404);
-            if (!Storage::saveChunk($paths['work'], $file, $idx, $idx * \App\Chunk::size((int) ($b['size'] ?? strlen($data))), $data))
+            }
+            Log::debug("Upload: Saving chunk $idx for $file (" . strlen($data) . " bytes) in {$paths['work']}");
+            if (!Storage::saveChunk($paths['work'], $file, $idx, $idx * \App\Chunk::size((int) ($b['size'] ?? strlen($data))), $data)) {
+                Log::error("Upload: Storage::saveChunk failed for $file index $idx");
                 self::err('Save failed');
+            }
             if (hash('xxh3', $data) !== $hash) {
                 $this->db->exec("UPDATE ar_file_hashes SET status='failed' WHERE rbfid=:r AND file_name=:f AND chunk_index=:i", [':r' => $r, ':f' => $file, ':i' => $idx]);
                 $this->db->commit();
@@ -159,17 +177,22 @@ class Server
         $esp = $this->db->q("SELECT hash_esperado FROM ar_files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f])['hash_esperado'];
         $act = \App\Hash::computeFile($wp);
         if ($esp === $act) {
-            if (!is_dir($paths['base']))
+            if (!is_dir($paths['base'])) {
+                Log::debug("Finalize: Creating base dir {$paths['base']}");
                 mkdir($paths['base'], 0755, true);
+            }
             $dp = $paths['base'] . '/' . $f;
-            if (file_exists($dp))
+            if (file_exists($dp)) {
+                Log::debug("Finalize: Removing old file $dp");
                 unlink($dp);
+            }
+            Log::info("Finalize: Moving verified file to $dp");
             rename($wp, $dp);
             $this->db->exec("UPDATE ar_files SET hash_xxh3=:h WHERE rbfid=:r AND file_name=:f", [':h' => $act, ':r' => $r, ':f' => $f]);
-            Log::add("File finalized & verified");
+            Log::info("File $f finalized & verified for $r");
             self::json(['ok' => true, 'status' => 'complete']);
         }
-        Log::add("Final hash mismatch");
+        Log::error("File $f: Final hash mismatch (exp: $esp, act: $act)");
         self::json(['ok' => true, 'status' => 'error']);
     }
     private function status(string $r): void
