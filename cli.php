@@ -25,11 +25,16 @@ class Client {
 
     public function discover(string $cfgPath): void {
         Log::info('Discovering locations...');
-        $data = json_decode(file_get_contents($cfgPath) ?: '{}', true);
+        $data = file_exists($cfgPath) ? json_decode(file_get_contents($cfgPath) ?: '{}', true) : [];
         $this->locations = array_map(fn($l) => ['rbfid' => $l['rbfid'], 'base' => $l['base'] ?? $l['base_path'] ?? null, 'work' => $l['work'] ?? $l['work_path'] ?? null], $data['locations'] ?? []);
         if (empty($this->locations)) {
             Log::info('Scanning disk...');
             $this->scanDisk();
+            if (!empty($this->locations)) {
+                $save = ['locations' => $this->locations];
+                file_put_contents($cfgPath, json_encode($save, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                Log::info("Auto-discovered locations saved to $cfgPath");
+            }
         }
         foreach ($this->locations as &$l) {
             if (!is_dir($l['work']))
