@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../Config.php';
-require_once __DIR__ . '/../../cli/Location.php';
-require_once __DIR__ . '/../Constants.php';
+namespace App\Services;
+
+use App\Config;
+use App\Cli\Location;
+use App\Constants;
 
 class ConfigService {
     public function loadLocations(string $configPath): ?array {

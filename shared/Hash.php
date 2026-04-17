@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+namespace App;
+
+use App\Utilities\StreamHasher;
+use Exception;
+
 class Hash
 {
     private string $hex;
@@ -19,7 +24,6 @@ class Hash
 
     public static function computeFile(string $path): Hash
     {
-        require_once __DIR__ . '/Utilities/StreamHasher.php';
         $hashHex = StreamHasher::hashFileEfficient($path, 'xxh3', 5242880);
         return new Hash($hashHex);
     }

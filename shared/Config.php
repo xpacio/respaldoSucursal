@@ -1,11 +1,11 @@
 <?php
-
 declare(strict_types=1);
 
-require_once __DIR__ . '/Constants.php';
-require_once __DIR__ . '/../cli/Location.php';
-require_once __DIR__ . '/../cli/RobocopyConfig.php';
-require_once __DIR__ . '/Logger.php';
+namespace App;
+
+use App\Cli\RobocopyConfig;
+use App\Cli\Location;
+use Exception;
 
 class Config
 {

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Utilities;
+
 class FileUtil
 {
     public static function fileExists(string $path): bool

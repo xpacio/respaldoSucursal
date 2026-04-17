@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Services;
+
 class TimestampManager
 {
     private array $timestamps = []; // Cache de timestamps por rbfid

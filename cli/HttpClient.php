@@ -1,13 +1,11 @@
 <?php
-
 declare(strict_types=1);
 
-require_once __DIR__ . '/FileHashData.php';
-require_once __DIR__ . '/SyncResponse.php';
-require_once __DIR__ . '/UploadResponse.php';
-require_once __DIR__ . '/../shared/Hash.php';
-require_once __DIR__ . '/../shared/Logger.php';
-require_once __DIR__ . '/../shared/Services/TimestampManager.php';
+namespace App\Cli;
+
+use App\Logger;
+use App\Services\TimestampManager;
+use Exception;
 
 class HttpClient
 {

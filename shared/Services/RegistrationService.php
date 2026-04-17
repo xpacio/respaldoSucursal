@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../Logger.php';
-require_once __DIR__ . '/../Hash.php';
-require_once __DIR__ . '/../../cli/HttpClient.php';
-require_once __DIR__ . '/TimestampManager.php';
+namespace App\Services;
+
+use App\Logger;
+use App\Hash;
+use App\Cli\HttpClient;
+use Exception;
 
 class RegistrationService {
     private HttpClient $http;

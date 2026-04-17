@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App;
+
 class Logger
 {
     private static string $logDir = 'logs';

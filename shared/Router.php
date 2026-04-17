@@ -1,4 +1,7 @@
 <?php
+
+namespace App;
+
 /**
  * Router - Convención por recurso
  * 

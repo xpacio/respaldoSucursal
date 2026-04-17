@@ -1,4 +1,9 @@
 <?php
+
+namespace App\Config;
+
+use PDO;
+
 /**
  * Database - Wrapper PDO con transacciones
  */

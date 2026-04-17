@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Cli;
+
 class Location
 {
     public string $rbfid;

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Utilities;
+
 class JsonUtil
 {
     public static function decode(string $json, bool $assoc = false): mixed

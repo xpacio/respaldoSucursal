@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Utilities;
+
 class CliHelpers
 {
     private const VERSION = '0.1.0';

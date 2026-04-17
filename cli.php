@@ -4,8 +4,16 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/shared/autoload.php';
-require_once __DIR__ . '/shared/Utilities/ArgumentParser.php';
-require_once __DIR__ . '/shared/Utilities/CliHelpers.php';
+
+use App\Logger;
+use App\Constants;
+use App\Config;
+use App\Cli\Client;
+use App\Cli\Location;
+use App\Services\ConfigLoader;
+use App\Utilities\ArgumentParser;
+use App\Utilities\CliHelpers;
+use Exception;
 
 function main(array $argv): void
 {

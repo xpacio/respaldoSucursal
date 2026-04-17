@@ -1,11 +1,13 @@
 <?php
-
 declare(strict_types=1);
 
-require_once __DIR__ . '/../Logger.php';
-require_once __DIR__ . '/../Utilities/FileUtil.php';
-require_once __DIR__ . '/../Utilities/JsonUtil.php';
-require_once __DIR__ . '/../../cli/Location.php';
+namespace App\Services;
+
+use App\Logger;
+use App\Utilities\FileUtil;
+use App\Utilities\JsonUtil;
+use App\Cli\Location;
+use App\Cli\Client;
 
 class ConfigLoader
 {

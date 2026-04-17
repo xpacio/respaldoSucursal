@@ -1,23 +1,26 @@
 <?php
 /**
- * Project-specific server entry point
+ * Project-specific server entry point (Facade)
  *
- * Simplified to expose only the current API routes without legacy UI or auth plumbing.
+ * Modernized entry point that delegates all API logic to the App\Api\ArCore facade.
  */
 
-require_once __DIR__ . '/shared/Logger.php';
-require_once __DIR__ . '/shared/Constants.php';
+require_once __DIR__ . '/shared/autoload.php';
 
+use App\Logger;
+use App\Router;
+use App\Config\Database;
+use App\Api\ArCore;
+
+// 1. Initialize Logging
 $logDir = __DIR__ . '/logs';
 $verbose = !isset($_GET['quiet']) || $_GET['quiet'] !== '1';
 Logger::init($logDir, $verbose);
-//Logger::setQuiet(true);
 
 Logger::info("=== API Request: " . ($_SERVER['REQUEST_URI'] ?? 'unknown') . " ===");
 
-// CORS headers
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
-header("Access-Control-Allow-Origin: $origin");
+// 2. CORS Headers
+header("Access-Control-Allow-Origin: *");
 header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Authorization, X-User-Id, X-TOTP-Token, Content-Type');
 header('Access-Control-Allow-Credentials: true');
@@ -26,60 +29,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-require_once __DIR__ . '/shared/autoload.php';
-require_once __DIR__ . '/shared/Config/config.php';
-require_once __DIR__ . '/shared/Config/Database.php';
-require_once __DIR__ . '/shared/Router.php';
-
+// 3. Initialize Database
 $config = require __DIR__ . '/shared/Config/config.php';
 $db = new Database($config['db']);
 
+// 4. Initialize Router
 $router = Router::getInstance();
 $router->db = $db;
 
-class SimpleClientService {
-    private $db;
-    public function __construct($db) { $this->db = $db; }
-    public function getClientStatus(string $rbfid): ?array {
-        error_log("SimpleClientService.getClientStatus: $rbfid");
-        $result = $this->db->fetchOne(
-            "SELECT c.rbfid, c.emp, c.plaza, c.enabled, ar.registered_at, ar.last_sync_at
-             FROM clients c
-             LEFT JOIN ar_clients ar ON ar.rbfid = c.rbfid
-             WHERE c.rbfid = :rbfid",
-            [':rbfid' => $rbfid]
-        );
-        error_log("SimpleClientService.getClientStatus result: " . json_encode($result));
-        return $result;
-    }
-    public function getClientFiles(string $rbfid): array {
-        return $this->db->fetchAll(
-            "SELECT file_name, chunk_count, updated_at FROM ar_files WHERE rbfid = :rbfid",
-            [':rbfid' => $rbfid]
-        );
-    }
-    public function registerClient(string $rbfid): void {
-        $existing = $this->db->fetchOne("SELECT rbfid FROM ar_clients WHERE rbfid = :rbfid", [':rbfid' => $rbfid]);
-        if (!$existing) {
-            $this->db->execute(
-                "INSERT INTO ar_clients (rbfid, enabled, registered_at) VALUES (:rbfid, true, NOW())",
-                [':rbfid' => $rbfid]
-            );
-        }
-    }
-}
-$router->clientService = new SimpleClientService($db);
-
+// 5. Detect and Clean Path
 $path = $_SERVER['PATH_INFO'] ?? '/';
 if (empty($path) || $path === '/') {
-    $path = $_SERVER['REQUEST_URI'] ?? '/';
-    $path = parse_url($path, PHP_URL_PATH);
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 }
-$path = preg_replace('#^/api/index\.php#', '', $path);
-$path = preg_replace('#^/api#', '', $path);
-if (empty($path)) {
-    $path = '/';
-}
+// Remove /api and /api/index.php from path
+$path = preg_replace('#^/api(/index\.php)?#', '', $path);
+$resource = ltrim($path, '/');
 
-error_log("index.php: dispatching with path=$path");
-$router->dispatch($path);
+// 6. Delegate to API Facade (ArCore)
+try {
+    $api = ArCore::getInstance($router);
+    $api->handleRequest($resource);
+} catch (\Exception $e) {
+    Logger::err("Entry point error: " . $e->getMessage());
+    header('Content-Type: application/json');
+    http_response_code(500);
+    echo json_encode(['ok' => false, 'error' => 'Internal Server Error']);
+}

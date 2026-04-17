@@ -1,47 +1,57 @@
 <?php
 /**
- * Autoloader - Carga clases bajo demanda
+ * Autoloader - Carga clases bajo demanda (PSR-4)
  * 
- * Mapea nombres de clase a archivos automáticamente.
+ * Mapea el namespace App\ a los directorios del proyecto.
  */
 spl_autoload_register(function (string $class) {
-    $className = ltrim($class, '\\');
-    $shortName = basename(str_replace('\\', '/', $className));
+    // Prefijo del namespace del proyecto
+    $prefix = 'App\\';
+    
+    // Si la clase no usa el prefijo, no hacemos nada
+    if (strpos($class, $prefix) !== 0) {
+        // Fallback para nombres cortos si es necesario (compatibilidad temporal)
+        $shortName = basename(str_replace(['\\', '/'], '/', $class));
+        $fallbackDirs = [
+            __DIR__,
+            __DIR__ . '/Services',
+            __DIR__ . '/Backup',
+            __DIR__ . '/Config',
+            __DIR__ . '/Traits',
+            __DIR__ . '/../cli',
+            __DIR__ . '/../api',
+        ];
 
-    // Mapeo explícito: clase → archivo (cuando el nombre no coincide)
-    $fileMap = [
-        'System' => 'Services/System.php',
-        'BackupCommandInterface' => 'Backup/BackupCommandInterface.php',
-        'ChunkDTO' => 'Backup/ChunkDTO.php',
-        'BackupSessionRepositoryInterface' => 'Backup/BackupSessionRepositoryInterface.php',
-        'ProcessChunkCommand' => 'Backup/ProcessChunkCommand.php',
-        'BackupApiController' => 'Backup/BackupApiController.php',
-        'FileSystemBackupRepository' => 'Backup/FileSystemBackupRepository.php',
+        foreach ($fallbackDirs as $dir) {
+            $file = $dir . '/' . $shortName . '.php';
+            if (file_exists($file)) {
+                require_once $file;
+                return;
+            }
+        }
+        return;
+    }
+
+    // Obtener el nombre relativo de la clase
+    $relativeClass = substr($class, strlen($prefix));
+
+    // Mapeo de sub-namespaces a directorios específicos
+    $mappings = [
+        'Api\\'     => __DIR__ . '/../api/',
+        'Cli\\'     => __DIR__ . '/../cli/',
+        ''          => __DIR__ . '/', // Default mapping for App\ -> shared/
     ];
-    
-    if (isset($fileMap[$className])) {
-        $file = __DIR__ . '/' . $fileMap[$className];
-        if (file_exists($file)) {
-            require_once $file;
-            return;
-        }
-    }
 
-    if (isset($fileMap[$shortName])) {
-        $file = __DIR__ . '/' . $fileMap[$shortName];
-        if (file_exists($file)) {
-            require_once $file;
-            return;
-        }
-    }
-    
-    // Búsqueda en directorios
-    $dirs = ['', 'Config', 'Services', 'Repositories', '../cli'];
-    foreach ($dirs as $dir) {
-        $filePath = $dir ? __DIR__ . "/{$dir}/{$shortName}.php" : __DIR__ . "/{$shortName}.php";
-        if (file_exists($filePath)) {
-            require_once $filePath;
-            return;
+    foreach ($mappings as $nsPrefix => $baseDir) {
+        if ($nsPrefix === '' || strpos($relativeClass, $nsPrefix) === 0) {
+            $subRelativeClass = ($nsPrefix === '') ? $relativeClass : substr($relativeClass, strlen($nsPrefix));
+            $file = $baseDir . str_replace('\\', '/', $subRelativeClass) . '.php';
+            
+            if (file_exists($file)) {
+                require_once $file;
+                return;
+            }
         }
     }
 });
+

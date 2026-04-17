@@ -19,11 +19,8 @@ class Client
     private string $cfgPath = '';
     private string $filesVersion = '';
     private array $filesToWatch = [];
-    private array $watchers = [];
     private int $timestamp = 0;
-    private string $totp = '';
     private int $lastFullSync = 0;
-    private array $lastFileHashes = [];
     private array $fileStateCache = [];
 
     private bool $isFirstSync = true;
@@ -54,25 +51,6 @@ class Client
 
     public function setLastFullSync(int $timestamp): void {
         $this->lastFullSync = $timestamp;
-    }
-
-    public function deinit(): void
-    {
-        foreach ($this->watchers as $watcher) {
-            $watcher->deinit();
-        }
-    }
-    private function initWatchers(): void {
-        $this->watchers = [];
-        
-        foreach ($this->locations as $loc) {
-            $watcher = new FileWatcher(
-                $loc->base_path,
-                $this->filesToWatch,
-                $loc->work_path
-            );
-            $this->watchers[] = $watcher;
-        }
     }
 
     public function register(): void {
@@ -159,11 +137,6 @@ class Client
         }
     }
 
-
-
-    // Nota: checkForChanges(), syncOnce() y las propiedades de $watchers ya no se necesitan,
-    // pero puedes dejarlas por si acaso, solo asegúrate de no llamarlas desde runLoop.
-
     private function getStateFilePath(Location $loc): string {
         return $loc->work_path . DIRECTORY_SEPARATOR . 'XCORTE.json';
     }
@@ -173,7 +146,6 @@ class Client
             $stateFile = $this->getStateFilePath($loc);
             $state = [
                 'lastFullSync' => $this->lastFullSync,
-                'lastFileHashes' => $this->lastFileHashes,
                 'fileStateCache' => $this->fileStateCache,
                 'isFirstSync' => $this->isFirstSync,
             ];
@@ -195,7 +167,6 @@ class Client
                     $state = json_decode($content, true);
                     if ($state !== null) {
                         $this->lastFullSync = $state['lastFullSync'] ?? $this->lastFullSync;
-                        $this->lastFileHashes = $state['lastFileHashes'] ?? $this->lastFileHashes;
                         $this->fileStateCache = $state['fileStateCache'] ?? $this->fileStateCache;
                         $this->isFirstSync = $state['isFirstSync'] ?? $this->isFirstSync;
                         Logger::debug("Estado cargado para {$loc->rbfid}");
@@ -317,37 +288,9 @@ class Client
         }
     }
 
-    public function generateApiConfig(string $searchRoot): ?array {
-        // Este método parece no usarse en el flujo actual
-        // La lógica de descubrimiento está en LocationDiscoveryService
-        Logger::warn("generateApiConfig está deprecado, usar LocationDiscoveryService");
-        return null;
-    }
-
     public function findRbfIni(string $cfgPath): void
     {
         $this->cfgPath = $cfgPath;
         $this->locations = $this->locationDiscoveryService->findLocations($cfgPath, dirname($_SERVER['argv'][0]));
-    }
-
-    private function findRbfIniFile(string $root): ?string {
-        // Este método parece no usarse en el flujo actual
-        // La lógica de descubrimiento está en LocationDiscoveryService
-        return null;
-    }
-
-    public function saveApiConfig(string $outputPath, string $rbfid, string $basePath): void {
-        $data = [
-            'rbfid' => $rbfid,
-            'base_path' => $basePath,
-            'generated_at' => date('c'),
-        ];
-
-        $json = json_encode($data, JSON_PRETTY_PRINT);
-        if (file_put_contents($outputPath, $json) === false) {
-            throw new Exception("Cannot write config to: $outputPath");
-        }
-
-        Logger::info("API config guardado en: $outputPath");
     }
 }
