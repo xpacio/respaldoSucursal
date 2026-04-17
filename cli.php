@@ -26,7 +26,7 @@ class Client {
     public function discover(string $cfgPath): void {
         Log::info('Discovering locations...');
         $data = json_decode(file_get_contents($cfgPath) ?: '{}', true);
-        $this->locations = array_map(fn($l) => ['rbfid' => $l['rbfid'], 'base' => $l['base_path'], 'work' => $l['work_path']], $data['locations'] ?? []);
+        $this->locations = array_map(fn($l) => ['rbfid' => $l['rbfid'], 'base' => $l['base'] ?? $l['base_path'] ?? null, 'work' => $l['work'] ?? $l['work_path'] ?? null], $data['locations'] ?? []);
         if (empty($this->locations)) {
             Log::info('Scanning disk...');
             $this->scanDisk();
@@ -140,6 +140,10 @@ class Client {
         if ($this->ch)
             curl_close($this->ch);
     }
+
+    public function getLocations(): array {
+        return $this->locations;
+    }
 }
 
 // --- CLI Execution ---
@@ -147,7 +151,7 @@ try {
     $c = new Client();
     $cfg = $_SERVER['argv'][1] ?? __DIR__.'/config.json';
     $c->discover($cfg);
-    if (empty($c->locations)) { Log::add('No locations found. Exiting.'); exit; }
+    if (empty($c->getLocations())) { Log::add('No locations found. Exiting.'); exit; }
     $c->register();
     if (in_array('--run-once', $_SERVER['argv'])) { $c->fullSync(); Log::add('Run once complete.'); exit; }
     $c->syncLoop();
