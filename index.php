@@ -57,7 +57,7 @@ class Server
             self::err('RBFID required');
         $c = $this->db->q("SELECT enabled FROM clients WHERE rbfid = :r", [':r' => $r]);
         if (!$c) {
-            $this->db->exec("INSERT INTO clients (rbfid, enabled, created_at) VALUES (:r, false, NOW())", [':r' => $r]);
+            $this->db->exec("INSERT INTO clients (rbfid, enabled) VALUES (:r, false)", [':r' => $r]);
             Log::info("Client $r auto-registered (latent)");
             self::json(['ok' => true, 'rbfid' => $r, 'enabled' => false, 'latent' => true]);
         }
@@ -66,7 +66,7 @@ class Server
     }
     private function register(string $r): void
     {
-        $this->db->exec("INSERT INTO clients (rbfid, enabled, created_at) VALUES (:r, true, NOW()) ON CONFLICT (rbfid) DO UPDATE SET enabled = true", [':r' => $r]);
+        $this->db->exec("INSERT INTO clients (rbfid, enabled) VALUES (:r, true) ON CONFLICT (rbfid) DO UPDATE SET enabled = true", [':r' => $r]);
         Log::info("Client $r registered");
         self::json(['ok' => true]);
     }
