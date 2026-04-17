@@ -64,6 +64,9 @@ class ArCore {
         $segments = array_values(array_filter(explode('/', $path)));
         $body = $this->router->getBody();
         
+        // DEBUG: Log the received body
+        $this->log("Received body: " . json_encode($body));
+        
         // 1. Determine Action
         $action = $segments[0] ?? ($body['action'] ?? 'sync');
         
@@ -78,7 +81,7 @@ class ArCore {
         // Actually, let's stick to Headers or Body for TOTP for simplicity and security.
         $token = $_SERVER['HTTP_X_TOTP_TOKEN'] ?? ($_SERVER['HTTP_X_TOKEN'] ?? ($body['totp_token'] ?? ''));
 
-        $this->log("Action detected: $action | Client: $rbfid");
+        $this->log("Action detected: $action | Client: $rbfid | Token present: " . (!empty($token) ? 'yes' : 'no'));
 
         // Prepare request context
         $context = [
@@ -143,7 +146,7 @@ class ArCore {
         $client = $this->client->getClientStatus($rbfid);
         
         if (!$client) {
-            $this->db->execute("INSERT INTO ar_clients (rbfid, enabled, registered_at) VALUES (:rbfid, false, NOW())", [':rbfid' => $rbfid]);
+            $this->db->execute("INSERT INTO ar_clients (rbfid, registered_at) VALUES (:rbfid, NOW())", [':rbfid' => $rbfid]);
             $this->db->execute("INSERT INTO clients (rbfid, enabled, created_at) VALUES (:rbfid, false, NOW())", [':rbfid' => $rbfid]);
             $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'enabled' => false, 'latent' => true]);
         }

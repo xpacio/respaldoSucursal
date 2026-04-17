@@ -33,7 +33,7 @@ class ClientService {
         $existing = $this->db->fetchOne("SELECT rbfid FROM ar_clients WHERE rbfid = :rbfid", [':rbfid' => $rbfid]);
         if (!$existing) {
             $this->db->execute(
-                "INSERT INTO ar_clients (rbfid, enabled, registered_at) VALUES (:rbfid, true, NOW())",
+                "INSERT INTO ar_clients (rbfid, registered_at) VALUES (:rbfid, NOW())",
                 [':rbfid' => $rbfid]
             );
         }

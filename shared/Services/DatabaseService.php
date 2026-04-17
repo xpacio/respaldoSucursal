@@ -11,4 +11,6 @@ class DatabaseService {
     public function fetchAll(string $sql, array $params = []) { return $this->db->fetchAll($sql, $params); }
     public function execute(string $sql, array $params = []) { return $this->db->execute($sql, $params); }
     public function insert(string $sql, array $params = []) { return $this->db->insert($sql, $params); }
+    
+    public function getDb() { return $this->db; }
 }

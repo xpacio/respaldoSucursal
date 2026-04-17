@@ -91,6 +91,9 @@ class Client
                 $totp = $this->regService->generateTotp($loc->rbfid);
                 $response = $this->http->registerClient($this->serverUrl, $loc->rbfid, $totp);
                 
+                // DEBUG: Log respuesta completa
+                Logger::debug("[{$loc->rbfid}] Respuesta registro: " . json_encode($response));
+                
                 if (isset($response['ok']) && $response['ok']) {
                     $enabled = $response['enabled'] ?? false;
                     Logger::info("[{$loc->rbfid}] Registrado OK - Enabled: " . ($enabled ? 'Sí' : 'No'));
