@@ -26,6 +26,7 @@ class Client
     private RegistrationService $regService;
     private SyncService $syncService;
     private LocationDiscoveryService $locationDiscoveryService;
+    private TimestampManager $timestampManager;
     
     // Properties needed to fix deprecation warnings
     private string $cfgPath = '';
@@ -41,17 +42,17 @@ class Client
         $this->serverUrl = Constants::DEFAULT_SERVER_URL;
         
         // Crear TimestampManager primero
-        $timestampManager = new TimestampManager();
+        $this->timestampManager = new TimestampManager();
         
         // Crear HttpClient y configurar TimestampManager
         $this->http = new HttpClient();
-        $this->http->setTimestampManager($timestampManager);
+        $this->http->setTimestampManager($this->timestampManager);
         
         $this->configService = new ConfigService();
         
         // Crear RegistrationService y configurar TimestampManager
         $this->regService = new RegistrationService($this->http, $this->serverUrl);
-        $this->regService->setTimestampManager($timestampManager);
+        $this->regService->setTimestampManager($this->timestampManager);
         
         $this->syncService = new SyncService($this->http, $this->regService);
         $this->locationDiscoveryService = new LocationDiscoveryService($this->configService);
@@ -268,6 +269,7 @@ class Client
     public function setServerUrl(string $url): void {
         $this->serverUrl = $url;
         $this->regService = new RegistrationService($this->http, $url);
+        $this->regService->setTimestampManager($this->timestampManager);
         $this->syncService = new SyncService($this->http, $this->regService);
     }
 
