@@ -63,3 +63,63 @@
 [2026-04-17 02:06:17] [DBG] Response: {"ok":false,"error":"Accion no reconocida","code":"INVALID_ACTION"}
 [2026-04-17 02:06:17] [DBG] getCachedTimestamp: timestampManager is null
 [2026-04-17 02:06:17] [ERR] Error: No timestamp available
+[2026-04-17 02:19:40] [INFO] AR - Agente de Respaldo
+[2026-04-17 02:19:40] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-17 02:19:40] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-17 02:19:40] [INFO] Sucursales configuradas: 1
+[2026-04-17 02:19:40] [INFO]   [roton] /srv/roton
+[2026-04-17 02:19:40] [INFO] Registrando 1 ubicaciones...
+[2026-04-17 02:19:40] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-17 02:19:40] [DBG] Fetching timestamp from health endpoint: http://respaldosucursal.servicios.care/health
+[2026-04-17 02:19:40] [DBG] HTTP Code: 400
+[2026-04-17 02:19:40] [DBG] Response: {"ok":false,"error":"Accion no reconocida","code":"INVALID_ACTION"}
+[2026-04-17 02:19:40] [WARN] [roton] No se pudo obtener timestamp, saltando registro
+[2026-04-17 02:19:40] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-17 02:19:40] [DBG] Fetching timestamp from health endpoint: http://respaldosucursal.servicios.care/health
+[2026-04-17 02:19:41] [DBG] HTTP Code: 400
+[2026-04-17 02:19:41] [DBG] Response: {"ok":false,"error":"Accion no reconocida","code":"INVALID_ACTION"}
+[2026-04-17 02:19:41] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-17 02:19:41] [ERR] generateTotp fallo: No timestamp available. Saltando.
+[2026-04-17 02:19:41] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-17 02:19:41] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-17 02:19:41] [INFO] Esperando 300s...
+[2026-04-17 02:24:09] [INFO] AR - Agente de Respaldo
+[2026-04-17 02:24:09] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-17 02:24:09] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-17 02:24:09] [INFO] Sucursales configuradas: 1
+[2026-04-17 02:24:09] [INFO]   [roton] /srv/roton
+[2026-04-17 02:24:09] [INFO] Registrando 1 ubicaciones...
+[2026-04-17 02:24:09] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-17 02:24:09] [DBG] Fetching timestamp from health endpoint: http://respaldosucursal.servicios.care/health
+[2026-04-17 02:24:10] [DBG] HTTP Code: 400
+[2026-04-17 02:24:10] [DBG] Response: {"ok":false,"error":"Accion no reconocida","code":"INVALID_ACTION"}
+[2026-04-17 02:24:10] [WARN] [roton] No se pudo obtener timestamp, saltando registro
+[2026-04-17 02:24:10] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-17 02:24:10] [DBG] Fetching timestamp from health endpoint: http://respaldosucursal.servicios.care/health
+[2026-04-17 02:24:10] [DBG] HTTP Code: 400
+[2026-04-17 02:24:10] [DBG] Response: {"ok":false,"error":"Accion no reconocida","code":"INVALID_ACTION"}
+[2026-04-17 02:24:10] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-17 02:24:10] [ERR] generateTotp fallo: No timestamp available. Saltando.
+[2026-04-17 02:24:10] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-17 02:24:10] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-17 02:24:10] [INFO] Esperando 300s...
+[2026-04-17 02:25:49] [INFO] AR - Agente de Respaldo
+[2026-04-17 02:25:49] [INFO] Servidor: http://respaldosucursal.servicios.care
+[2026-04-17 02:25:49] [INFO] Ubicaciones cargadas desde configuración: 1
+[2026-04-17 02:25:49] [INFO] Sucursales configuradas: 1
+[2026-04-17 02:25:49] [INFO]   [roton] /srv/roton
+[2026-04-17 02:25:49] [INFO] Registrando 1 ubicaciones...
+[2026-04-17 02:25:49] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-17 02:25:49] [DBG] Fetching timestamp from health endpoint: http://respaldosucursal.servicios.care/health
+[2026-04-17 02:25:49] [DBG] HTTP Code: 400
+[2026-04-17 02:25:49] [DBG] Response: {"ok":false,"error":"Accion no reconocida","code":"INVALID_ACTION"}
+[2026-04-17 02:25:49] [WARN] [roton] No se pudo obtener timestamp, saltando registro
+[2026-04-17 02:25:49] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-17 02:25:49] [DBG] Fetching timestamp from health endpoint: http://respaldosucursal.servicios.care/health
+[2026-04-17 02:25:49] [DBG] HTTP Code: 400
+[2026-04-17 02:25:49] [DBG] Response: {"ok":false,"error":"Accion no reconocida","code":"INVALID_ACTION"}
+[2026-04-17 02:25:49] [DBG] getCachedTimestamp: timestampManager is null
+[2026-04-17 02:25:49] [ERR] generateTotp fallo: No timestamp available. Saltando.
+[2026-04-17 02:25:49] [INFO] Iniciando modo espera (poll=300s, fullCheck=3600s)
+[2026-04-17 02:25:49] [DBG] [roton] Copying files to work directory: /srv/roton/quickbck/
+[2026-04-17 02:25:49] [INFO] Esperando 300s...

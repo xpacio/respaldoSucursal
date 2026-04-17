@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\Cli\RobocopyConfig;
 use App\Cli\Location;
 use Exception;
 
 class Config
 {
     public string $server_url = Constants::DEFAULT_SERVER_URL;
-    public RobocopyConfig $robocopy;
     public int $sync_interval_sec = 3600;
     public int $full_check_interval_ms = 3600000;
     public array $files = [];
@@ -21,7 +19,6 @@ class Config
 
     public function __construct()
     {
-        $this->robocopy = new RobocopyConfig();
     }
 
     public static function getInstance(): Config
@@ -55,10 +52,6 @@ class Config
 
         if (isset($data['server_url'])) {
             $config->server_url = $data['server_url'];
-        }
-
-        if (isset($data['robocopy'])) {
-            $config->robocopy = new RobocopyConfig($data['robocopy']);
         }
 
         if (isset($data['sync_interval_sec'])) {
@@ -95,7 +88,6 @@ class Config
     {
         $data = [
             'server_url' => $this->server_url,
-            'robocopy' => $this->robocopy->toArray(),
             'sync_interval_sec' => $this->sync_interval_sec,
             'full_check_interval_ms' => $this->full_check_interval_ms,
             'locations' => [],

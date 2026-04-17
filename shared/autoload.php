@@ -15,7 +15,6 @@ spl_autoload_register(function (string $class) {
         $fallbackDirs = [
             __DIR__,
             __DIR__ . '/Services',
-            __DIR__ . '/Backup',
             __DIR__ . '/Config',
             __DIR__ . '/Traits',
             __DIR__ . '/../cli',
