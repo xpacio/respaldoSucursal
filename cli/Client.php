@@ -55,6 +55,18 @@ class Client
         
         $this->syncService = new SyncService($this->http, $this->regService);
         $this->locationDiscoveryService = new LocationDiscoveryService($this->configService);
+        
+        // Sincronizar tiempo inmediatamente al iniciar
+        $this->syncServerTime();
+    }
+
+    private function syncServerTime(): void {
+        if (empty($this->locations)) return;
+        $loc = $this->locations[0] ?? null;
+        if ($loc) {
+            Logger::info("Sincronizando tiempo con servidor...");
+            $this->regService->fetchTimestamp($loc->rbfid, true);
+        }
     }
     
     public static function init(): Client {

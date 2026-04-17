@@ -38,15 +38,15 @@ $router = Router::getInstance();
 $router->db = $db;
 
 // 5. Detect and Clean Path
-$path = $_SERVER['PATH_INFO'] ?? '/';
-if (empty($path) || $path === '/') {
-    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-}
-// Remove /api and /api/index.php from path
-$path = preg_replace('#^/api(/index\.php)?#', '', $path);
-$resource = ltrim($path, '/');
+$pathInfo = $_SERVER['PATH_INFO'] ?? '';
+$requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
-// 6. Delegate to API Facade (ArCore)
+// Prefer PATH_INFO, fallback to REQUEST_URI
+$path = !empty($pathInfo) ? $pathInfo : $requestUri;
+
+// Clean /api and /api/index.php prefixes
+$cleanPath = preg_replace('#^/api(/index\.php)?#', '', $path);
+$resource = ltrim($cleanPath, '/') ?: 'health'; // Default to health if empty
 try {
     $api = ArCore::getInstance($router);
     $api->handleRequest($resource);

@@ -13,6 +13,12 @@ use App\Cli\Chunk;
 use App\Hash;
 use Exception;
 
+/**
+ * ArCore Facade
+ * 
+ * Manages API routing using a REST-like structure: /api/{action}/{rbfid}/{extra}
+ * Also maintains backward compatibility with legacy body-based actions.
+ */
 class ArCore {
     use ResponseTrait, LoggingTrait;
 
@@ -52,35 +58,84 @@ class ArCore {
     /**
      * Entry point for API requests (Facade)
      */
-    public function handleRequest(string $resource): void {
-        $this->log("handleRequest: resource=$resource");
+    public function handleRequest(string $path): void {
+        $this->log("handleRequest: path=$path");
         
+        $segments = array_values(array_filter(explode('/', $path)));
         $body = $this->router->getBody();
-        $action = $body['action'] ?? '';
         
-        if ($resource === '' || $resource === null) {
-            $action = $action ?: ($body['action'] ?? 'sync');
+        // 1. Determine Action
+        $action = $segments[0] ?? ($body['action'] ?? 'sync');
+        
+        // 2. Determine RBFID (URL -> Header -> Body)
+        $rbfid = $segments[1] ?? ($_SERVER['HTTP_X_RBFID'] ?? ($body['rbfid'] ?? ''));
+        
+        // 3. Determine TOTP Token (URL -> Header -> Body)
+        $token = $segments[2] ?? ($_SERVER['HTTP_X_TOTP_TOKEN'] ?? ($_SERVER['HTTP_X_TOKEN'] ?? ($body['totp_token'] ?? '')));
+
+        // Special case: if segments[2] looks like a hash or chunk, it's not the token.
+        // We assume token is the 3rd segment only for specific actions if provided.
+        // Actually, let's stick to Headers or Body for TOTP for simplicity and security.
+        $token = $_SERVER['HTTP_X_TOTP_TOKEN'] ?? ($_SERVER['HTTP_X_TOKEN'] ?? ($body['totp_token'] ?? ''));
+
+        $this->log("Action detected: $action | Client: $rbfid");
+
+        // Prepare request context
+        $context = [
+            'action' => $action,
+            'rbfid'  => $rbfid,
+            'token'  => $token,
+            'body'   => $body,
+            'params' => array_slice($segments, 1) // Everything after action
+        ];
+
+        // --- GLOBAL SECURITY MIDDLEWARE ---
+        // Verify TOTP for all actions EXCEPT 'health' and 'download'
+        $publicActions = ['health', 'download', 'init']; 
+        
+        if (!in_array($action, $publicActions)) {
+            if (empty($rbfid) || empty($token)) {
+                $this->jsonResponse(['ok' => false, 'error' => 'Autenticacion requerida (RBFID y X-TOTP-Token)'], 401);
+            }
+
+            // Validar auth
+            $timestamp = $_SERVER['HTTP_X_TIMESTAMP'] ?? ($body['timestamp'] ?? '');
+            if (!empty($timestamp)) {
+                $seed = substr((string)$timestamp, 0, -2);
+                $expected = Hash::compute($seed . $rbfid)->toBase64();
+                if ($token !== $expected) $this->jsonResponse(['ok' => false, 'error' => 'Token dinamico invalido', 'code' => 'AUTH_ERROR'], 401);
+            } else {
+                $validation = TotpValidator::validate($this->db->getDb(), $rbfid, $token);
+                if (!$validation['ok']) $this->jsonResponse($validation, 401);
+            }
         }
 
-        $this->log("Action: $action");
-
         switch ($action) {
-            case 'init':     $this->handleInit($body); break;
-            case 'register': $this->handleRegister($body); break;
-            case 'config':   $this->handleConfig($body); break;
-            case 'sync':     $this->handleSync($body); break;
-            case 'upload':   $this->handleUpload($body); break;
-            case 'status':   $this->handleStatus($body); break;
-            case 'history':  $this->handleHistory($body); break;
-            case 'download': $this->handleDownload($body); break;
-            case 'query_chunks': $this->handleQueryChunks($body); break;
+            case 'health':       $this->handleHealth($context); break;
+            case 'init':         $this->handleInit($context); break;
+            case 'register':     $this->handleRegister($context); break;
+            case 'config':       $this->handleConfig($context); break;
+            case 'sync':         $this->handleSync($context); break;
+            case 'upload':       $this->handleUpload($context); break;
+            case 'status':       $this->handleStatus($context); break;
+            case 'history':      $this->handleHistory($context); break;
+            case 'download':     $this->handleDownload($context); break;
+            case 'query_chunks': $this->handleQueryChunks($context); break;
             default:
-                $this->jsonResponse(['ok' => false, 'error' => 'Accion no reconocida', 'code' => 'INVALID_ACTION'], 400);
+                $this->jsonResponse(['ok' => false, 'error' => "Accion '$action' no reconocida", 'code' => 'INVALID_ACTION'], 400);
         }
     }
 
-    private function handleInit(array $body): void {
-        $rbfid = $body['rbfid'] ?? '';
+    private function handleHealth(array $ctx): void {
+        $this->jsonResponse([
+            'ok' => true, 
+            'status' => 'healthy',
+            'message' => 'Use el timestamp de esta respuesta para generar su TOTP'
+        ]);
+    }
+
+    private function handleInit(array $ctx): void {
+        $rbfid = $ctx['rbfid'];
         if (empty($rbfid)) {
             $this->jsonResponse(['ok' => false, 'error' => 'RBFID requerido', 'code' => 'MISSING_RBFID'], 400);
         }
@@ -100,62 +155,33 @@ class ArCore {
         $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'enabled' => true]);
     }
 
-    private function handleRegister(array $body): void {
-        $rbfid = $body['rbfid'] ?? '';
-        $totp = $body['totp_token'] ?? '';
-
-        if (empty($rbfid) || empty($totp)) {
-            $this->jsonResponse(['ok' => false, 'error' => 'RBFID y TOTP requeridos'], 400);
-        }
-
-        $validation = TotpValidator::validate($this->db->getDb(), $rbfid, $totp);
-        if (!$validation['ok']) {
-            $this->jsonResponse(['ok' => false, 'error' => $validation['error']], 401);
-        }
-
+    private function handleRegister(array $ctx): void {
         try {
-            $this->client->registerClient($rbfid);
-            $client = $this->client->getClientStatus($rbfid);
-            $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'enabled' => $client['enabled'] ?? false]);
+            $this->client->registerClient($ctx['rbfid']);
+            $client = $this->client->getClientStatus($ctx['rbfid']);
+            $this->jsonResponse(['ok' => true, 'rbfid' => $ctx['rbfid'], 'enabled' => $client['enabled'] ?? false]);
         } catch (Exception $e) {
             $this->jsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
         }
     }
 
-    private function handleConfig(array $body): void {
-        $rbfid = $body['rbfid'] ?? '';
-        $clientVersion = $body['files_version'] ?? '';
-
+    private function handleConfig(array $ctx): void {
+        $clientVersion = $ctx['body']['files_version'] ?? '';
         $files = $this->db->fetchAll("SELECT file_name FROM ar_global_files WHERE enabled = true ORDER BY file_name");
         $filesList = array_column($files, 'file_name');
         $serverVersion = substr(md5(implode(',', $filesList)), 0, 8);
 
-        $response = ['ok' => true, 'rbfid' => $rbfid, 'files_version' => $serverVersion];
+        $response = ['ok' => true, 'rbfid' => $ctx['rbfid'], 'files_version' => $serverVersion];
         if ($clientVersion !== $serverVersion) {
             $response['files'] = $filesList;
         }
         $this->jsonResponse($response);
     }
 
-    private function handleSync(array $body): void {
-        $rbfid = $body['rbfid'] ?? $_SERVER['HTTP_X_RBFID'] ?? '';
-        $timestamp = $body['timestamp'] ?? $_SERVER['HTTP_X_TIMESTAMP'] ?? '';
-        $token = $body['totp_token'] ?? $_SERVER['HTTP_X_TOKEN'] ?? '';
+    private function handleSync(array $ctx): void {
+        $rbfid = $ctx['rbfid'];
+        $body = $ctx['body'];
         $files = $body['files'] ?? [];
-
-        if (empty($rbfid) || empty($token)) {
-            $this->jsonResponse(['ok' => false, 'error' => 'Faltan datos de autenticacion'], 401);
-        }
-
-        // Validar auth
-        if (!empty($timestamp)) {
-            $seed = substr((string)$timestamp, 0, -2);
-            $expected = Hash::compute($seed . $rbfid)->toBase64();
-            if ($token !== $expected) $this->jsonResponse(['ok' => false, 'error' => 'Token invalido'], 401);
-        } else {
-            $validation = TotpValidator::validate($this->db->getDb(), $rbfid, $token);
-            if (!$validation['ok']) $this->jsonResponse($validation, 401);
-        }
 
         $slots = $this->getSlots();
         $rateDelay = $slots['available'] > 0 ? 3000 : 10000;
@@ -218,19 +244,19 @@ class ArCore {
         ]);
     }
 
-    private function handleUpload(array $body): void {
-        $rbfid = $body['rbfid'] ?? '';
-        $totp = $body['totp_token'] ?? '';
-        $filename = $body['filename'] ?? '';
-        $chunkIdx = (int)($body['chunk_index'] ?? 0);
-        $hash = $body['hash_xxh3'] ?? '';
-        $data = $body['data'] ?? '';
-
-        $validation = $this->auth->validate($rbfid, $totp);
-        if (!$validation['ok']) $this->jsonResponse($validation, 401);
+    private function handleUpload(array $ctx): void {
+        $rbfid = $ctx['rbfid'];
+        $body = $ctx['body'];
+        $params = $ctx['params']; // Elements after /upload/
+        
+        // Params from URL: /{rbfid}/{filename}/{index}/{hash}
+        $filename = $params[1] ?? ($body['filename'] ?? '');
+        $chunkIdx = (int)($params[2] ?? ($body['chunk_index'] ?? 0));
+        $hash     = $params[3] ?? ($body['hash_xxh3'] ?? '');
+        $data     = $body['data'] ?? '';
 
         if (empty($filename) || empty($hash) || empty($data)) {
-            $this->jsonResponse(['ok' => false, 'error' => 'Faltan campos'], 400);
+            $this->jsonResponse(['ok' => false, 'error' => 'Faltan campos (filename, hash o data)'], 400);
         }
 
         $paths = $this->getClientPaths($rbfid);
@@ -244,27 +270,21 @@ class ArCore {
         }
     }
 
-    private function handleStatus(array $body): void {
-        $rbfid = $body['rbfid'] ?? '';
-        if (empty($rbfid)) $this->jsonResponse(['ok' => false, 'error' => 'RBFID requerido'], 400);
-        
-        $client = $this->client->getClientStatus($rbfid);
+    private function handleStatus(array $ctx): void {
+        $client = $this->client->getClientStatus($ctx['rbfid']);
         if (!$client) $this->jsonResponse(['ok' => false, 'error' => 'No encontrado'], 404);
         
-        $files = $this->client->getClientFiles($rbfid);
+        $files = $this->client->getClientFiles($ctx['rbfid']);
         $this->jsonResponse(['ok' => true, 'client' => $client, 'files' => $files]);
     }
 
-    private function handleHistory(array $body): void {
-        $rbfid = $body['rbfid'] ?? '';
-        $limit = (int)($body['limit'] ?? 50);
-        if (empty($rbfid)) $this->jsonResponse(['ok' => false, 'error' => 'RBFID requerido'], 400);
-        
-        $history = $this->db->fetchAll("SELECT id, file_name, chunk_count, updated_at FROM ar_files WHERE rbfid = :rbfid ORDER BY updated_at DESC LIMIT :limit", [':rbfid' => $rbfid, ':limit' => $limit]);
+    private function handleHistory(array $ctx): void {
+        $limit = (int)($ctx['body']['limit'] ?? 50);
+        $history = $this->db->fetchAll("SELECT id, file_name, chunk_count, updated_at FROM ar_files WHERE rbfid = :rbfid ORDER BY updated_at DESC LIMIT :limit", [':rbfid' => $ctx['rbfid'], ':limit' => $limit]);
         $this->jsonResponse(['ok' => true, 'history' => $history]);
     }
 
-    private function handleDownload(array $body): void {
+    private function handleDownload(array $ctx): void {
         $exe_path = '/srv/zigRespaldoSucursal/zig-out/bin/ar.exe';
         if (!file_exists($exe_path)) $this->jsonResponse(['ok' => false, 'error' => 'No encontrado'], 404);
 
@@ -275,18 +295,12 @@ class ArCore {
         exit;
     }
 
-    private function handleQueryChunks(array $body): void {
-        $rbfid = $body['rbfid'] ?? '';
-        $filename = $body['filename'] ?? '';
-        $totp = $body['totp_token'] ?? '';
-
-        $validation = TotpValidator::validate($this->db->getDb(), $rbfid, $totp);
-        if (!$validation['ok']) $this->jsonResponse($validation, 401);
-
-        $paths = $this->getClientPaths($rbfid);
+    private function handleQueryChunks(array $ctx): void {
+        $filename = $ctx['params'][1] ?? ($ctx['body']['filename'] ?? '');
+        $paths = $this->getClientPaths($ctx['rbfid']);
         if (!$paths) $this->jsonResponse(['ok' => false, 'error' => 'No encontrado'], 404);
 
-        $faltantes = $this->db->fetchAll("SELECT chunk_index, hash_xxh3, status, error_count FROM ar_file_hashes WHERE rbfid = :rbfid AND file_name = :file AND status != 'received' ORDER BY chunk_index", [':rbfid' => $rbfid, ':file' => $filename]);
+        $faltantes = $this->db->fetchAll("SELECT chunk_index, hash_xxh3, status, error_count FROM ar_file_hashes WHERE rbfid = :rbfid AND file_name = :file AND status != 'received' ORDER BY chunk_index", [':rbfid' => $ctx['rbfid'], ':file' => $filename]);
 
         $next = null;
         foreach ($faltantes as $ch) {

@@ -9,11 +9,11 @@ trait ResponseTrait
         $timestamp = time();
         $timestampStr = (string) $timestamp;
         
-        // Agregar timestamp a respuestas exitosas (2xx)
-        if ($code >= 200 && $code < 300 && !isset($data['timestamp'])) {
+        // Agregar siempre el timestamp a todas las respuestas (éxito y error)
+        if (!isset($data['timestamp'])) {
             $data['timestamp'] = $timestampStr;
-            header('X-Timestamp: ' . $timestampStr);
         }
+        header('X-Timestamp: ' . $timestampStr);
         
         header('Content-Type: application/json');
         http_response_code($code);
