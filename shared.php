@@ -73,8 +73,7 @@ class Hash
     }
     public static function computeFile(string $p): string
     {
-        $sz = filesize($p) ?: 0;
-        return ($sz < 5242880 && function_exists('hash_file')) ? hash_file('xxh3', $p) : hash('xxh3', file_get_contents($p), false);
+        return hash_file('xxh3', $p);
     }
     public static function toBase64(string $hex): string
     {
