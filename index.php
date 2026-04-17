@@ -7,7 +7,7 @@ use App\Config;
 use App\Totp;
 use App\Log;
 use App\Storage;
-use JsonRes;
+use App\JsonRes;
 
 class Server
 {

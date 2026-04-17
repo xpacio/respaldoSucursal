@@ -131,8 +131,15 @@ class Client {
         $tok = Totp::gen($l['rbfid'] ?? '', $ts);
         curl_setopt($this->ch, CURLOPT_URL, $this->url);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode(['action' => $action, ...$body, 'totp_token' => $tok, 'timestamp' => $ts]));
-        $res = json_decode(curl_exec($this->ch), true) ?: [];
-        Log::add("Server responded to '$action': " . ($res['ok'] ? 'OK' : 'FAIL'), $res['ok'] ? 'INFO' : 'ERROR');
+        $raw = curl_exec($this->ch);
+        if ($raw === false) {
+            $err = curl_error($this->ch);
+            Log::error("cURL Error ($action): $err");
+            return ['ok' => false, 'error' => $err];
+        }
+        $res = json_decode($raw, true) ?: [];
+        $ok = (bool) ($res['ok'] ?? false);
+        Log::add("Server responded to '$action': " . ($ok ? 'OK' : 'FAIL'), $ok ? 'INFO' : 'ERROR');
         return $res;
     }
 
