@@ -1,5 +1,5 @@
 clear
-chmod -R v a+w ./log
+chmod -Rv a+w ./log
 #php -f cli.php --run-once
 git pull
 git push
