@@ -1,0 +1,19 @@
+# Ignore absolutely everything by default
+*
+
+# Allow directories so we can recurse into them
+!*/
+
+# Exclude PHP files from being ignored
+!*.php
+
+# Keep essential project metadata and configuration
+!.gitignore
+!*.json
+!*.md
+!*.bat
+!*.sh
+
+# Explicitly ignore logs and temporary directories even if they contain php (unlikely)
+logs/
+tmp/
