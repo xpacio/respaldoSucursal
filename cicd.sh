@@ -1,6 +1,6 @@
 clear
-chmod -Rv a+w logs/*.log
-#php -f cli.php --run-once
 git pull
 git push
 git status
+chmod -Rv a+w logs/*.log
+chmod -Rv a+w *
