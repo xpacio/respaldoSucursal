@@ -64,9 +64,6 @@ class ArCore {
         $segments = array_values(array_filter(explode('/', $path)));
         $body = $this->router->getBody();
         
-        // DEBUG: Log the received body
-        $this->log("Received body: " . json_encode($body));
-        
         // 1. Determine Action
         $action = $segments[0] ?? ($body['action'] ?? 'sync');
         
@@ -81,7 +78,7 @@ class ArCore {
         // Actually, let's stick to Headers or Body for TOTP for simplicity and security.
         $token = $_SERVER['HTTP_X_TOTP_TOKEN'] ?? ($_SERVER['HTTP_X_TOKEN'] ?? ($body['totp_token'] ?? ''));
 
-        $this->log("Action detected: $action | Client: $rbfid | Token present: " . (!empty($token) ? 'yes' : 'no'));
+        $this->log("Action detected: $action | Client: $rbfid");
 
         // Prepare request context
         $context = [
@@ -146,7 +143,7 @@ class ArCore {
         $client = $this->client->getClientStatus($rbfid);
         
         if (!$client) {
-            $this->db->execute("INSERT INTO ar_clients (rbfid, registered_at) VALUES (:rbfid, NOW())", [':rbfid' => $rbfid]);
+            $this->db->execute("INSERT INTO ar_clients (rbfid, enabled, registered_at) VALUES (:rbfid, false, NOW())", [':rbfid' => $rbfid]);
             $this->db->execute("INSERT INTO clients (rbfid, enabled, created_at) VALUES (:rbfid, false, NOW())", [':rbfid' => $rbfid]);
             $this->jsonResponse(['ok' => true, 'rbfid' => $rbfid, 'enabled' => false, 'latent' => true]);
         }
@@ -206,32 +203,47 @@ class ArCore {
 
             if ($serverFile && $mtime > 0 && (int)$serverFile['file_mtime'] > $mtime) continue;
 
-            if (!$serverFile || $serverFile['hash_xxh3'] !== $hashCompleto) {
-                $chunkCnt = max(1, count($chunkHashes));
-                $this->db->execute(
-                    "INSERT INTO ar_files (rbfid, file_name, chunk_count, hash_esperado, updated_at, file_size, file_mtime)
-                     VALUES (:rbfid, :file, :cnt, :esperado, NOW(), :size, :mtime)
-                     ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :cnt, hash_xxh3 = NULL, hash_esperado = :esperado, updated_at = NOW(), file_size = :size, file_mtime = :mtime",
-                    [':rbfid' => $rbfid, ':file' => $filename, ':cnt' => $chunkCnt, ':esperado' => $hashCompleto, ':size' => $size, ':mtime' => $mtime]
-                );
+            // Always check if there are pending chunks for this file, even if the record exists
+            $next = $this->db->fetchOne(
+                "SELECT chunk_index FROM ar_file_hashes 
+                 WHERE rbfid = :rbfid AND file_name = :file AND status != 'received' 
+                 ORDER BY chunk_index LIMIT 1", 
+                [':rbfid' => $rbfid, ':file' => $filename]
+            );
 
-                foreach ($chunkHashes as $idx => $ch) {
+            // If the file is missing or has a different hash, OR if there are pending chunks
+            if (!$serverFile || $serverFile['hash_xxh3'] !== $hashCompleto || $next) {
+                
+                // If the hash changed or file is missing, reset chunks
+                if (!$serverFile || $serverFile['hash_xxh3'] !== $hashCompleto) {
+                    $chunkCnt = max(1, count($chunkHashes));
                     $this->db->execute(
-                        "INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at)
-                         VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())
-                         ON CONFLICT (rbfid, file_name, chunk_index) DO UPDATE SET hash_xxh3 = :hash, status = 'pending', updated_at = NOW()",
-                        [':rbfid' => $rbfid, ':file' => $filename, ':idx' => $idx, ':hash' => $ch]
+                        "INSERT INTO ar_files (rbfid, file_name, chunk_count, hash_esperado, updated_at, file_size, file_mtime)
+                         VALUES (:rbfid, :file, :cnt, :esperado, NOW(), :size, :mtime)
+                         ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :cnt, hash_xxh3 = NULL, hash_esperado = :esperado, updated_at = NOW(), file_size = :size, file_mtime = :mtime",
+                        [':rbfid' => $rbfid, ':file' => $filename, ':cnt' => $chunkCnt, ':esperado' => $hashCompleto, ':size' => $size, ':mtime' => $mtime]
                     );
+
+                    foreach ($chunkHashes as $idx => $ch) {
+                        $this->db->execute(
+                            "INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at)
+                             VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())
+                             ON CONFLICT (rbfid, file_name, chunk_index) DO UPDATE SET hash_xxh3 = :hash, status = 'pending', updated_at = NOW()",
+                            [':rbfid' => $rbfid, ':file' => $filename, ':idx' => $idx, ':hash' => $ch]
+                        );
+                    }
+                    
+                    // Refresh $next after inserting
+                    $next = ['chunk_index' => 0];
                 }
 
-                $next = $this->db->fetchOne("SELECT chunk_index FROM ar_file_hashes WHERE rbfid = :rbfid AND file_name = :file AND status != 'received' ORDER BY chunk_index LIMIT 1", [':rbfid' => $rbfid, ':file' => $filename]);
                 if ($next) {
                     $needsUpload[] = [
                         'file' => $filename,
-                        'chunk' => $next['chunk_index'],
+                        'chunk' => (int)$next['chunk_index'],
                         'work_path' => ($clientPaths['work_dir'] ?? '') . '/' . $filename,
                         'dest_path' => ($clientPaths['base_dir'] ?? '') . '/' . $filename,
-                        'md5' => $hashCompleto
+                        'md5' => $hashCompleto // This is used as expected full hash
                     ];
                 }
             }

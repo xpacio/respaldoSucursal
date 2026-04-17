@@ -26,7 +26,6 @@ class Client
     private RegistrationService $regService;
     private SyncService $syncService;
     private LocationDiscoveryService $locationDiscoveryService;
-    private TimestampManager $timestampManager;
     
     // Properties needed to fix deprecation warnings
     private string $cfgPath = '';
@@ -42,17 +41,17 @@ class Client
         $this->serverUrl = Constants::DEFAULT_SERVER_URL;
         
         // Crear TimestampManager primero
-        $this->timestampManager = new TimestampManager();
+        $timestampManager = new TimestampManager();
         
         // Crear HttpClient y configurar TimestampManager
         $this->http = new HttpClient();
-        $this->http->setTimestampManager($this->timestampManager);
+        $this->http->setTimestampManager($timestampManager);
         
         $this->configService = new ConfigService();
         
         // Crear RegistrationService y configurar TimestampManager
         $this->regService = new RegistrationService($this->http, $this->serverUrl);
-        $this->regService->setTimestampManager($this->timestampManager);
+        $this->regService->setTimestampManager($timestampManager);
         
         $this->syncService = new SyncService($this->http, $this->regService);
         $this->locationDiscoveryService = new LocationDiscoveryService($this->configService);
@@ -90,9 +89,6 @@ class Client
                 }
                 $totp = $this->regService->generateTotp($loc->rbfid);
                 $response = $this->http->registerClient($this->serverUrl, $loc->rbfid, $totp);
-                
-                // DEBUG: Log respuesta completa
-                Logger::debug("[{$loc->rbfid}] Respuesta registro: " . json_encode($response));
                 
                 if (isset($response['ok']) && $response['ok']) {
                     $enabled = $response['enabled'] ?? false;
@@ -254,11 +250,6 @@ class Client
         $this->isFirstSync = false;
     }
 
-    private function copyToWork(Location $loc): void
-    {
-        // TODO: Implement actual file copying logic here
-        Logger::debug("[{$loc->rbfid}] Copying files to work directory: {$loc->work_path}");
-    }
 
 
 
@@ -284,7 +275,6 @@ class Client
     public function setServerUrl(string $url): void {
         $this->serverUrl = $url;
         $this->regService = new RegistrationService($this->http, $url);
-        $this->regService->setTimestampManager($this->timestampManager);
         $this->syncService = new SyncService($this->http, $this->regService);
     }
 

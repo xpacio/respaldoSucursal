@@ -46,13 +46,7 @@ $path = !empty($pathInfo) ? $pathInfo : $requestUri;
 
 // Clean /api and /api/index.php prefixes
 $cleanPath = preg_replace('#^/api(/index\.php)?#', '', $path);
-$resource = ltrim($cleanPath, '/');
-
-// DEBUG: Log path information
-error_log("API Path Debug: PATH_INFO='$pathInfo', REQUEST_URI='{$_SERVER['REQUEST_URI']}', parsed='$requestUri', clean='$cleanPath', resource='$resource'");
-
-// NEVER default to health - let ArCore handle empty path based on action in body
-// ArCore::handleRequest will use action from body if path is empty
+$resource = ltrim($cleanPath, '/') ?: 'health'; // Default to health if empty
 try {
     $api = ArCore::getInstance($router);
     $api->handleRequest($resource);

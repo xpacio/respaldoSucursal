@@ -22,7 +22,7 @@ class Constants
 
     public const DEFAULT_SERVER_URL = 'http://respaldosucursal.servicios.care';
 
-    public const POLL_INTERVAL_SECONDS = 30;
+    public const POLL_INTERVAL_SECONDS = 300;
     public const STABILIZE_DELAY_MS = 2000;
     public const FULL_CHECK_INTERVAL_SECONDS = 3600;
 
