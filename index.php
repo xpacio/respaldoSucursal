@@ -26,10 +26,11 @@ class Server
             exit(0);
         $path = trim(preg_replace('#^/api(/index\.php)?#', '', $_SERVER['PATH_INFO'] ?? parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH)), '/');
         $body = json_decode(file_get_contents('php://input') ?: '{}', true) ?: [];
-        $action = explode('/', $path)[0] ?? ($body['action'] ?? 'sync');
-        $rbfid = explode('/', $path)[1] ?? ($_SERVER['HTTP_X_RBFID'] ?? ($body['rbfid'] ?? ''));
+        $parts = explode('/', $path);
+        $action = (!empty($parts[0])) ? $parts[0] : ($body['action'] ?? 'sync');
+        $rbfid = (!empty($parts[1])) ? $parts[1] : ($_SERVER['HTTP_X_RBFID'] ?? ($body['rbfid'] ?? ''));
         $token = $_SERVER['HTTP_X_TOTP_TOKEN'] ?? ($_SERVER['HTTP_X_TOKEN'] ?? ($body['totp_token'] ?? ''));
-        Log::add("Action: $action | RBFID: $rbfid");
+        Log::add("Action: $action | RBFID: $rbfid | Path: $path");
 
         if ($action !== 'health' && (empty($rbfid) || empty($token)))
             self::err('Auth required', 401);
