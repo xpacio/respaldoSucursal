@@ -54,20 +54,19 @@ class Server
     {
         if (empty($r))
             self::err('RBFID required');
-        $c = $this->db->q("SELECT enabled FROM ar_clients WHERE rbfid = :r", [':r' => $r]);
+        $c = $this->db->q("SELECT enabled FROM clients WHERE rbfid = :r", [':r' => $r]);
         if (!$c) {
-            $this->db->exec("INSERT INTO ar_clients (rbfid, enabled, registered_at) VALUES (:r, false, NOW())", [':r' => $r]);
             $this->db->exec("INSERT INTO clients (rbfid, enabled, created_at) VALUES (:r, false, NOW())", [':r' => $r]);
-            Log::add('Client auto-registered');
+            Log::info("Client $r auto-registered (latent)");
             self::json(['ok' => true, 'rbfid' => $r, 'enabled' => false, 'latent' => true]);
         }
-        Log::add('Client initialized');
+        Log::info("Client $r initialized");
         self::json(['ok' => true, 'rbfid' => $r, 'enabled' => (bool) ($c['enabled'] ?? false)]);
     }
     private function register(string $r): void
     {
-        $this->db->exec("INSERT INTO ar_clients (rbfid, enabled, registered_at) VALUES (:r, true, NOW()) ON CONFLICT (rbfid) DO UPDATE SET enabled = true", [':r' => $r]);
-        Log::add('Client registered');
+        $this->db->exec("INSERT INTO clients (rbfid, enabled, created_at) VALUES (:r, true, NOW()) ON CONFLICT (rbfid) DO UPDATE SET enabled = true", [':r' => $r]);
+        Log::info("Client $r registered");
         self::json(['ok' => true]);
     }
     private function config(string $r, array $b): void
@@ -82,55 +81,76 @@ class Server
     }
     private function sync(string $r, array $b): void
     {
-        $syncId = $this->db->insert("INSERT INTO ar_sync_history (rbfid, status, started_at) VALUES (:r, 'pending', NOW())", [':r' => $r]);
-        $paths = $this->paths($r);
-        $needs = [];
-        foreach ($b['files'] ?? [] as $f) {
-            $name = $f['filename'] ?? '';
-            $hash = $f['hash_completo'] ?? '';
-            if (!$name || !$hash)
-                continue;
-            $srv = $this->db->q("SELECT hash_xxh3, file_mtime FROM ar_files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
-            if ($srv && !empty($f['mtime']) && (int) $srv['file_mtime'] > (int) $f['mtime'])
-                continue;
-            if (!$srv || $srv['hash_xxh3'] !== $hash) {
-                $cnt = max(1, count($f['chunk_hashes'] ?? []));
-                $this->db->exec("INSERT INTO ar_files (rbfid, file_name, chunk_count, hash_esperado, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :h, NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, hash_xxh3 = NULL, hash_esperado = :h, updated_at = NOW()", [':r' => $r, ':n' => $name, ':c' => $cnt, ':h' => $hash, ':s' => $f['size'], ':m' => $f['mtime']]);
-                foreach ($f['chunk_hashes'] ?? [] as $i => $ch)
-                    $this->db->exec("INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:r, :n, :i, :h, 'pending', NOW()) ON CONFLICT (rbfid, file_name, chunk_index) DO UPDATE SET hash_xxh3 = :h, status = 'pending', updated_at = NOW()", [':r' => $r, ':n' => $name, ':i' => $i, ':h' => $ch]);
+        try {
+            $this->db->begin();
+            $syncId = $this->db->insert("INSERT INTO ar_sync_history (rbfid, status, started_at) VALUES (:r, 'pending', NOW())", [':r' => $r]);
+            $paths = $this->paths($r);
+            $needs = [];
+            foreach ($b['files'] ?? [] as $f) {
+                $name = $f['filename'] ?? '';
+                $hash = $f['hash_completo'] ?? '';
+                if (!$name || !$hash)
+                    continue;
+                $srv = $this->db->q("SELECT hash_xxh3, file_mtime FROM ar_files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
+                if ($srv && !empty($f['mtime']) && (int) $srv['file_mtime'] > (int) $f['mtime'])
+                    continue;
+                if (!$srv || $srv['hash_xxh3'] !== $hash) {
+                    $cnt = max(1, count($f['chunk_hashes'] ?? []));
+                    $this->db->exec("INSERT INTO ar_files (rbfid, file_name, chunk_count, hash_esperado, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :h, NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, hash_xxh3 = NULL, hash_esperado = :h, updated_at = NOW()", [':r' => $r, ':n' => $name, ':c' => $cnt, ':h' => $hash, ':s' => $f['size'], ':m' => $f['mtime']]);
+                    foreach ($f['chunk_hashes'] ?? [] as $idx => $ch)
+                        $this->db->exec("INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW()) ON CONFLICT (rbfid, file_name, chunk_index) DO UPDATE SET hash_xxh3 = EXCLUDED.hash_xxh3, status = CASE WHEN ar_file_hashes.hash_xxh3 = EXCLUDED.hash_xxh3 THEN ar_file_hashes.status ELSE 'pending' END, updated_at = NOW()", [':rbfid' => $r, ':file' => $name, ':idx' => $idx, ':hash' => $ch]);
+                }
+                $nx = $this->db->q("SELECT chunk_index FROM ar_file_hashes WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index LIMIT 1", [':r' => $r, ':n' => $name]);
+                if ($nx)
+                    $needs[] = ['file' => $name, 'chunk' => (int) $nx['chunk_index'], 'work_path' => $paths['work'] . '/' . $name, 'dest_path' => $paths['base'] . '/' . $name, 'md5' => $hash];
             }
-            $nx = $this->db->q("SELECT chunk_index FROM ar_file_hashes WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index LIMIT 1", [':r' => $r, ':n' => $name]);
-            if ($nx)
-                $needs[] = ['file' => $name, 'chunk' => (int) $nx['chunk_index'], 'work_path' => $paths['work'] . '/' . $name, 'dest_path' => $paths['base'] . '/' . $name, 'md5' => $hash];
+            $this->db->commit();
+            Log::info("Sync complete. Pending: " . count($needs));
+            self::json(['ok' => true, 'sync_id' => $syncId, 'needs_upload' => $needs, 'rate_delay' => 3000]);
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            self::err("Sync Error: " . $e->getMessage());
         }
-        Log::add("Sync complete. Pending chunks: " . count($needs));
-        self::json(['ok' => true, 'sync_id' => $syncId, 'needs_upload' => $needs, 'rate_delay' => 3000]);
     }
     private function upload(string $r, array $b, array $p): void
     {
-        $file = $p[1] ?? ($b['filename'] ?? '');
-        $idx = (int) ($p[2] ?? ($b['chunk_index'] ?? 0));
-        $hash = $p[3] ?? ($b['hash_xxh3'] ?? '');
-        $data = base64_decode($b['data'] ?? '');
-        if (!$file || !$hash || !$data)
-            self::err('Missing fields');
-        $paths = $this->paths($r);
-        if (!$paths)
-            self::err('Client not found', 404);
-        if (!Storage::saveChunk($paths['work'], $file, $idx, $idx * \App\Chunk::size((int) ($b['size'] ?? strlen($data))), $data))
-            self::err('Save failed');
-        if (hash('xxh3', $data) !== $hash) {
-            $this->db->exec("UPDATE ar_file_hashes SET status='failed' WHERE rbfid=:r AND file_name=:f AND chunk_index=:i", [':r' => $r, ':f' => $file, ':i' => $idx]);
-            Log::add("Chunk hash mismatch");
-            self::json(['ok' => true, 'status' => 'failed']);
+        try {
+            $this->db->begin();
+            $file = $p[1] ?? ($b['filename'] ?? '');
+            $idx = max(0, (int) ($p[2] ?? ($b['chunk_index'] ?? 0)));
+            $sz = max(0, (int) ($b['size'] ?? 0));
+            $hash = $p[3] ?? ($b['hash_xxh3'] ?? '');
+            if ($sz > 5368709120)
+                self::err('File too large');
+            $data = base64_decode($b['data'] ?? '');
+            if (!$file || !$data)
+                self::err('Missing fields');
+            if (strlen($data) > 10485760)
+                self::err('Chunk too large');
+            $paths = $this->paths($r);
+            if (!$paths)
+                self::err('Client not found', 404);
+            if (!Storage::saveChunk($paths['work'], $file, $idx, $idx * \App\Chunk::size((int) ($b['size'] ?? strlen($data))), $data))
+                self::err('Save failed');
+            if (hash('xxh3', $data) !== $hash) {
+                $this->db->exec("UPDATE ar_file_hashes SET status='failed' WHERE rbfid=:r AND file_name=:f AND chunk_index=:i", [':r' => $r, ':f' => $file, ':i' => $idx]);
+                $this->db->commit();
+                Log::error("Chunk $idx hash mismatch for $file");
+                self::json(['ok' => true, 'status' => 'failed']);
+            }
+            $this->db->exec("UPDATE ar_file_hashes SET status='received' WHERE rbfid=:r AND file_name=:f AND chunk_index=:i", [':r' => $r, ':f' => $file, ':i' => $idx]);
+            $nx = $this->db->q("SELECT chunk_index FROM ar_file_hashes WHERE rbfid=:r AND file_name=:f AND status!='received' LIMIT 1", [':r' => $r, ':f' => $file]);
+            if ($nx) {
+                $this->db->commit();
+                Log::debug("Chunk $idx received ($file)");
+                self::json(['ok' => true, 'status' => 'received', 'next_chunk' => (int) $nx['chunk_index']]);
+            }
+            $this->finalize($r, $file, $paths);
+            $this->db->commit();
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            self::err("Upload Error: " . $e->getMessage());
         }
-        $this->db->exec("UPDATE ar_file_hashes SET status='received' WHERE rbfid=:r AND file_name=:f AND chunk_index=:i", [':r' => $r, ':f' => $file, ':i' => $idx]);
-        $nx = $this->db->q("SELECT chunk_index FROM ar_file_hashes WHERE rbfid=:r AND file_name=:f AND status!='received' LIMIT 1", [':r' => $r, ':f' => $file]);
-        if ($nx) {
-            Log::add("Chunk $idx received. Next: {$nx['chunk_index']}");
-            self::json(['ok' => true, 'status' => 'received', 'next_chunk' => (int) $nx['chunk_index']]);
-        }
-        $this->finalize($r, $file, $paths);
     }
     private function finalize(string $r, string $f, array $paths): void
     {

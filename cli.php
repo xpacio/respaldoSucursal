@@ -6,77 +6,139 @@ require_once __DIR__ . '/shared.php';
 use App\DB; use App\Config; use App\Totp; use App\Log; use App\Storage; use App\Constants; use App\Hash; use App\Chunk;
 
 class Client {
-    private string $url; private array $locations = []; private int $lastFull = 0; private array $cache = [];
-    public function __construct() { $this->url = Constants::DEFAULT_URL; Log::init(dirname(__FILE__).'/logs', true); }
+    private string $url;
+    private array $locations = [];
+    private int $lastFull = 0;
+    private array $cache = [];
+    private $ch;
+
+    public function __construct() {
+        $this->url = Constants::DEFAULT_URL;
+        Log::init(dirname(__FILE__) . '/logs', true);
+        $this->ch = curl_init();
+        curl_setopt_array($this->ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json']
+        ]);
+    }
 
     public function discover(string $cfgPath): void {
-        Log::add('Discovering locations...');
+        Log::info('Discovering locations...');
         $data = json_decode(file_get_contents($cfgPath) ?: '{}', true);
-        $this->locations = array_map(fn($l) => ['rbfid'=>$l['rbfid'], 'base'=>$l['base_path'], 'work'=>$l['work_path']], $data['locations'] ?? []);
-        if (empty($this->locations)) { Log::add('Scanning disk...'); $this->scanDisk(); }
-        foreach ($this->locations as &$l) { if (!is_dir($l['work'])) mkdir($l['work'], 0755, true); }
-        Log::add('Found '.count($this->locations).' locations');
+        $this->locations = array_map(fn($l) => ['rbfid' => $l['rbfid'], 'base' => $l['base_path'], 'work' => $l['work_path']], $data['locations'] ?? []);
+        if (empty($this->locations)) {
+            Log::info('Scanning disk...');
+            $this->scanDisk();
+        }
+        foreach ($this->locations as &$l) {
+            if (!is_dir($l['work']))
+                mkdir($l['work'], 0755, true);
+        }
+        Log::info('Found ' . count($this->locations) . ' locations');
     }
 
     private function scanDisk(): void {
-        foreach (['C','D'] as $drv) {
-            $root = "$drv:\\\\"; if (!is_dir($root)) continue;
+        foreach (['C', 'D'] as $drv) {
+            $root = "$drv:\\\\";
+            if (!is_dir($root))
+                continue;
             foreach (scandir($root) as $dir) {
-                if (in_array(strtolower($dir), Constants::EXCLUDED_WIN)) continue;
-                $ini = "$root$dir\\rbf\\rbf.ini"; if (!file_exists($ini)) continue;
-                if (preg_match('/_suc=([^\
-\r]+)/i', file_get_contents($ini), $m)) {
-                    $id = trim($m[1], ' "'); $base = "$root$dir";
-                    $this->locations[] = ['rbfid'=>$id, 'base'=>$base, 'work'=>$base.'\\quickbck\\'];
-                    Log::add("Auto-discovered: $id");
+                if (in_array(strtolower($dir), Constants::EXCLUDED_WIN))
+                    continue;
+                $ini = "$root$dir\\rbf\\rbf.ini";
+                if (!file_exists($ini))
+                    continue;
+                if (preg_match('/_suc=([^\n\r]+)/i', file_get_contents($ini), $m)) {
+                    $id = trim($m[1], ' "');
+                    $base = "$root$dir";
+                    $this->locations[] = ['rbfid' => $id, 'base' => $base, 'work' => $base . '\\quickbck\\'];
+                    Log::info("Auto-discovered: $id");
                 }
             }
         }
     }
 
-    public function register(): void { foreach ($this->locations as $l) { $this->req('register', ['rbfid'=>$l['rbfid']]); Log::add("Registered: {$l['rbfid']}"); } }
+    public function register(): void {
+        foreach ($this->locations as $l) {
+            $this->req('register', ['rbfid' => $l['rbfid']]);
+            Log::info("Registered: {$l['rbfid']}");
+        }
+    }
 
     public function syncLoop(): void {
-        Log::add('Starting sync loop...');
+        Log::info('Starting sync loop...');
         while (true) {
-            if (time() - $this->lastFull >= Constants::FULL_CHECK_SEC) { $this->lastFull = time(); $this->fullSync(); }
+            if (time() - $this->lastFull >= Constants::FULL_CHECK_SEC) {
+                $this->lastFull = time();
+                $this->fullSync();
+            }
             foreach ($this->locations as $l) {
-                foreach (Constants::WATCH_FILES as $f) {
-                    $wp = $l['work'].DIRECTORY_SEPARATOR.$f; if (!file_exists($wp)) continue;
-                    $st = stat($wp); $k = hash('xxh64', $wp);
-                    if (isset($this->cache[$k]) && $this->cache[$k]['mtime']==$st['mtime'] && $this->cache[$k]['size']==$st['size']) continue;
-                    Log::add("Syncing $f @ {$l['rbfid']}");
-                    $this->uploadFile($l, $f, $wp, (int)$st['mtime'], (int)$st['size']);
-                    $this->cache[$k] = ['mtime'=>$st['mtime'], 'size'=>$st['size']];
+                foreach (Constants::$WATCH_FILES as $f) {
+                    $wp = $l['work'] . DIRECTORY_SEPARATOR . $f;
+                    if (!file_exists($wp))
+                        continue;
+                    $st = stat($wp);
+                    $k = hash('xxh64', $wp);
+                    if (isset($this->cache[$k]) && $this->cache[$k]['mtime'] == $st['mtime'] && $this->cache[$k]['size'] == $st['size'])
+                        continue;
+                    Log::info("Syncing $f @ {$l['rbfid']}");
+                    $this->uploadFile($l, $f, $wp, (int) $st['mtime'], (int) $st['size']);
+                    $this->cache[$k] = ['mtime' => $st['mtime'], 'size' => $st['size']];
                 }
             }
+            Log::flush();
             sleep(Constants::POLL_SEC);
         }
     }
 
     private function fullSync(): void {
-        Log::add('Running full hash check...');
-        $l = $this->locations[0] ?? null; if (!$l) return;
-        $res = $this->req('config', ['rbfid'=>$l['rbfid']]);
-        if (!empty($res['files'])) { Log::add("Updated file list (".count($res['files']).")"); Constants::WATCH_FILES = $res['files']; }
-    }
-
-    private function uploadFile(array $loc, string $file, string $wp, int $mtime, int $size): void {
-        $h = Hash::computeFile($wp); $cs = Chunk::size($size); $chs = []; $off = 0; $fh = fopen($wp,'rb');
-        while ($off < $size) { $chs[] = hash('xxh3', fread($fh, $cs)); $off += $cs; } fclose($fh);
-        $req = $this->req('sync', ['rbfid'=>$loc['rbfid'], 'files'=>[['filename'=>$file, 'hash_completo'=>Hash::toBase64($h), 'chunk_hashes'=>array_map(fn($c)=>Hash::toBase64($c), $chs), 'mtime'=>$mtime, 'size'=>$size]]]);
-        foreach ($req['needs_upload'] ?? [] as $t) {
-            $off = $t['chunk'] * $cs; $d = file_get_contents($wp, false, null, $off, min($cs, $size-$off));
-            $this->req('upload', ['rbfid'=>$loc['rbfid'], 'filename'=>$t['file'], 'chunk_index'=>$t['chunk'], 'hash_xxh3'=>Hash::toBase64(hash('xxh3', $d)), 'data'=>base64_encode($d)]);
-            Log::add("Uploaded chunk {$t['chunk']} of $file");
+        Log::info('Running full hash check...');
+        $l = $this->locations[0] ?? null;
+        if (!$l)
+            return;
+        $res = $this->req('config', ['rbfid' => $l['rbfid']]);
+        if (!empty($res['files'])) {
+            Log::info("Updated file list (" . count($res['files']) . ")");
+            Constants::$WATCH_FILES = $res['files'];
         }
     }
 
+    private function uploadFile(array $loc, string $file, string $wp, int $mtime, int $size): void {
+        $h = Hash::computeFile($wp);
+        $cs = Chunk::size($size);
+        $chs = [];
+        $off = 0;
+        $fh = fopen($wp, 'rb');
+        while ($off < $size) {
+            $chs[] = hash('xxh3', fread($fh, $cs));
+            $off += $cs;
+        }
+        fclose($fh);
+        $req = $this->req('sync', ['rbfid' => $loc['rbfid'], 'files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => array_map(fn($c) => Hash::toBase64($c), $chs), 'mtime' => $mtime, 'size' => $size]]]);
+        foreach ($req['needs_upload'] ?? [] as $t) {
+            $off = $t['chunk'] * $cs;
+            $d = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
+            $this->req('upload', ['rbfid' => $loc['rbfid'], 'filename' => $t['file'], 'chunk_index' => $t['chunk'], 'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
+            Log::debug("Uploaded chunk {$t['chunk']} of $file");
+        }
+        Log::flush();
+    }
+
     private function req(string $action, array $body): array {
-        $l = $this->locations[0] ?? null; $ts = time(); $tok = Totp::gen($l['rbfid']??'', $ts);
-        $ch = curl_init($this->url); curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['action'=>$action, ...$body, 'totp_token'=>$tok, 'timestamp'=>$ts]));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); $res = json_decode(curl_exec($ch), true) ?: []; curl_close($ch);
-        Log::add("Server responded to '$action': ".($res['ok']?'OK':'FAIL')); return $res;
+        $l = $this->locations[0] ?? null;
+        $ts = time();
+        $tok = Totp::gen($l['rbfid'] ?? '', $ts);
+        curl_setopt($this->ch, CURLOPT_URL, $this->url);
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode(['action' => $action, ...$body, 'totp_token' => $tok, 'timestamp' => $ts]));
+        $res = json_decode(curl_exec($this->ch), true) ?: [];
+        Log::add("Server responded to '$action': " . ($res['ok'] ? 'OK' : 'FAIL'), $res['ok'] ? 'INFO' : 'ERROR');
+        return $res;
+    }
+
+    public function __destruct() {
+        if ($this->ch)
+            curl_close($this->ch);
     }
 }
 
