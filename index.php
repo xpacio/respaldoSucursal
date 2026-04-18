@@ -376,7 +376,9 @@ class Server
     }
     private function schedule(string $r): void
     {
-        $sql = "SELECT s.name, s.type, cs.config, cs.frequency_seconds 
+        $sql = "SELECT s.name, s.type, 
+                       COALESCE(cs.config, s.default_config) as config, 
+                       COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds 
                 FROM client_services cs
                 JOIN services s ON s.id = cs.service_id
                 WHERE cs.client_rbfid = :r AND cs.enabled = true
@@ -386,9 +388,12 @@ class Server
         
         foreach ($services as $svc) {
             $this->db->exec("UPDATE client_services 
-                            SET next_execution = NOW() + (frequency_seconds || ' seconds')::interval,
+                            SET next_execution = NOW() + (COALESCE(cs.frequency_seconds, s.default_frequency_seconds) || ' seconds')::interval,
                                 last_execution = NOW()
-                            WHERE client_rbfid = :r AND service_id = (SELECT id FROM services WHERE name = :n)", 
+                            FROM services s
+                            WHERE client_services.service_id = s.id 
+                            AND client_services.client_rbfid = :r 
+                            AND s.name = :n", 
                             [':r' => $r, ':n' => $svc['name']]);
         }
         
@@ -443,7 +448,9 @@ class Server
     {
         $name = $b['service'] ?? '';
         $row = $this->db->q(
-            "SELECT cs.config, cs.frequency_seconds, s.type, s.name
+            "SELECT COALESCE(cs.config, s.default_config) as config, 
+                    COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds, 
+                    s.type, s.name
              FROM client_services cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
             [':r' => $r, ':n' => $name]
@@ -465,7 +472,8 @@ class Server
         $ctx = ['rbfid' => $r, 'emp' => $paths['emp'], 'plaza' => $paths['plaza']];
 
         $row = $this->db->q(
-            "SELECT cs.config FROM client_services cs JOIN services s ON s.id = cs.service_id
+            "SELECT COALESCE(cs.config, s.default_config) as config 
+             FROM client_services cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n",
             [':r' => $r, ':n' => $serviceName]
         );
@@ -497,7 +505,8 @@ class Server
         $ctx = ['rbfid' => $r, 'emp' => $paths['emp'], 'plaza' => $paths['plaza']];
 
         $row = $this->db->q(
-            "SELECT cs.config FROM client_services cs JOIN services s ON s.id = cs.service_id
+            "SELECT COALESCE(cs.config, s.default_config) as config 
+             FROM client_services cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n",
             [':r' => $r, ':n' => $serviceName]
         );
