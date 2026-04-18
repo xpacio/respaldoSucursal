@@ -363,6 +363,32 @@ class Client {
         }
     }
 
+    }
+
+    // --- INFO MODE ---
+    public function showStatusAndExit(): void {
+        $loc = $this->locations[0] ?? null;
+        if (!$loc) {
+            echo "Error: No hay ubicaciones configuradas. Ejecute 'php cli.php -discover'\n";
+            exit(1);
+        }
+
+        echo "RBFID: " . $loc['rbfid'] . " [CONFIGURADO]\n";
+        echo "Carpeta: " . $loc['base'] . "\n";
+        
+        echo "Verificando servidor... ";
+        $res = $this->http->req('health', $loc['rbfid'], []);
+        if (isset($res['ok']) && $res['ok']) {
+            echo "SERVIDOR EN LINEA\n";
+        } else {
+            echo "SERVIDOR FUERA DE LINEA o ERROR DE CONEXION\n";
+        }
+
+        echo "Cerrando en 10 segundos...\n";
+        sleep(10);
+        exit(0);
+    }
+
     private function scanDisk(): void {
         $paths = Platform::isWindows() ? array_map(fn($d) => $d.':\\', range('C','D')) : ['/srv'];
         foreach ($paths as $root) {
@@ -390,10 +416,13 @@ try {
     
     $service = null;
     $rbfid = null;
+    $isMaster = false;
     $cfg = __DIR__ . '/config.json';
 
     foreach ($args as $idx => $arg) {
-        if (str_starts_with($arg, '-')) {
+        if ($arg === '--master') {
+            $isMaster = true;
+        } elseif (str_starts_with($arg, '-')) {
             $name = ltrim($arg, '-');
             if ($name === 'rbfid') {
                 $rbfid = $args[$idx + 1] ?? null;
@@ -405,10 +434,12 @@ try {
 
     $client = new Client($cfg);
 
-    if ($service) {
+    if ($isMaster) {
+        $client->runOrchestrator();
+    } elseif ($service) {
         $client->executeService($service, (string)$rbfid);
     } else {
-        $client->runOrchestrator();
+        $client->showStatusAndExit();
     }
 } catch (\Throwable $e) {
     echo "Fatal Error: " . $e->getMessage() . PHP_EOL;
