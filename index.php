@@ -63,6 +63,8 @@ class Server
             'schedule' => $this->schedule($rbfid),
             'service_result' => $this->serviceResult($rbfid, $body),
             'heartbeat' => $this->heartbeat($rbfid, $body),
+            'download_list' => $this->downloadList($rbfid, $body),
+            'download_file' => $this->downloadFile($rbfid, $body),
             default => self::err("Action '$action' invalid", 400)
         };
     }
@@ -418,6 +420,59 @@ class Server
                         [':r' => $r, ':s' => $status, ':run' => json_encode($running), ':info' => json_encode($info)]);
                         
         self::json(['ok' => true]);
+    }
+
+    private function downloadList(string $r, array $b): void
+    {
+        $service = $b['service'] ?? '';
+        $paths = $this->paths($r);
+        if (!$paths) self::err('Client not found');
+
+        // Origen configurable o por defecto para descargaVales
+        $sourceDir = "/srv/vales/{$paths['emp']}/{$paths['plaza']}/$r";
+        if (!is_dir($sourceDir)) {
+            self::json(['ok' => true, 'files' => []]);
+            return;
+        }
+
+        $targetFiles = ($service === 'descargaVales') ? ['EISYENC.DBF', 'EISYPAR.DBF'] : [];
+        $files = [];
+
+        foreach ($targetFiles as $f) {
+            $p = $sourceDir . '/' . $f;
+            if (file_exists($p)) {
+                $files[] = [
+                    'filename' => $f,
+                    'size' => filesize($p),
+                    'mtime' => filemtime($p),
+                    'hash' => \App\Hash::toBase64(\App\Hash::computeFile($p))
+                ];
+            }
+        }
+        self::json(['ok' => true, 'files' => $files]);
+    }
+
+    private function downloadFile(string $r, array $b): void
+    {
+        $filename = $b['filename'] ?? '';
+        $chunkIdx = (int)($b['chunk_index'] ?? 0);
+        $paths = $this->paths($r);
+        
+        $sourceDir = "/srv/vales/{$paths['emp']}/{$paths['plaza']}/$r";
+        $p = $sourceDir . '/' . $filename;
+        if (!file_exists($p)) self::err('File not found', 404);
+
+        $fileSize = filesize($p);
+        $chunkSize = \App\Chunk::size($fileSize);
+        $offset = $chunkIdx * $chunkSize;
+        if ($offset >= $fileSize) self::err('Invalid chunk index');
+
+        $data = file_get_contents($p, false, null, $offset, min($chunkSize, $fileSize - $offset));
+        self::json([
+            'ok' => true, 
+            'data' => base64_encode($data), 
+            'hash_xxh3' => \App\Hash::toBase64(hash('xxh3', $data))
+        ]);
     }
 
     private function download(): void

@@ -88,6 +88,9 @@ class Client {
                 case 'respaldo':
                     $results = $this->serviceRespaldo($loc);
                     break;
+                case 'descargaVales':
+                    $results = $this->serviceDescargaVales($loc);
+                    break;
                 case 'discover':
                     $this->discover($this->cfgPath);
                     $results = ['locations' => count($this->locations)];
@@ -138,6 +141,56 @@ class Client {
         }
         
         return ['files_updated' => $updated, 'missing_count' => count($missing)];
+    }
+
+    // --- LOGIC: DESCARGA ---
+    private function serviceDescargaVales(array $loc): array {
+        $rbfid = $loc['rbfid'];
+        $resList = $this->http->req('download_list', $rbfid, ['service' => 'descargaVales']);
+        if (empty($resList['files'])) return ['status' => 'nothing_to_download'];
+
+        $downloaded = 0;
+        $destBase = $loc['base'] . DIRECTORY_SEPARATOR . 'MODEM_ATM';
+        if (!is_dir($destBase)) mkdir($destBase, 0755, true);
+
+        foreach ($resList['files'] as $f) {
+            $name = $f['filename'];
+            $destPath = $destBase . DIRECTORY_SEPARATOR . $name;
+            $localHash = file_exists($destPath) ? Hash::toBase64(Hash::computeFile($destPath)) : '';
+
+            if ($localHash === $f['hash']) {
+                Log::debug("File $name is up to date");
+                continue;
+            }
+
+            Log::info("Downloading $name (" . $f['size'] . " bytes)");
+            $tempPath = $destPath . '.tmp';
+            $fh = fopen($tempPath, 'wb');
+            $chunkIdx = 0;
+            $chunkSize = Chunk::size($f['size']);
+            $totalChunks = ceil($f['size'] / $chunkSize);
+
+            while ($chunkIdx < $totalChunks) {
+                $chunkRes = $this->http->req('download_file', $rbfid, ['filename' => $name, 'chunk_index' => $chunkIdx]);
+                if (!$chunkRes['ok']) throw new \Exception("Failed to download chunk $chunkIdx of $name");
+                
+                $data = base64_decode($chunkRes['data']);
+                if (Hash::toBase64(hash('xxh3', $data)) !== $chunkRes['hash_xxh3']) {
+                    throw new \Exception("Hash mismatch on chunk $chunkIdx of $name");
+                }
+                fwrite($fh, $data);
+                $chunkIdx++;
+            }
+            fclose($fh);
+            if (Hash::toBase64(Hash::computeFile($tempPath)) !== $f['hash']) {
+                unlink($tempPath);
+                throw new \Exception("Final hash mismatch for $name");
+            }
+            rename($tempPath, $destPath);
+            touch($destPath, $f['mtime']);
+            $downloaded++;
+        }
+        return ['files_downloaded' => $downloaded];
     }
 
     private function syncWorkFiles(array $loc): array {
