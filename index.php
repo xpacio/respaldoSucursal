@@ -38,7 +38,9 @@ class Server
         $action = (!empty($parts[0])) ? $parts[0] : (isset($body['action']) ? $body['action'] : 'sync');
         $rbfid = (!empty($parts[1])) ? $parts[1] : (isset($_SERVER['HTTP_X_RBFID']) ? $_SERVER['HTTP_X_RBFID'] : (isset($body['rbfid']) ? $body['rbfid'] : ''));
         $token = isset($_SERVER['HTTP_X_TOTP_TOKEN']) ? $_SERVER['HTTP_X_TOTP_TOKEN'] : (isset($_SERVER['HTTP_X_TOKEN']) ? $_SERVER['HTTP_X_TOKEN'] : (isset($body['totp_token']) ? $body['totp_token'] : ''));
-        Log::add("Action: $action | RBFID: $rbfid | Path: $path");
+        
+        $action = strtolower(trim($action));
+        Log::add("Action: [$action] | RBFID: $rbfid | Path: $path");
 
         if ($action !== 'health' && (empty($rbfid) || empty($token))) {
             Log::error("Auth failed: Missing RBFID or Token");
@@ -49,26 +51,26 @@ class Server
             self::err('Token dinamico invalido', 401);
         }
 
-        match ($action) {
-            'health' => self::json(['ok' => true, 'status' => 'healthy']),
-            'init' => $this->init($rbfid),
-            'register' => $this->register($rbfid),
-            'config' => $this->config($rbfid, $body),
-            'sync' => $this->sync($rbfid, $body),
-            'upload' => $this->upload($rbfid, $body, explode('/', $path)),
-            'missing' => $this->missing($rbfid, $body),
-            'status' => $this->status($rbfid),
-            'history' => $this->history($rbfid, $body),
-            'download' => $this->download(),
-            'schedule' => $this->schedule($rbfid, $body),
-            'service_result' => $this->serviceResult($rbfid, $body),
-            'heartbeat' => $this->heartbeat($rbfid, $body),
-            'metrics' => $this->metrics($rbfid, $body),
-            'service_config' => $this->serviceConfig($rbfid, $body),
-            'download_list' => $this->downloadList($rbfid, $body),
-            'download_file' => $this->downloadFile($rbfid, $body),
-            default => self::err("Action '$action' invalid", 400)
-        };
+        switch ($action) {
+            case 'health': self::json(['ok' => true, 'status' => 'healthy']); break;
+            case 'init': $this->init($rbfid); break;
+            case 'register': $this->register($rbfid); break;
+            case 'config': $this->config($rbfid, $body); break;
+            case 'sync': $this->sync($rbfid, $body); break;
+            case 'upload': $this->upload($rbfid, $body, explode('/', $path)); break;
+            case 'missing': $this->missing($rbfid, $body); break;
+            case 'status': $this->status($rbfid); break;
+            case 'history': $this->history($rbfid, $body); break;
+            case 'download': $this->download(); break;
+            case 'schedule': $this->schedule($rbfid, $body); break;
+            case 'service_result': $this->serviceResult($rbfid, $body); break;
+            case 'heartbeat': $this->heartbeat($rbfid, $body); break;
+            case 'metrics': $this->metrics($rbfid, $body); break;
+            case 'service_config': $this->serviceConfig($rbfid, $body); break;
+            case 'download_list': $this->downloadList($rbfid, $body); break;
+            case 'download_file': $this->downloadFile($rbfid, $body); break;
+            default: self::err("Action '$action' invalid", 400);
+        }
     }
 
     private function init(string $r): void

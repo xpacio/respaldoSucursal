@@ -26,3 +26,7 @@
 [2026-04-18 22:47:29] [INFO] Iniciando escaneo de discos...
 [2026-04-18 22:47:29] [INFO] Service End: discover. Status: success. Time: 15ms
 [2026-04-18 22:50:13] [ERROR] Server responded to 'schedule': FAIL
+[2026-04-18 22:52:48] [INFO] Iniciando escaneo de discos...
+[2026-04-18 22:52:48] [ERROR] Server responded to 'schedule': FAIL
+[2026-04-18 22:53:04] [ERROR] Server responded to 'schedule': FAIL
+[2026-04-18 23:32:36] [ERROR] Server responded to 'schedule': FAIL
