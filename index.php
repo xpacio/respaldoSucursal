@@ -60,7 +60,7 @@ class Server
             'status' => $this->status($rbfid),
             'history' => $this->history($rbfid, $body),
             'download' => $this->download(),
-            'schedule' => $this->schedule($rbfid),
+            'schedule' => $this->schedule($rbfid, $body),
             'service_result' => $this->serviceResult($rbfid, $body),
             'heartbeat' => $this->heartbeat($rbfid, $body),
             'metrics' => $this->metrics($rbfid, $body),
@@ -377,35 +377,62 @@ class Server
     {
         self::json(['ok' => true, 'history' => $this->db->qa("SELECT id, file_name, updated_at FROM files WHERE rbfid=:r ORDER BY updated_at DESC LIMIT :l", [':r' => $r, ':l' => (int) ($b['limit'] ?? 50)])]);
     }
-    private function schedule(string $r): void
+    private function schedule(string $r, array $b): void
     {
+        $specificService = $b['service'] ?? null;
+        
         $sql = "SELECT s.name, s.type, 
                        COALESCE(cs.config, s.default_config) as config, 
                        COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds 
                 FROM service_config cs
                 JOIN services s ON s.id = cs.service_id
-                WHERE cs.client_rbfid = :r AND cs.enabled = true
-                AND (cs.next_execution IS NULL OR cs.next_execution <= NOW())";
+                WHERE cs.client_rbfid = :r AND cs.enabled = true";
         
-        $services = $this->db->qa($sql, [':r' => $r]);
+        $params = [':r' => $r];
+
+        if ($specificService) {
+            // Modo Manual: Buscar el servicio solicitado sin importar el horario
+            $sql .= " AND s.name = :n";
+            $params[':n'] = $specificService;
+            $row = $this->db->q($sql, $params);
+            
+            if (!$row) {
+                self::json(['ok' => false, 'error' => 'Servicio no encontrado o deshabilitado']);
+                return;
+            }
+            
+            // Actualizar cronograma para este servicio específico
+            $this->updateNextExecution($r, $specificService, (int)$row['frequency_seconds']);
+            self::json(['ok' => true, 'name' => $row['name'], 'type' => $row['type'], 'config' => json_decode($row['config'] ?? '{}', true)]);
+            return;
+        }
+
+        // Modo Orquestador: Solo lo que ya toca ejecutar
+        $sql .= " AND (cs.next_execution IS NULL OR cs.next_execution <= NOW())";
+        $services = $this->db->qa($sql, $params);
         
         foreach ($services as $svc) {
-            $this->db->exec("UPDATE service_config 
-                            SET next_execution = NOW() + (COALESCE(service_config.frequency_seconds, s.default_frequency_seconds) || ' seconds')::interval,
-                                last_execution = NOW()
-                            FROM services s
-                            WHERE service_config.service_id = s.id 
-                            AND service_config.client_rbfid = :r 
-                            AND s.name = :n", 
-                            [':r' => $r, ':n' => $svc['name']]);
+            $this->updateNextExecution($r, $svc['name'], (int)$svc['frequency_seconds']);
         }
         
         self::json(['ok' => true, 'services' => $services]);
     }
 
+    private function updateNextExecution(string $r, string $serviceName, int $seconds): void
+    {
+        $this->db->exec("UPDATE service_config 
+                        SET next_execution = NOW() + (:s || ' seconds')::interval,
+                            last_execution = NOW()
+                        FROM services s
+                        WHERE service_config.service_id = s.id 
+                        AND service_config.client_rbfid = :r 
+                        AND s.name = :n", 
+                        [':r' => $r, ':n' => $serviceName, ':s' => $seconds]);
+    }
+
     private function serviceResult(string $r, array $b): void
     {
-        $name = $b['service_name'] ?? 'unknown';
+        $name = $b['service'] ?? 'unknown';
         $status = $b['status'] ?? 'unknown';
         $results = $b['results'] ?? [];
         $timeMs = (int)($b['execution_time_ms'] ?? 0);
