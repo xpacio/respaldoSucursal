@@ -11,6 +11,7 @@ class Client {
     private array $locations = [];
     private string $cfgPath;
     private array $cache = [];
+    private int $lastConfigCheck = 0;
 
     public function __construct(string $cfgPath) {
         $this->cfgPath = $cfgPath;
@@ -38,6 +39,14 @@ class Client {
     public function runOrchestrator(): void {
         Log::info('--- ORCHESTRATOR STARTED ---');
         while (true) {
+            $now = time();
+
+            // Actualizar lista de archivos cada 3600 segundos
+            if ($now - $this->lastConfigCheck >= 3600) {
+                $this->lastConfigCheck = $now;
+                $this->checkConfig();
+            }
+
             foreach ($this->locations as $loc) {
                 $rbfid = $loc['rbfid'];
                 Log::debug("Checking schedule for $rbfid");
@@ -62,6 +71,27 @@ class Client {
             }
             Log::flush();
             sleep(60);
+        }
+    }
+
+    private function checkConfig(): void {
+        $loc = $this->locations[0] ?? null;
+        if (!$loc) return;
+
+        $data = ClientConfig::load($this->cfgPath);
+        $currentVersion = $data['files_version'] ?? '';
+
+        $res = $this->http->req('config', $loc['rbfid'], ['files_version' => $currentVersion]);
+        if (!empty($res['files'])) {
+            $files = array_map('strtoupper', $res['files']);
+            $newVersion = $res['files_version'] ?? substr(md5(implode(',', $files)), 0, 8);
+            Constants::$WATCH_FILES = $files;
+            $data['files_version'] = $newVersion;
+            $data['watch_files'] = $files;
+            ClientConfig::save($this->cfgPath, $data);
+            Log::info("checkConfig: Lista actualizada (" . count($files) . " archivos, v$newVersion)");
+        } else {
+            Log::debug("checkConfig: Sin cambios (v" . ($res['files_version'] ?? 'unknown') . ")");
         }
     }
 
@@ -361,8 +391,6 @@ class Client {
             ClientConfig::save($cfgPath, ['locations' => $this->locations, 'files_version' => '', 'watch_files' => []]);
             Log::info("Saved " . count($this->locations) . " locations to $cfgPath");
         }
-    }
-
     }
 
     // --- INFO MODE ---
