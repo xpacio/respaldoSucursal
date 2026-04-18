@@ -1,0 +1,9 @@
+{
+    "locations": [
+        {
+            "rbfid": "roton",
+            "base": "/srv/roton",
+            "work": "/srv/roton/quickbck/"
+        }
+    ]
+}

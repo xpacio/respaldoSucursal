@@ -39,11 +39,15 @@ class Client {
         foreach ($this->locations as &$l) {
             if (!is_dir($l['work']))
                 mkdir($l['work'], 0755, true);
+            
+            // Copy/update files from base to work directory
+            $this->syncWorkFiles($l);
         }
         Log::info('Found ' . count($this->locations) . ' locations');
     }
 
     private function scanDisk(): void {
+        // Windows drives (original compatibility)
         foreach (['C', 'D'] as $drv) {
             $root = "$drv:\\\\";
             if (!is_dir($root))
@@ -51,16 +55,104 @@ class Client {
             foreach (scandir($root) as $dir) {
                 if (in_array(strtolower($dir), Constants::EXCLUDED_WIN))
                     continue;
-                $ini = "$root$dir\\rbf\\rbf.ini";
-                if (!file_exists($ini))
-                    continue;
-                if (preg_match('/_suc=([^\n\r]+)/i', file_get_contents($ini), $m)) {
-                    $id = trim($m[1], ' "');
-                    $base = "$root$dir";
-                    $this->locations[] = ['rbfid' => $id, 'base' => $base, 'work' => $base . '\\quickbck\\'];
-                    Log::info("Auto-discovered: $id");
-                }
+                $this->checkClientLocation("$root$dir");
             }
+        }
+        
+        // Linux directory - only /srv
+        $root = '/srv';
+        if (is_dir($root)) {
+            foreach (scandir($root) as $dir) {
+                if ($dir === '.' || $dir === '..')
+                    continue;
+                $this->checkClientLocation("$root/$dir");
+            }
+        }
+    }
+    
+    private function checkClientLocation(string $path): void {
+        // Only detect via rbf/rbf.ini with _suc= pattern
+        $ini = $path . DIRECTORY_SEPARATOR . 'rbf' . DIRECTORY_SEPARATOR . 'rbf.ini';
+        if (file_exists($ini)) {
+            $content = file_get_contents($ini);
+            if (preg_match('/_suc=([^\n\r]+)/i', $content, $m)) {
+                $id = trim($m[1], ' "');
+                $work = $path . DIRECTORY_SEPARATOR . 'quickbck' . DIRECTORY_SEPARATOR;
+                $this->locations[] = ['rbfid' => $id, 'base' => $path, 'work' => $work];
+                Log::info("Auto-discovered: $id at $path");
+            }
+        }
+    }
+    
+    private function syncWorkFiles(array $loc): void {
+        $base = $loc['base'];
+        $work = $loc['work'];
+        
+        Log::debug("Syncing files from $base to $work for {$loc['rbfid']}");
+        
+        if (!is_dir($base)) {
+            Log::error("Base directory not found: $base");
+            return;
+        }
+        
+        $filesUpdated = 0;
+        
+        foreach (Constants::$WATCH_FILES as $file) {
+            $src = $base . DIRECTORY_SEPARATOR . $file;
+            $dst = $work . DIRECTORY_SEPARATOR . $file;
+            
+            if (!file_exists($src)) {
+                Log::debug("Source file $file not found in $base");
+                continue;
+            }
+            
+            $copyNeeded = false;
+            
+            if (!file_exists($dst)) {
+                $copyNeeded = true;
+                Log::debug("File $file doesn't exist in work directory, will copy");
+            } else {
+                $srcStat = stat($src);
+                $dstStat = stat($dst);
+                
+                Log::debug("Comparing $file: src_mtime={$srcStat['mtime']}, dst_mtime={$dstStat['mtime']}, src_size={$srcStat['size']}, dst_size={$dstStat['size']}");
+                
+                if ($srcStat['size'] !== $dstStat['size']) {
+                    $copyNeeded = true;
+                    Log::debug("File $file changed (size: {$srcStat['size']} != {$dstStat['size']}), will update");
+                }
+                // Optional: also check mtime if source is newer
+                // else if ($srcStat['mtime'] > $dstStat['mtime']) {
+                //     $copyNeeded = true;
+                //     Log::debug("File $file changed (mtime: {$srcStat['mtime']} > {$dstStat['mtime']}), will update");
+                // }
+            }
+            
+            if ($copyNeeded) {
+                Log::info("Copying $file from $base to $work");
+                if (copy($src, $dst)) {
+                    // Preserve mtime
+                    $srcStat = stat($src);
+                    touch($dst, $srcStat['mtime']);
+                    
+                    if (file_exists($dst)) {
+                        $filesUpdated++;
+                        Log::info("Copied/updated $file to work directory");
+                    } else {
+                        Log::error("Failed to copy $file to work directory");
+                    }
+                } else {
+                    Log::error("Copy failed for $file");
+                }
+            } else {
+                Log::debug("File $file is up to date in work directory");
+            }
+        }
+        
+        if ($filesUpdated > 0) {
+            Log::info("Synced $filesUpdated files to work directory for {$loc['rbfid']}");
+        } else {
+            Log::debug("No files needed syncing for {$loc['rbfid']}");
         }
     }
 
@@ -73,12 +165,16 @@ class Client {
 
     public function syncLoop(): void {
         Log::info('Starting sync loop...');
+        $fileCount = 0;
         while (true) {
             if (time() - $this->lastFull >= Constants::FULL_CHECK_SEC) {
                 $this->lastFull = time();
                 $this->fullSync();
             }
             foreach ($this->locations as $l) {
+                // Sync files from base to work directory first
+                $this->syncWorkFiles($l);
+                
                 foreach (Constants::$WATCH_FILES as $f) {
                     $wp = $l['work'] . DIRECTORY_SEPARATOR . $f;
                     if (!file_exists($wp))
@@ -90,6 +186,8 @@ class Client {
                     Log::info("Syncing $f @ {$l['rbfid']}");
                     $this->uploadFile($l, $f, $wp, (int) $st['mtime'], (int) $st['size']);
                     $this->cache[$k] = ['mtime' => $st['mtime'], 'size' => $st['size']];
+                    
+                    // Note: Removed debug exit to allow continuous operation
                 }
             }
             Log::flush();
@@ -120,13 +218,51 @@ class Client {
             $off += $cs;
         }
         fclose($fh);
+        
+        Log::debug("File $file: size=$size, chunk_size=$cs, total_chunks=" . count($chs));
+        
         $req = $this->req('sync', ['rbfid' => $loc['rbfid'], 'files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => array_map(fn($c) => Hash::toBase64($c), $chs), 'mtime' => $mtime, 'size' => $size]]]);
+        
+        Log::debug("Sync response for $file: " . json_encode($req));
+        
+        $chunksUploaded = 0;
+        $currentChunk = 0;
+        
+        // Upload initial chunks from needs_upload
         foreach ($req['needs_upload'] ?? [] as $t) {
             $off = $t['chunk'] * $cs;
             $d = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
-            $this->req('upload', ['rbfid' => $loc['rbfid'], 'filename' => $t['file'], 'chunk_index' => $t['chunk'], 'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
-            Log::debug("Uploaded chunk {$t['chunk']} of $file");
+            $uploadResp = $this->req('upload', ['rbfid' => $loc['rbfid'], 'filename' => $t['file'], 'chunk_index' => $t['chunk'], 'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
+            Log::debug("Uploaded chunk {$t['chunk']} of $file, response: " . json_encode($uploadResp));
+            $chunksUploaded++;
+            $currentChunk = $t['chunk'];
         }
+        
+        // Continue uploading if server returns next_chunk
+        while (true) {
+            $nextChunk = null;
+            
+            // Check if we should get next chunk from server response
+            if (isset($uploadResp['next_chunk'])) {
+                $nextChunk = $uploadResp['next_chunk'];
+            }
+            
+            if ($nextChunk === null || $nextChunk >= count($chs)) {
+                break;
+            }
+            
+            $off = $nextChunk * $cs;
+            $d = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
+            $uploadResp = $this->req('upload', ['rbfid' => $loc['rbfid'], 'filename' => $file, 'chunk_index' => $nextChunk, 'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
+            Log::debug("Uploaded chunk $nextChunk of $file, response: " . json_encode($uploadResp));
+            $chunksUploaded++;
+            $currentChunk = $nextChunk;
+            
+            // Small delay between chunks
+            usleep(100000); // 0.1 second
+        }
+        
+        Log::info("Uploaded $chunksUploaded chunks for $file (expected: " . count($chs) . ")");
         Log::flush();
     }
 
@@ -161,10 +297,26 @@ class Client {
 // --- CLI Execution ---
 try {
     $c = new Client();
-    $cfg = $_SERVER['argv'][1] ?? __DIR__.'/config.json';
+    
+    // Parse command line arguments
+    $args = $_SERVER['argv'];
+    array_shift($args); // Remove script name
+    
+    $cfg = __DIR__.'/config.json';
+    $runOnce = false;
+    
+    foreach ($args as $arg) {
+        if ($arg === '--run-once') {
+            $runOnce = true;
+        } elseif (strpos($arg, '--') !== 0) {
+            // First non-option argument is config path
+            $cfg = $arg;
+        }
+    }
+    
     $c->discover($cfg);
     if (empty($c->getLocations())) { Log::add('No locations found. Exiting.'); exit; }
     $c->register();
-    if (in_array('--run-once', $_SERVER['argv'])) { $c->fullSync(); Log::add('Run once complete.'); exit; }
+    if ($runOnce) { $c->fullSync(); Log::add('Run once complete.'); exit; }
     $c->syncLoop();
 } catch (\Throwable $e) { Log::add('CLI Fatal: '.$e->getMessage()); exit(1); }
