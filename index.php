@@ -60,6 +60,9 @@ class Server
             'status' => $this->status($rbfid),
             'history' => $this->history($rbfid, $body),
             'download' => $this->download(),
+            'schedule' => $this->schedule($rbfid),
+            'service_result' => $this->serviceResult($rbfid, $body),
+            'heartbeat' => $this->heartbeat($rbfid, $body),
             default => self::err("Action '$action' invalid", 400)
         };
     }
@@ -367,6 +370,56 @@ class Server
     {
         self::json(['ok' => true, 'history' => $this->db->qa("SELECT id, file_name, updated_at FROM ar_files WHERE rbfid=:r ORDER BY updated_at DESC LIMIT :l", [':r' => $r, ':l' => (int) ($b['limit'] ?? 50)])]);
     }
+    private function schedule(string $r): void
+    {
+        $sql = "SELECT s.name, s.type, cs.config, cs.frequency_seconds 
+                FROM client_services cs
+                JOIN services s ON s.id = cs.service_id
+                WHERE cs.client_rbfid = :r AND cs.enabled = true
+                AND (cs.next_execution IS NULL OR cs.next_execution <= NOW())";
+        
+        $services = $this->db->qa($sql, [':r' => $r]);
+        
+        foreach ($services as $svc) {
+            $this->db->exec("UPDATE client_services 
+                            SET next_execution = NOW() + (frequency_seconds || ' seconds')::interval,
+                                last_execution = NOW()
+                            WHERE client_rbfid = :r AND service_id = (SELECT id FROM services WHERE name = :n)", 
+                            [':r' => $r, ':n' => $svc['name']]);
+        }
+        
+        self::json(['ok' => true, 'services' => $services]);
+    }
+
+    private function serviceResult(string $r, array $b): void
+    {
+        $name = $b['service_name'] ?? 'unknown';
+        $status = $b['status'] ?? 'unknown';
+        $results = $b['results'] ?? [];
+        $timeMs = (int)($b['execution_time_ms'] ?? 0);
+        
+        $this->db->exec("INSERT INTO service_executions (client_rbfid, service_name, status, results, execution_time_ms, completed_at)
+                        VALUES (:r, :n, :s, :res, :t, NOW())",
+                        [':r' => $r, ':n' => $name, ':s' => $status, ':res' => json_encode($results), ':t' => $timeMs]);
+                        
+        self::json(['ok' => true]);
+    }
+
+    private function heartbeat(string $r, array $b): void
+    {
+        $status = $b['status'] ?? 'unknown';
+        $running = $b['services_running'] ?? [];
+        $info = $b['system_info'] ?? [];
+        
+        $this->db->exec("INSERT INTO client_health (client_rbfid, last_heartbeat, orchestrator_status, services_running, system_info)
+                        VALUES (:r, NOW(), :s, :run, :info)
+                        ON CONFLICT (client_rbfid) DO UPDATE SET
+                        last_heartbeat = NOW(), orchestrator_status = :s, services_running = :run, system_info = :info",
+                        [':r' => $r, ':s' => $status, ':run' => json_encode($running), ':info' => json_encode($info)]);
+                        
+        self::json(['ok' => true]);
+    }
+
     private function download(): void
     {
         $p = '/srv/zigRespaldoSucursal/zig-out/bin/ar.exe';
