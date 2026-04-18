@@ -92,7 +92,7 @@ class Server
     }
     private function config(string $r, array $b): void
     {
-        $files = array_column($this->db->qa("SELECT file_name FROM ar_global_files WHERE enabled = true"), 'file_name');
+        $files = array_column($this->db->qa("SELECT file_name FROM catalog WHERE enabled = true"), 'file_name');
         $sv = substr(md5(implode(',', $files)), 0, 8);
         $res = ['ok' => true, 'rbfid' => $r, 'files_version' => $sv];
         if (($b['files_version'] ?? '') !== $sv) {
@@ -109,7 +109,7 @@ class Server
     {
         try {
             $this->db->begin();
-            $syncId = $this->db->insert("INSERT INTO ar_sync_history (rbfid, status, started_at) VALUES (:r, 'pending', NOW())", [':r' => $r]);
+            $syncId = $this->db->insert("INSERT INTO sync_history (rbfid, status, started_at) VALUES (:r, 'pending', NOW())", [':r' => $r]);
             $paths = $this->paths($r);
             $needs = [];
             
@@ -123,7 +123,7 @@ class Server
                 if (!$name || !$hash || empty($chunkHashes))
                     continue;
                     
-                $srv = $this->db->q("SELECT hash_xxh3, file_mtime, status FROM ar_files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
+                $srv = $this->db->q("SELECT hash_xxh3, file_mtime, status FROM files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                 
                 // Si el archivo está marcado como 'missing', ignorar la sincronización
                 if ($srv && $srv['status'] === 'missing') {
@@ -157,7 +157,7 @@ class Server
                     Log::info("Sync: File $name needs update ($cnt chunks)");
                     
                     // Eliminar registros antiguos
-                    $this->db->exec("DELETE FROM ar_file_hashes WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
+                    $this->db->exec("DELETE FROM file_chunks WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                     
                     // OPTIMIZACIÓN: Si tenemos archivo existente, comparar chunks individualmente
                     $pendingChunks = $cnt; // Por defecto, todos pendientes
@@ -181,12 +181,12 @@ class Server
                             
                             if ($chunkHash === $chunkHashes[$i]) {
                                 // Chunk coincide, marcarlo como recibido
-                                $this->db->exec("INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'received', NOW())", 
+                                $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'received', NOW())", 
                                     [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $chunkHashes[$i]]);
                                 Log::debug("Sync: Chunk $i of $name already matches");
                             } else {
                                 // Chunk diferente, marcarlo como pendiente
-                                $this->db->exec("INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
+                                $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
                                     [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $chunkHashes[$i]]);
                                 $pendingChunks++;
                                 if ($firstPendingChunk === null) {
@@ -198,20 +198,20 @@ class Server
                     } else {
                         // Sin archivo existente, todos los chunks pendientes
                         for ($i = 0; $i < $cnt; $i++) {
-                            $this->db->exec("INSERT INTO ar_file_hashes (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
+                            $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
                                 [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $chunkHashes[$i] ?? '']);
                         }
                     }
                     
                     // Actualizar registro principal del archivo
-                    $this->db->exec("INSERT INTO ar_files (rbfid, file_name, chunk_count, chunk_pending, hash_esperado, status, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :p, :h, 'pending', NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, chunk_pending = :p, hash_xxh3 = NULL, hash_esperado = :h, status = 'pending', updated_at = NOW()", 
+                    $this->db->exec("INSERT INTO files (rbfid, file_name, chunk_count, chunk_pending, hash_esperado, status, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :p, :h, 'pending', NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, chunk_pending = :p, hash_xxh3 = NULL, hash_esperado = :h, status = 'pending', updated_at = NOW()", 
                         [':r' => $r, ':n' => $name, ':c' => $cnt, ':p' => $pendingChunks, ':h' => $hash, ':s' => $fileSize, ':m' => $fileMtime]);
                     
                     Log::info("Sync: File $name has $pendingChunks pending chunks (total: $cnt)");
                 }
                 
                 // Obtener primer chunk pendiente
-                $nx = $this->db->q("SELECT chunk_index FROM ar_file_hashes WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index LIMIT 1", [':r' => $r, ':n' => $name]);
+                $nx = $this->db->q("SELECT chunk_index FROM file_chunks WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index LIMIT 1", [':r' => $r, ':n' => $name]);
                 if ($nx) {
                     Log::debug("Sync: Requesting chunk {$nx['chunk_index']} for $name");
                     $needs[] = ['file' => $name, 'chunk' => (int) $nx['chunk_index'], 'work_path' => $paths['work'] . '/' . $name, 'dest_path' => $paths['base'] . '/' . $name, 'md5' => $hash];
@@ -244,18 +244,18 @@ class Server
                 $fileUpper = strtoupper($file);
                 
                 // Verificar si el archivo ya existe en la base de datos
-                $existing = $this->db->q("SELECT status FROM ar_files WHERE rbfid = :r AND file_name = :f", [':r' => $r, ':f' => $fileUpper]);
+                $existing = $this->db->q("SELECT status FROM files WHERE rbfid = :r AND file_name = :f", [':r' => $r, ':f' => $fileUpper]);
                 
                 if ($existing) {
                     // Si existe pero no está como 'missing', actualizar estado
                     if ($existing['status'] !== 'missing') {
-                        $this->db->exec("UPDATE ar_files SET status = 'missing', updated_at = NOW() WHERE rbfid = :r AND file_name = :f", 
+                        $this->db->exec("UPDATE files SET status = 'missing', updated_at = NOW() WHERE rbfid = :r AND file_name = :f", 
                             [':r' => $r, ':f' => $fileUpper]);
                         Log::debug("Updated file $fileUpper status to 'missing' for client $r");
                     }
                 } else {
                     // Insertar nuevo registro con estado 'missing'
-                    $this->db->exec("INSERT INTO ar_files (rbfid, file_name, status, updated_at) VALUES (:r, :f, 'missing', NOW())", 
+                    $this->db->exec("INSERT INTO files (rbfid, file_name, status, updated_at) VALUES (:r, :f, 'missing', NOW())", 
                         [':r' => $r, ':f' => $fileUpper]);
                     Log::debug("Added missing file $fileUpper for client $r");
                 }
@@ -299,13 +299,13 @@ class Server
                 self::err('Save failed');
             }
             if (hash('xxh3', $data) !== \App\Hash::fromBase64($hash)) {
-                $this->db->exec("UPDATE ar_file_hashes SET status='failed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
+                $this->db->exec("UPDATE file_chunks SET status='failed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
                 $this->db->commit();
                 Log::error("Chunk $idx hash mismatch for $file");
                 self::json(['ok' => true, 'status' => 'failed']);
             }
             // Obtener el chunk_count esperado para este archivo
-            $fileInfo = $this->db->q("SELECT chunk_count, chunk_pending FROM ar_files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
+            $fileInfo = $this->db->q("SELECT chunk_count, chunk_pending FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
             $totalChunks = $fileInfo['chunk_count'] ?? 1;
             $currentPending = $fileInfo['chunk_pending'] ?? 1;
             
@@ -313,24 +313,24 @@ class Server
             $newPending = max(0, $currentPending - 1);
             
             // Buscar siguiente chunk pendiente (no asumir secuencial)
-            $nextPending = $this->db->q("SELECT chunk_index FROM ar_file_hashes WHERE rbfid=:r AND file_name=:f AND status != 'received' AND chunk_index > :idx ORDER BY chunk_index LIMIT 1", 
+            $nextPending = $this->db->q("SELECT chunk_index FROM file_chunks WHERE rbfid=:r AND file_name=:f AND status != 'received' AND chunk_index > :idx ORDER BY chunk_index LIMIT 1", 
                 [':r' => $r, ':f' => $file, ':idx' => $idx]);
             $nextChunk = $nextPending ? (int) $nextPending['chunk_index'] : null;
             
             // Si hay más chunks pendientes
             if ($nextChunk !== null && $newPending > 0) {
                 // Actualizar el chunk actual como recibido
-                $this->db->exec("UPDATE ar_file_hashes SET status='received', updated_at=NOW() WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx", 
+                $this->db->exec("UPDATE file_chunks SET status='received', updated_at=NOW() WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx", 
                     [':r' => $r, ':f' => $file, ':idx' => $idx]);
-                $this->db->exec("UPDATE ar_files SET chunk_pending=:p WHERE rbfid=:r AND file_name=:f", [':p' => $newPending, ':r' => $r, ':f' => $file]);
+                $this->db->exec("UPDATE files SET chunk_pending=:p WHERE rbfid=:r AND file_name=:f", [':p' => $newPending, ':r' => $r, ':f' => $file]);
                 $this->db->commit();
                 Log::debug("Chunk $idx received ($file), next: $nextChunk, pending: $newPending");
                 self::json(['ok' => true, 'status' => 'received', 'next_chunk' => $nextChunk]);
             } else {
                 // Último chunk recibido, marcar como recibido para proceder a finalizar
-                $this->db->exec("UPDATE ar_file_hashes SET status='received', updated_at=NOW() WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx", 
+                $this->db->exec("UPDATE file_chunks SET status='received', updated_at=NOW() WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx", 
                     [':r' => $r, ':f' => $file, ':idx' => $idx]);
-                $this->db->exec("UPDATE ar_files SET chunk_pending=0, status='completed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
+                $this->db->exec("UPDATE files SET chunk_pending=0, status='completed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
                 $this->finalize($r, $file, $paths);
                 $this->db->commit();
             }
@@ -342,7 +342,7 @@ class Server
     private function finalize(string $r, string $f, array $paths): void
     {
         $wp = $paths['work'] . '/' . $f;
-        $esp = $this->db->q("SELECT hash_esperado FROM ar_files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f])['hash_esperado'];
+        $esp = $this->db->q("SELECT hash_esperado FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f])['hash_esperado'];
         $act = \App\Hash::computeFile($wp);
         if ($esp === \App\Hash::toBase64($act)) {
             if (!is_dir($paths['base'])) {
@@ -356,7 +356,7 @@ class Server
             }
             Log::info("Finalize: Moving verified file to $dp");
             rename($wp, $dp);
-            $this->db->exec("UPDATE ar_files SET hash_xxh3=:h, status='completed', chunk_pending=0 WHERE rbfid=:r AND file_name=:f", [':h' => $act, ':r' => $r, ':f' => $f]);
+            $this->db->exec("UPDATE files SET hash_xxh3=:h, status='completed', chunk_pending=0 WHERE rbfid=:r AND file_name=:f", [':h' => $act, ':r' => $r, ':f' => $f]);
             Log::info("File $f finalized & verified for $r");
             self::json(['ok' => true, 'status' => 'complete']);
         }
@@ -368,18 +368,18 @@ class Server
         $c = $this->db->q("SELECT * FROM clients WHERE rbfid=:r", [':r' => $r]);
         if (!$c)
             self::err('Not found', 404);
-        self::json(['ok' => true, 'client' => $c, 'files' => $this->db->qa("SELECT file_name, updated_at FROM ar_files WHERE rbfid=:r", [':r' => $r])]);
+        self::json(['ok' => true, 'client' => $c, 'files' => $this->db->qa("SELECT file_name, updated_at FROM files WHERE rbfid=:r", [':r' => $r])]);
     }
     private function history(string $r, array $b): void
     {
-        self::json(['ok' => true, 'history' => $this->db->qa("SELECT id, file_name, updated_at FROM ar_files WHERE rbfid=:r ORDER BY updated_at DESC LIMIT :l", [':r' => $r, ':l' => (int) ($b['limit'] ?? 50)])]);
+        self::json(['ok' => true, 'history' => $this->db->qa("SELECT id, file_name, updated_at FROM files WHERE rbfid=:r ORDER BY updated_at DESC LIMIT :l", [':r' => $r, ':l' => (int) ($b['limit'] ?? 50)])]);
     }
     private function schedule(string $r): void
     {
         $sql = "SELECT s.name, s.type, 
                        COALESCE(cs.config, s.default_config) as config, 
                        COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds 
-                FROM client_services cs
+                FROM service_config cs
                 JOIN services s ON s.id = cs.service_id
                 WHERE cs.client_rbfid = :r AND cs.enabled = true
                 AND (cs.next_execution IS NULL OR cs.next_execution <= NOW())";
@@ -387,12 +387,12 @@ class Server
         $services = $this->db->qa($sql, [':r' => $r]);
         
         foreach ($services as $svc) {
-            $this->db->exec("UPDATE client_services 
-                            SET next_execution = NOW() + (COALESCE(cs.frequency_seconds, s.default_frequency_seconds) || ' seconds')::interval,
+            $this->db->exec("UPDATE service_config 
+                            SET next_execution = NOW() + (COALESCE(service_config.frequency_seconds, s.default_frequency_seconds) || ' seconds')::interval,
                                 last_execution = NOW()
                             FROM services s
-                            WHERE client_services.service_id = s.id 
-                            AND client_services.client_rbfid = :r 
+                            WHERE service_config.service_id = s.id 
+                            AND service_config.client_rbfid = :r 
                             AND s.name = :n", 
                             [':r' => $r, ':n' => $svc['name']]);
         }
@@ -407,7 +407,7 @@ class Server
         $results = $b['results'] ?? [];
         $timeMs = (int)($b['execution_time_ms'] ?? 0);
         
-        $this->db->exec("INSERT INTO service_executions (client_rbfid, service_name, status, results, execution_time_ms, completed_at)
+        $this->db->exec("INSERT INTO service_history (client_rbfid, service_name, status, results, execution_time_ms, completed_at)
                         VALUES (:r, :n, :s, :res, :t, NOW())",
                         [':r' => $r, ':n' => $name, ':s' => $status, ':res' => json_encode($results), ':t' => $timeMs]);
                         
@@ -420,7 +420,7 @@ class Server
         $running = $b['services_running'] ?? [];
         $info = $b['system_info'] ?? [];
         
-        $this->db->exec("INSERT INTO client_health (client_rbfid, last_heartbeat, orchestrator_status, services_running, system_info)
+        $this->db->exec("INSERT INTO service_health (client_rbfid, last_heartbeat, orchestrator_status, services_running, system_info)
                         VALUES (:r, NOW(), :s, :run, :info)
                         ON CONFLICT (client_rbfid) DO UPDATE SET
                         last_heartbeat = NOW(), orchestrator_status = :s, services_running = :run, system_info = :info",
@@ -432,7 +432,7 @@ class Server
     private function metrics(string $r, array $b): void
     {
         // Actualizar system_info con nuevas métricas (merge JSONB)
-        $this->db->exec("UPDATE client_health SET system_info = system_info || :m, last_heartbeat = NOW() WHERE client_rbfid = :r", 
+        $this->db->exec("UPDATE service_health SET system_info = system_info || :m, last_heartbeat = NOW() WHERE client_rbfid = :r", 
             [':r' => $r, ':m' => json_encode($b)]);
         self::json(['ok' => true]);
     }
@@ -451,7 +451,7 @@ class Server
             "SELECT COALESCE(cs.config, s.default_config) as config, 
                     COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds, 
                     s.type, s.name
-             FROM client_services cs JOIN services s ON s.id = cs.service_id
+             FROM service_config cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
             [':r' => $r, ':n' => $name]
         );
@@ -473,7 +473,7 @@ class Server
 
         $row = $this->db->q(
             "SELECT COALESCE(cs.config, s.default_config) as config 
-             FROM client_services cs JOIN services s ON s.id = cs.service_id
+             FROM service_config cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n",
             [':r' => $r, ':n' => $serviceName]
         );
@@ -506,7 +506,7 @@ class Server
 
         $row = $this->db->q(
             "SELECT COALESCE(cs.config, s.default_config) as config 
-             FROM client_services cs JOIN services s ON s.id = cs.service_id
+             FROM service_config cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n",
             [':r' => $r, ':n' => $serviceName]
         );
