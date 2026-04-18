@@ -9,6 +9,7 @@ class Client {
     private string $url;
     private array $locations = [];
     private int $lastFull = 0;
+    private int $lastConfigCheck = 0;
     private array $cache = [];
     private $ch;
 
@@ -26,12 +27,24 @@ class Client {
     public function discover(string $cfgPath): void {
         Log::info('Discovering locations...');
         $data = file_exists($cfgPath) ? json_decode(file_get_contents($cfgPath) ?: '{}', true) : [];
-        $this->locations = array_map(fn($l) => ['rbfid' => $l['rbfid'], 'base' => $l['base'] ?? $l['base_path'] ?? null, 'work' => $l['work'] ?? $l['work_path'] ?? null], $data['locations'] ?? []);
+        $this->locations = array_map(function($l) {
+            $base = isset($l['base']) ? $l['base'] : (isset($l['base_path']) ? $l['base_path'] : null);
+            $work = isset($l['work']) ? $l['work'] : (isset($l['work_path']) ? $l['work_path'] : null);
+            return ['rbfid' => $l['rbfid'], 'base' => $base, 'work' => $work];
+        }, isset($data['locations']) ? $data['locations'] : []);
+        
+        // Cargar lista de archivos de config.json si existe
+        if (!empty($data['watch_files'])) {
+            Constants::$WATCH_FILES = array_map('strtoupper', $data['watch_files']);
+            $version = isset($data['files_version']) ? $data['files_version'] : 'unknown';
+            Log::info("Loaded " . count(Constants::$WATCH_FILES) . " files from config.json (version: $version)");
+        }
+        
         if (empty($this->locations)) {
             Log::info('Scanning disk...');
             $this->scanDisk();
             if (!empty($this->locations)) {
-                $save = ['locations' => $this->locations];
+                $save = ['locations' => $this->locations, 'files_version' => '', 'watch_files' => []];
                 file_put_contents($cfgPath, json_encode($save, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
                 Log::info("Auto-discovered locations saved to $cfgPath");
             }
@@ -87,8 +100,9 @@ class Client {
     private function syncWorkFiles(array $loc): void {
         $base = $loc['base'];
         $work = $loc['work'];
+        $rbfid = $loc['rbfid'];
         
-        Log::debug("Syncing files from $base to $work for {$loc['rbfid']}");
+        Log::debug("Syncing files from $base to $work for $rbfid");
         
         if (!is_dir($base)) {
             Log::error("Base directory not found: $base");
@@ -96,40 +110,62 @@ class Client {
         }
         
         $filesUpdated = 0;
+        $missingFiles = [];
         
         foreach (Constants::$WATCH_FILES as $file) {
-            $src = $base . DIRECTORY_SEPARATOR . $file;
-            $dst = $work . DIRECTORY_SEPARATOR . $file;
+            // Asegurar nombre en mayúsculas
+            $fileUpper = strtoupper($file);
             
-            if (!file_exists($src)) {
-                Log::debug("Source file $file not found in $base");
+            // Buscar archivo en base directory (puede estar en minúsculas o mixto)
+            $found = false;
+            $actualName = $fileUpper;
+            
+            // Primero intentar con el nombre exacto (mayúsculas)
+            $src = $base . DIRECTORY_SEPARATOR . $fileUpper;
+            if (file_exists($src)) {
+                $found = true;
+            } else {
+                // Buscar archivo con cualquier casing
+                if (is_dir($base)) {
+                    foreach (scandir($base) as $entry) {
+                        if (strtoupper($entry) === $fileUpper) {
+                            $src = $base . DIRECTORY_SEPARATOR . $entry;
+                            $actualName = $entry;
+                            $found = true;
+                            Log::debug("Found $fileUpper as $actualName in base directory");
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if (!$found) {
+                Log::debug("File $fileUpper not found in $base");
+                $missingFiles[] = $fileUpper;
                 continue;
             }
+            
+            $dst = $work . DIRECTORY_SEPARATOR . $fileUpper;
             
             $copyNeeded = false;
             
             if (!file_exists($dst)) {
                 $copyNeeded = true;
-                Log::debug("File $file doesn't exist in work directory, will copy");
+                Log::debug("File $fileUpper doesn't exist in work directory, will copy");
             } else {
                 $srcStat = stat($src);
                 $dstStat = stat($dst);
                 
-                Log::debug("Comparing $file: src_mtime={$srcStat['mtime']}, dst_mtime={$dstStat['mtime']}, src_size={$srcStat['size']}, dst_size={$dstStat['size']}");
+                Log::debug("Comparing $fileUpper: src_mtime={$srcStat['mtime']}, dst_mtime={$dstStat['mtime']}, src_size={$srcStat['size']}, dst_size={$dstStat['size']}");
                 
                 if ($srcStat['size'] !== $dstStat['size']) {
                     $copyNeeded = true;
-                    Log::debug("File $file changed (size: {$srcStat['size']} != {$dstStat['size']}), will update");
+                    Log::debug("File $fileUpper changed (size: {$srcStat['size']} != {$dstStat['size']}), will update");
                 }
-                // Optional: also check mtime if source is newer
-                // else if ($srcStat['mtime'] > $dstStat['mtime']) {
-                //     $copyNeeded = true;
-                //     Log::debug("File $file changed (mtime: {$srcStat['mtime']} > {$dstStat['mtime']}), will update");
-                // }
             }
             
             if ($copyNeeded) {
-                Log::info("Copying $file from $base to $work");
+                Log::info("Copying $fileUpper from $base to $work");
                 if (copy($src, $dst)) {
                     // Preserve mtime
                     $srcStat = stat($src);
@@ -137,22 +173,47 @@ class Client {
                     
                     if (file_exists($dst)) {
                         $filesUpdated++;
-                        Log::info("Copied/updated $file to work directory");
+                        Log::info("Copied/updated $fileUpper to work directory");
                     } else {
-                        Log::error("Failed to copy $file to work directory");
+                        Log::error("Failed to copy $fileUpper to work directory");
                     }
                 } else {
-                    Log::error("Copy failed for $file");
+                    Log::error("Copy failed for $fileUpper");
                 }
             } else {
-                Log::debug("File $file is up to date in work directory");
+                Log::debug("File $fileUpper is up to date in work directory");
             }
         }
         
+        // Notificar archivos faltantes al servidor
+        if (!empty($missingFiles)) {
+            $this->reportMissingFiles($rbfid, $missingFiles);
+        }
+        
         if ($filesUpdated > 0) {
-            Log::info("Synced $filesUpdated files to work directory for {$loc['rbfid']}");
+            Log::info("Synced $filesUpdated files to work directory for $rbfid");
         } else {
-            Log::debug("No files needed syncing for {$loc['rbfid']}");
+            Log::debug("No files needed syncing for $rbfid");
+        }
+    }
+    
+    private function reportMissingFiles(string $rbfid, array $missingFiles): void {
+        Log::info("Reporting " . count($missingFiles) . " missing files to server: " . implode(', ', $missingFiles));
+        
+        try {
+            $response = $this->req('missing', [
+                'rbfid' => $rbfid,
+                'missing_files' => $missingFiles,
+                'timestamp' => time()
+            ]);
+            
+            if (isset($response['ok']) ? $response['ok'] : false) {
+                Log::info("Missing files reported successfully");
+            } else {
+                Log::error("Failed to report missing files: " . (isset($response['error']) ? $response['error'] : 'Unknown error'));
+            }
+        } catch (\Throwable $e) {
+            Log::error("Error reporting missing files: " . $e->getMessage());
         }
     }
 
@@ -167,8 +228,16 @@ class Client {
         Log::info('Starting sync loop...');
         $fileCount = 0;
         while (true) {
-            if (time() - $this->lastFull >= Constants::FULL_CHECK_SEC) {
-                $this->lastFull = time();
+            $currentTime = time();
+            
+            // Verificar configuración cada 3600 segundos (1 hora)
+            if ($currentTime - $this->lastConfigCheck >= 3600) {
+                $this->lastConfigCheck = $currentTime;
+                $this->checkConfig();
+            }
+            
+            if ($currentTime - $this->lastFull >= Constants::FULL_CHECK_SEC) {
+                $this->lastFull = $currentTime;
                 $this->fullSync();
             }
             foreach ($this->locations as $l) {
@@ -176,15 +245,20 @@ class Client {
                 $this->syncWorkFiles($l);
                 
                 foreach (Constants::$WATCH_FILES as $f) {
-                    $wp = $l['work'] . DIRECTORY_SEPARATOR . $f;
+                    // Asegurar nombre en mayúsculas
+                    $fUpper = strtoupper($f);
+                    $wp = $l['work'] . DIRECTORY_SEPARATOR . $fUpper;
+                    
                     if (!file_exists($wp))
                         continue;
+                    
                     $st = stat($wp);
                     $k = hash('xxh64', $wp);
                     if (isset($this->cache[$k]) && $this->cache[$k]['mtime'] == $st['mtime'] && $this->cache[$k]['size'] == $st['size'])
                         continue;
-                    Log::info("Syncing $f @ {$l['rbfid']}");
-                    $this->uploadFile($l, $f, $wp, (int) $st['mtime'], (int) $st['size']);
+                    
+                    Log::info("Syncing $fUpper @ {$l['rbfid']}");
+                    $this->uploadFile($l, $fUpper, $wp, (int) $st['mtime'], (int) $st['size']);
                     $this->cache[$k] = ['mtime' => $st['mtime'], 'size' => $st['size']];
                     
                     // Note: Removed debug exit to allow continuous operation
@@ -195,19 +269,76 @@ class Client {
         }
     }
 
-    private function fullSync(): void {
-        Log::info('Running full hash check...');
-        $l = $this->locations[0] ?? null;
+    private function checkConfig(): void {
+        Log::info('Checking for updated file list (every 3600s)...');
+        $l = isset($this->locations[0]) ? $this->locations[0] : null;
         if (!$l)
             return;
-        $res = $this->req('config', ['rbfid' => $l['rbfid']]);
+        
+        // Cargar configuración actual
+        $cfgPath = __DIR__ . '/config.json';
+        $config = file_exists($cfgPath) ? json_decode(file_get_contents($cfgPath) ?: '{}', true) : [];
+        $currentVersion = isset($config['files_version']) ? $config['files_version'] : '';
+        
+        $res = $this->req('config', ['rbfid' => $l['rbfid'], 'files_version' => $currentVersion]);
+        
         if (!empty($res['files'])) {
-            Log::info("Updated file list (" . count($res['files']) . ")");
-            Constants::$WATCH_FILES = $res['files'];
+            // Normalizar nombres a mayúsculas
+            $files = array_map('strtoupper', $res['files']);
+            $newVersion = isset($res['files_version']) ? $res['files_version'] : substr(md5(implode(',', $files)), 0, 8);
+            
+            Log::info("Updated file list (" . count($files) . "), version: $newVersion");
+            
+            // Actualizar Constants y config.json
+            Constants::$WATCH_FILES = $files;
+            $config['files_version'] = $newVersion;
+            $config['watch_files'] = $files;
+            
+            file_put_contents($cfgPath, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            Log::info("Saved file list to config.json");
+        } else {
+            $version = isset($res['files_version']) ? $res['files_version'] : 'unknown';
+            Log::debug("File list unchanged (version: $version)");
+        }
+    }
+    
+    private function fullSync(): void {
+        Log::info('Running full hash check...');
+        $l = isset($this->locations[0]) ? $this->locations[0] : null;
+        if (!$l)
+            return;
+        
+        // Cargar configuración actual
+        $cfgPath = __DIR__ . '/config.json';
+        $config = file_exists($cfgPath) ? json_decode(file_get_contents($cfgPath) ?: '{}', true) : [];
+        $currentVersion = isset($config['files_version']) ? $config['files_version'] : '';
+        
+        $res = $this->req('config', ['rbfid' => $l['rbfid'], 'files_version' => $currentVersion]);
+        
+        if (!empty($res['files'])) {
+            // Normalizar nombres a mayúsculas
+            $files = array_map('strtoupper', $res['files']);
+            $newVersion = isset($res['files_version']) ? $res['files_version'] : substr(md5(implode(',', $files)), 0, 8);
+            
+            Log::info("Updated file list (" . count($files) . "), version: $newVersion");
+            
+            // Actualizar Constants y config.json
+            Constants::$WATCH_FILES = $files;
+            $config['files_version'] = $newVersion;
+            $config['watch_files'] = $files;
+            
+            file_put_contents($cfgPath, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            Log::info("Saved file list to config.json");
+        } else {
+            $version = isset($res['files_version']) ? $res['files_version'] : 'unknown';
+            Log::debug("File list unchanged (version: $version)");
         }
     }
 
     private function uploadFile(array $loc, string $file, string $wp, int $mtime, int $size): void {
+        // Asegurar nombre en mayúsculas
+        $fileUpper = strtoupper($file);
+        
         $h = Hash::computeFile($wp);
         $cs = Chunk::size($size);
         $chs = [];
@@ -219,21 +350,21 @@ class Client {
         }
         fclose($fh);
         
-        Log::debug("File $file: size=$size, chunk_size=$cs, total_chunks=" . count($chs));
+        Log::debug("File $fileUpper: size=$size, chunk_size=$cs, total_chunks=" . count($chs));
         
-        $req = $this->req('sync', ['rbfid' => $loc['rbfid'], 'files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => array_map(fn($c) => Hash::toBase64($c), $chs), 'mtime' => $mtime, 'size' => $size]]]);
+        $req = $this->req('sync', ['rbfid' => $loc['rbfid'], 'files' => [['filename' => $fileUpper, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => array_map(fn($c) => Hash::toBase64($c), $chs), 'mtime' => $mtime, 'size' => $size]]]);
         
-        Log::debug("Sync response for $file: " . json_encode($req));
+        Log::debug("Sync response for $fileUpper: " . json_encode($req));
         
         $chunksUploaded = 0;
         $currentChunk = 0;
         
         // Upload initial chunks from needs_upload
-        foreach ($req['needs_upload'] ?? [] as $t) {
+        foreach (isset($req['needs_upload']) ? $req['needs_upload'] : [] as $t) {
             $off = $t['chunk'] * $cs;
             $d = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
-            $uploadResp = $this->req('upload', ['rbfid' => $loc['rbfid'], 'filename' => $t['file'], 'chunk_index' => $t['chunk'], 'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
-            Log::debug("Uploaded chunk {$t['chunk']} of $file, response: " . json_encode($uploadResp));
+            $uploadResp = $this->req('upload', ['rbfid' => $loc['rbfid'], 'filename' => $fileUpper, 'chunk_index' => $t['chunk'], 'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
+            Log::debug("Uploaded chunk {$t['chunk']} of $fileUpper, response: " . json_encode($uploadResp));
             $chunksUploaded++;
             $currentChunk = $t['chunk'];
         }
@@ -253,8 +384,8 @@ class Client {
             
             $off = $nextChunk * $cs;
             $d = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
-            $uploadResp = $this->req('upload', ['rbfid' => $loc['rbfid'], 'filename' => $file, 'chunk_index' => $nextChunk, 'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
-            Log::debug("Uploaded chunk $nextChunk of $file, response: " . json_encode($uploadResp));
+            $uploadResp = $this->req('upload', ['rbfid' => $loc['rbfid'], 'filename' => $fileUpper, 'chunk_index' => $nextChunk, 'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
+            Log::debug("Uploaded chunk $nextChunk of $fileUpper, response: " . json_encode($uploadResp));
             $chunksUploaded++;
             $currentChunk = $nextChunk;
             
@@ -262,16 +393,27 @@ class Client {
             usleep(100000); // 0.1 second
         }
         
-        Log::info("Uploaded $chunksUploaded chunks for $file (expected: " . count($chs) . ")");
+        Log::info("Uploaded $chunksUploaded chunks for $fileUpper (expected: " . count($chs) . ")");
         Log::flush();
     }
 
     private function req(string $action, array $body): array {
-        $l = $this->locations[0] ?? null;
+        $l = isset($this->locations[0]) ? $this->locations[0] : null;
         $ts = time();
-        $tok = Totp::gen($l['rbfid'] ?? '', $ts);
-        curl_setopt($this->ch, CURLOPT_URL, $this->url);
-        curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode(['action' => $action, ...$body, 'totp_token' => $tok, 'timestamp' => $ts]));
+        $rbfid = isset($l['rbfid']) ? $l['rbfid'] : '';
+        $tok = Totp::gen($rbfid, $ts);
+        
+        // Construir URL con action y rbfid
+        $url = $this->url . '/api/' . $action . '/' . $rbfid;
+        
+        curl_setopt($this->ch, CURLOPT_URL, $url);
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-RBFID: ' . $rbfid,
+            'X-TOTP-Token: ' . $tok,
+            'X-Timestamp: ' . $ts
+        ]);
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($body));
         $raw = curl_exec($this->ch);
         if ($raw === false) {
             $err = curl_error($this->ch);
@@ -279,7 +421,7 @@ class Client {
             return ['ok' => false, 'error' => $err];
         }
         $res = json_decode($raw, true) ?: [];
-        $ok = (bool) ($res['ok'] ?? false);
+        $ok = (bool) (isset($res['ok']) ? $res['ok'] : false);
         Log::add("Server responded to '$action': " . ($ok ? 'OK' : 'FAIL'), $ok ? 'INFO' : 'ERROR');
         return $res;
     }

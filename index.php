@@ -24,12 +24,20 @@ class Server
     {
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS')
             exit(0);
-        $path = trim(preg_replace('#^/api(/index\.php)?#', '', $_SERVER['PATH_INFO'] ?? parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH)), '/');
-        $body = json_decode(file_get_contents('php://input') ?: '{}', true) ?: [];
+        
+        // Obtener body JSON
+        $body = [];
+        $input = file_get_contents('php://input');
+        if (!empty($input)) {
+            $body = json_decode($input, true) ?: [];
+        }
+        
+        $pathInfo = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/');
+        $path = trim(preg_replace('#^/api(/index\.php)?#', '', $pathInfo), '/');
         $parts = explode('/', $path);
-        $action = (!empty($parts[0])) ? $parts[0] : ($body['action'] ?? 'sync');
-        $rbfid = (!empty($parts[1])) ? $parts[1] : ($_SERVER['HTTP_X_RBFID'] ?? ($body['rbfid'] ?? ''));
-        $token = $_SERVER['HTTP_X_TOTP_TOKEN'] ?? ($_SERVER['HTTP_X_TOKEN'] ?? ($body['totp_token'] ?? ''));
+        $action = (!empty($parts[0])) ? $parts[0] : (isset($body['action']) ? $body['action'] : 'sync');
+        $rbfid = (!empty($parts[1])) ? $parts[1] : (isset($_SERVER['HTTP_X_RBFID']) ? $_SERVER['HTTP_X_RBFID'] : (isset($body['rbfid']) ? $body['rbfid'] : ''));
+        $token = isset($_SERVER['HTTP_X_TOTP_TOKEN']) ? $_SERVER['HTTP_X_TOTP_TOKEN'] : (isset($_SERVER['HTTP_X_TOKEN']) ? $_SERVER['HTTP_X_TOKEN'] : (isset($body['totp_token']) ? $body['totp_token'] : ''));
         Log::add("Action: $action | RBFID: $rbfid | Path: $path");
 
         if ($action !== 'health' && (empty($rbfid) || empty($token))) {
@@ -48,6 +56,7 @@ class Server
             'config' => $this->config($rbfid, $body),
             'sync' => $this->sync($rbfid, $body),
             'upload' => $this->upload($rbfid, $body, explode('/', $path)),
+            'missing' => $this->missing($rbfid, $body),
             'status' => $this->status($rbfid),
             'history' => $this->history($rbfid, $body),
             'download' => $this->download(),
@@ -108,6 +117,12 @@ class Server
                     continue;
                     
                 $srv = $this->db->q("SELECT hash_xxh3, file_mtime, status FROM ar_files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
+                
+                // Si el archivo está marcado como 'missing', ignorar la sincronización
+                if ($srv && $srv['status'] === 'missing') {
+                    Log::debug("Sync: Skipping $name (marked as missing)");
+                    continue;
+                }
                 
                 if ($srv && !empty($fileMtime) && (int) $srv['file_mtime'] > (int) $fileMtime) {
                     Log::debug("Sync: Skipping $name (server file is newer: {$srv['file_mtime']} > {$fileMtime})");
@@ -202,6 +217,53 @@ class Server
         } catch (\Throwable $e) {
             $this->db->rollBack();
             self::err("Sync Error: " . $e->getMessage());
+        }
+    }
+    private function missing(string $r, array $b): void
+    {
+        try {
+            $missingFiles = $b['missing_files'] ?? [];
+            if (empty($missingFiles)) {
+                self::json(['ok' => true, 'message' => 'No missing files reported']);
+                return;
+            }
+            
+            Log::info("Client $r reported " . count($missingFiles) . " missing files: " . implode(', ', $missingFiles));
+            
+            $this->db->begin();
+            
+            foreach ($missingFiles as $file) {
+                // Normalizar nombre a mayúsculas
+                $fileUpper = strtoupper($file);
+                
+                // Verificar si el archivo ya existe en la base de datos
+                $existing = $this->db->q("SELECT status FROM ar_files WHERE rbfid = :r AND file_name = :f", [':r' => $r, ':f' => $fileUpper]);
+                
+                if ($existing) {
+                    // Si existe pero no está como 'missing', actualizar estado
+                    if ($existing['status'] !== 'missing') {
+                        $this->db->exec("UPDATE ar_files SET status = 'missing', updated_at = NOW() WHERE rbfid = :r AND file_name = :f", 
+                            [':r' => $r, ':f' => $fileUpper]);
+                        Log::debug("Updated file $fileUpper status to 'missing' for client $r");
+                    }
+                } else {
+                    // Insertar nuevo registro con estado 'missing'
+                    $this->db->exec("INSERT INTO ar_files (rbfid, file_name, status, updated_at) VALUES (:r, :f, 'missing', NOW())", 
+                        [':r' => $r, ':f' => $fileUpper]);
+                    Log::debug("Added missing file $fileUpper for client $r");
+                }
+            }
+            
+            $this->db->commit();
+            Log::info("Missing files processed for client $r");
+            self::json(['ok' => true, 'message' => 'Missing files recorded']);
+            
+        } catch (\Throwable $e) {
+            if (isset($this->db)) {
+                $this->db->rollBack();
+            }
+            Log::error("Error processing missing files: " . $e->getMessage());
+            self::err("Missing files error: " . $e->getMessage());
         }
     }
     private function upload(string $r, array $b, array $p): void
