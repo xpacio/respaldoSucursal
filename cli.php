@@ -200,7 +200,7 @@ class Client {
                     ['filename' => $name, 'chunk_index' => $i, 'service' => $service]);
                 if (!($res['ok'] ?? false)) throw new \Exception("Chunk $i failed for $name");
                 $data = base64_decode($res['data']);
-                if (Hash::toBase64(hash('xxh3', $data)) !== $res['hash_xxh3'])
+                if (Hash::toBase64(hash('xxh3', $data)) !== $res['chunk_hash'])
                     throw new \Exception("Hash mismatch chunk $i of $name");
                 fwrite($fh, $data);
             }
@@ -347,7 +347,7 @@ class Client {
             $uploadResp = $this->http->req('upload', $loc['rbfid'], [
                 'filename' => $file,
                 'chunk_index' => $t['chunk'],
-                'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)),
+                'chunk_hash' => Hash::toBase64(hash('xxh3', $d)),
                 'data' => base64_encode($d),
                 'size' => $size
             ]);
@@ -360,7 +360,7 @@ class Client {
             $uploadResp = $this->http->req('upload', $loc['rbfid'], [
                 'filename' => $file,
                 'chunk_index' => $idx,
-                'hash_xxh3' => Hash::toBase64(hash('xxh3', $d)),
+                'chunk_hash' => Hash::toBase64(hash('xxh3', $d)),
                 'data' => base64_encode($d),
                 'size' => $size
             ]);

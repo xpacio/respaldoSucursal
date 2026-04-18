@@ -109,7 +109,6 @@ class Server
     {
         try {
             $this->db->begin();
-            $syncId = $this->db->insert("INSERT INTO sync_history (rbfid, status, started_at) VALUES (:r, 'pending', NOW())", [':r' => $r]);
             $paths = $this->paths($r);
             $needs = [];
             
@@ -123,7 +122,7 @@ class Server
                 if (!$name || !$hash || empty($chunkHashes))
                     continue;
                     
-                $srv = $this->db->q("SELECT hash_xxh3, file_mtime, status FROM files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
+                $srv = $this->db->q("SELECT file_hash, file_mtime, status FROM files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                 
                 // Si el archivo está marcado como 'missing', ignorar la sincronización
                 if ($srv && $srv['status'] === 'missing') {
@@ -152,7 +151,7 @@ class Server
                     }
                 }
                 
-                if (!$srv || $srv['hash_xxh3'] !== $hash) {
+                if (!$srv || $srv['file_hash'] !== $hash) {
                     $cnt = count($chunkHashes);
                     Log::info("Sync: File $name needs update ($cnt chunks)");
                     
@@ -181,12 +180,12 @@ class Server
                             
                             if ($chunkHash === $chunkHashes[$i]) {
                                 // Chunk coincide, marcarlo como recibido
-                                $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'received', NOW())", 
+                                $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'received', NOW())", 
                                     [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $chunkHashes[$i]]);
                                 Log::debug("Sync: Chunk $i of $name already matches");
                             } else {
                                 // Chunk diferente, marcarlo como pendiente
-                                $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
+                                $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
                                     [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $chunkHashes[$i]]);
                                 $pendingChunks++;
                                 if ($firstPendingChunk === null) {
@@ -198,13 +197,13 @@ class Server
                     } else {
                         // Sin archivo existente, todos los chunks pendientes
                         for ($i = 0; $i < $cnt; $i++) {
-                            $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, hash_xxh3, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
+                            $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
                                 [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $chunkHashes[$i] ?? '']);
                         }
                     }
                     
-                    // Actualizar registro principal del archivo
-                    $this->db->exec("INSERT INTO files (rbfid, file_name, chunk_count, chunk_pending, hash_esperado, status, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :p, :h, 'pending', NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, chunk_pending = :p, hash_xxh3 = NULL, hash_esperado = :h, status = 'pending', updated_at = NOW()", 
+                    // Actualizar registro principal del archivo: guardamos el hash meta y ponemos estado pending
+                    $this->db->exec("INSERT INTO files (rbfid, file_name, chunk_count, chunk_pending, file_hash, status, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :p, :h, 'pending', NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, chunk_pending = :p, file_hash = :h, status = 'pending', updated_at = NOW()", 
                         [':r' => $r, ':n' => $name, ':c' => $cnt, ':p' => $pendingChunks, ':h' => $hash, ':s' => $fileSize, ':m' => $fileMtime]);
                     
                     Log::info("Sync: File $name has $pendingChunks pending chunks (total: $cnt)");
@@ -213,8 +212,9 @@ class Server
                 // Obtener primer chunk pendiente
                 $nx = $this->db->q("SELECT chunk_index FROM file_chunks WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index LIMIT 1", [':r' => $r, ':n' => $name]);
                 if ($nx) {
-                    Log::debug("Sync: Requesting chunk {$nx['chunk_index']} for $name");
-                    $needs[] = ['file' => $name, 'chunk' => (int) $nx['chunk_index'], 'work_path' => $paths['work'] . '/' . $name, 'dest_path' => $paths['base'] . '/' . $name, 'md5' => $hash];
+                $needs[] = ['file' => $name, 'chunk' => (int) $nx['chunk_index'],
+                            'work_path' => $paths['work'] . '/' . $name,
+                            'dest_path' => $paths['base'] . '/' . $name];
                 }
             }
             
@@ -280,7 +280,7 @@ class Server
             $file = $p[1] ?? ($b['filename'] ?? '');
             $idx = max(0, (int) ($p[2] ?? ($b['chunk_index'] ?? 0)));
             $sz = max(0, (int) ($b['size'] ?? 0));
-            $hash = $p[3] ?? ($b['hash_xxh3'] ?? '');
+            $hash = $p[3] ?? ($b['chunk_hash'] ?? '');
             if ($sz > 5368709120)
                 self::err('File too large');
             $data = base64_decode($b['data'] ?? '');
@@ -342,9 +342,12 @@ class Server
     private function finalize(string $r, string $f, array $paths): void
     {
         $wp = $paths['work'] . '/' . $f;
-        $esp = $this->db->q("SELECT hash_esperado FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f])['hash_esperado'];
-        $act = \App\Hash::computeFile($wp);
-        if ($esp === \App\Hash::toBase64($act)) {
+        $row = $this->db->q("SELECT file_hash FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
+        $target = $row['file_hash'] ?? '';
+        $actual = \App\Hash::computeFile($wp);
+        $actualBase64 = \App\Hash::toBase64($actual);
+
+        if ($target === $actualBase64) {
             if (!is_dir($paths['base'])) {
                 Log::debug("Finalize: Creating base dir {$paths['base']}");
                 mkdir($paths['base'], 0755, true);
@@ -356,11 +359,11 @@ class Server
             }
             Log::info("Finalize: Moving verified file to $dp");
             rename($wp, $dp);
-            $this->db->exec("UPDATE files SET hash_xxh3=:h, status='completed', chunk_pending=0 WHERE rbfid=:r AND file_name=:f", [':h' => $act, ':r' => $r, ':f' => $f]);
+            $this->db->exec("UPDATE files SET status='completed', chunk_pending=0 WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
             Log::info("File $f finalized & verified for $r");
             self::json(['ok' => true, 'status' => 'complete']);
         }
-        Log::error("File $f: Final hash mismatch (exp: $esp, act: " . \App\Hash::toBase64($act) . ")");
+        Log::error("File $f: Final hash mismatch (exp: $target, act: $actualBase64)");
         self::json(['ok' => true, 'status' => 'error']);
     }
     private function status(string $r): void
@@ -525,7 +528,7 @@ class Server
 
         $data = file_get_contents($p, false, null, $offset, min($chunkSize, $fileSize - $offset));
         self::json(['ok' => true, 'data' => base64_encode($data),
-                    'hash_xxh3' => \App\Hash::toBase64(hash('xxh3', $data))]);
+                    'chunk_hash' => \App\Hash::toBase64(hash('xxh3', $data))]);
     }
 
     private function download(): void
