@@ -2,8 +2,9 @@
 <?php declare(strict_types=1);
 namespace App\Cli;
 
-require_once __DIR__ . '/shared.php';
-use App\DB; use App\Config; use App\Totp; use App\Log; use App\Storage; use App\Constants; use App\Hash; use App\Chunk;
+require_once __DIR__ . '/shared_client.php';
+use App\Constants; use App\Log; use App\Hash; use App\Chunk; use App\Totp;
+use App\HttpClient; use App\Platform; use App\ClientConfig;
 
 class Client {
     private string $url;
@@ -11,17 +12,12 @@ class Client {
     private int $lastFull = 0;
     private int $lastConfigCheck = 0;
     private array $cache = [];
-    private $ch;
+    private HttpClient $http;
 
     public function __construct() {
         $this->url = Constants::DEFAULT_URL;
         Log::init(dirname(__FILE__) . '/logs', true);
-        $this->ch = curl_init();
-        curl_setopt_array($this->ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json']
-        ]);
+        $this->http = new HttpClient($this->url);
     }
 
     public function discover(string $cfgPath): void {
@@ -398,38 +394,12 @@ class Client {
     }
 
     private function req(string $action, array $body): array {
-        $l = isset($this->locations[0]) ? $this->locations[0] : null;
-        $ts = time();
-        $rbfid = isset($l['rbfid']) ? $l['rbfid'] : '';
-        $tok = Totp::gen($rbfid, $ts);
-        
-        // Construir URL con action y rbfid
-        $url = $this->url . '/api/' . $action . '/' . $rbfid;
-        
-        curl_setopt($this->ch, CURLOPT_URL, $url);
-        curl_setopt($this->ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'X-RBFID: ' . $rbfid,
-            'X-TOTP-Token: ' . $tok,
-            'X-Timestamp: ' . $ts
-        ]);
-        curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($body));
-        $raw = curl_exec($this->ch);
-        if ($raw === false) {
-            $err = curl_error($this->ch);
-            Log::error("cURL Error ($action): $err");
-            return ['ok' => false, 'error' => $err];
-        }
-        $res = json_decode($raw, true) ?: [];
-        $ok = (bool) (isset($res['ok']) ? $res['ok'] : false);
-        Log::add("Server responded to '$action': " . ($ok ? 'OK' : 'FAIL'), $ok ? 'INFO' : 'ERROR');
-        return $res;
+        $l = $this->locations[0] ?? null;
+        $rbfid = $l['rbfid'] ?? '';
+        return $this->http->req($action, $rbfid, $body);
     }
 
-    public function __destruct() {
-        if ($this->ch)
-            curl_close($this->ch);
-    }
+    public function __destruct() {}
 
     public function getLocations(): array {
         return $this->locations;

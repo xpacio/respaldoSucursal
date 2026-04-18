@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 namespace App\Api;
 
-require_once __DIR__ . '/shared.php';
+require_once __DIR__ . '/shared_server.php';
 use App\DB;
 use App\Config;
-use App\Totp;
+use App\TotpServer as Totp;
 use App\Log;
 use App\Storage;
 use App\JsonRes;
