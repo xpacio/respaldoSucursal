@@ -1,0 +1,16 @@
+[2026-04-18 22:40:42] [INFO] Service Start: testRespaldo ()
+[2026-04-18 22:40:42] [ERROR] Service Error: RBFID  not found in config
+[2026-04-18 22:40:42] [ERROR] Server responded to 'service_result': FAIL
+[2026-04-18 22:40:42] [INFO] Service End: testRespaldo. Status: failed. Time: 0ms
+[2026-04-18 22:42:01] [INFO] Service Start: main ()
+[2026-04-18 22:42:01] [ERROR] Service Error: RBFID  not found in config
+[2026-04-18 22:42:01] [ERROR] Server responded to 'service_result': FAIL
+[2026-04-18 22:42:01] [INFO] Service End: main. Status: failed. Time: 0ms
+[2026-04-18 22:42:07] [INFO] Service Start: mainsss ()
+[2026-04-18 22:42:07] [ERROR] Service Error: RBFID  not found in config
+[2026-04-18 22:42:07] [ERROR] Server responded to 'service_result': FAIL
+[2026-04-18 22:42:07] [INFO] Service End: mainsss. Status: failed. Time: 0ms
+[2026-04-18 22:42:20] [INFO] Service Start: no_existe ()
+[2026-04-18 22:42:20] [ERROR] Service Error: RBFID  not found in config
+[2026-04-18 22:42:20] [ERROR] Server responded to 'service_result': FAIL
+[2026-04-18 22:42:20] [INFO] Service End: no_existe. Status: failed. Time: 0ms

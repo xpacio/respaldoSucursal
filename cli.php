@@ -370,12 +370,21 @@ class Client {
 
     // --- LOGIC: DISCOVER ---
     public function discover(string $cfgPath): void {
-        Log::info('Discovering locations...');
-        $this->scanDisk();
-        if (!empty($this->locations)) {
-            ClientConfig::save($cfgPath, ['locations' => $this->locations, 'files_version' => '', 'watch_files' => []]);
-            Log::info("Saved " . count($this->locations) . " locations to $cfgPath");
+        Log::info("Iniciando escaneo de discos...");
+        $locs = Platform::scanDisk();
+        
+        if (empty($locs)) {
+            echo "❌ Error: No se detectaron sucursales." . PHP_EOL;
+            echo "   Asegúrese de que exista la carpeta C:\\pvsi y que contenga un archivo .rbfid o rbf\\rbf.ini válido." . PHP_EOL;
+            exit(1);
         }
+        
+        $this->locations = $locs;
+        ClientConfig::save($cfgPath, [
+            'locations' => $this->locations,
+            'watch_files' => Constants::$WATCH_FILES
+        ]);
+        echo "✅ " . count($locs) . " sucursales encontradas y guardadas en config.json" . PHP_EOL;
     }
 
     // --- INFO MODE ---
@@ -402,57 +411,44 @@ class Client {
         exit(0);
     }
 
-    private function scanDisk(): void {
-        $paths = Platform::isWindows() ? array_map(fn($d) => $d.':\\', range('C','D')) : ['/srv'];
-        foreach ($paths as $root) {
-            if (!is_dir($root)) continue;
-            foreach (scandir($root) as $dir) {
-                if ($dir === '.' || $dir === '..' || in_array(strtolower($dir), Constants::EXCLUDED_WIN)) continue;
-                $path = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $dir;
-                $ini = $path . DIRECTORY_SEPARATOR . 'rbf' . DIRECTORY_SEPARATOR . 'rbf.ini';
-                if (file_exists($ini) && preg_match('/_suc=([^\n\r]+)/i', file_get_contents($ini), $m)) {
-                    $this->locations[] = [
-                        'rbfid' => trim($m[1], ' "'),
-                        'base' => $path,
-                        'work' => $path . DIRECTORY_SEPARATOR . 'quickbck' . DIRECTORY_SEPARATOR
-                    ];
-                }
-            }
-        }
-    }
+
 }
 
 // --- MAIN EXECUTION ---
 try {
-    $args = $_SERVER['argv'];
-    array_shift($args); // script name
-    
-    $service = null;
-    $rbfid = null;
-    $isMaster = false;
-    $cfg = __DIR__ . '/config.json';
+    if (PHP_SAPI === 'cli') {
+        $cfgFile = 'config.json';
+        $client = new Client($cfgFile);
 
-    foreach ($args as $idx => $arg) {
-        if ($arg === '--master') {
-            $isMaster = true;
-        } elseif (str_starts_with($arg, '-')) {
-            $name = ltrim($arg, '-');
-            if ($name === 'rbfid') {
-                $rbfid = $args[$idx + 1] ?? null;
-            } else {
-                $service = $name;
-            }
+        $arg = $argv[1] ?? '';
+        
+        // Modo Maestro / Orquestador
+        if ($arg === '--master' || $arg === '--main') {
+            $client->runOrchestrator();
+        } 
+        // Modo Descubrimiento explícito
+        elseif ($arg === '-discover') {
+            $client->executeService('discover', '');
         }
-    }
-
-    $client = new Client($cfg);
-
-    if ($isMaster) {
-        $client->runOrchestrator();
-    } elseif ($service) {
-        $client->executeService($service, (string)$rbfid);
-    } else {
-        $client->showStatusAndExit();
+        // Modo Servicio individual (-respaldo RBFID)
+        elseif (str_starts_with($arg, '-') && !str_starts_with($arg, '--')) {
+            $service = substr($arg, 1);
+            $rbfid = $argv[2] ?? '';
+            $client->executeService($service, $rbfid);
+        } 
+        // Modo Información (Default)
+        elseif (empty($arg)) {
+            $client->showStatusAndExit();
+        }
+        // Error de comando
+        else {
+            echo "Comando desconocido: $arg" . PHP_EOL;
+            echo "Uso: " . PHP_EOL;
+            echo "  php cli.php             (Muestra estatus)" . PHP_EOL;
+            echo "  php cli.php --master    (Inicia orquestador)" . PHP_EOL;
+            echo "  php cli.php -discover   (Escanea discos)" . PHP_EOL;
+            echo "  php cli.php -[servicio] [rbfid]  (Ejecuta servicio manual)" . PHP_EOL;
+        }
     }
 } catch (\Throwable $e) {
     echo "Fatal Error: " . $e->getMessage() . PHP_EOL;

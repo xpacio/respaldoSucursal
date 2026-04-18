@@ -24,6 +24,36 @@ class Platform
         return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
     }
 
+    public static function scanDisk(): array {
+        $locs = [];
+        $drives = self::isWindows() ? ['C','D','E','F','G'] : ['/mnt','/media'];
+        foreach ($drives as $d) {
+            $base = self::isWindows() ? "$d:\\pvsi" : "$d/pvsi";
+            if (!is_dir($base)) continue;
+
+            $rbfid = null;
+            $rFile = $base . DIRECTORY_SEPARATOR . '.rbfid';
+            $iniFile = $base . DIRECTORY_SEPARATOR . 'rbf' . DIRECTORY_SEPARATOR . 'rbf.ini';
+
+            if (file_exists($rFile)) {
+                $rbfid = trim(file_get_contents($rFile));
+            } elseif (file_exists($iniFile)) {
+                if (preg_match('/_suc=([^\n\r]+)/i', file_get_contents($iniFile), $m)) {
+                    $rbfid = trim($m[1], ' "');
+                }
+            }
+
+            if ($rbfid) {
+                $locs[] = [
+                    'rbfid' => $rbfid, 
+                    'base' => $base, 
+                    'work' => $base . DIRECTORY_SEPARATOR . 'quickbck'
+                ];
+            }
+        }
+        return $locs;
+    }
+
     public static function getDrives(): array
     {
         if (!self::isWindows()) return [];
