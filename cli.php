@@ -99,126 +99,110 @@ class Client {
     public function executeService(string $service, string $rbfid): void {
         $start = microtime(true);
         Log::info("Service Start: $service ($rbfid)");
-        
+
         $loc = null;
-        foreach ($this->locations as $l) {
+        foreach ($this->locations as $l)
             if ($l['rbfid'] === $rbfid) { $loc = $l; break; }
-        }
-        
-        if (!$loc && $service !== 'discover') {
-            Log::error("RBFID $rbfid not found in config");
-            return;
-        }
 
         $results = [];
-        $status = 'success';
+        $status  = 'success';
 
         try {
-            switch ($service) {
-                case 'respaldo':
-                    $results = $this->serviceRespaldo($loc);
-                    break;
-                case 'descargaVales':
-                    $results = $this->serviceDescargaVales($loc);
-                    break;
-                case 'monitoreoDisk':
-                    $results = $this->serviceMonitoreoDisk();
-                    break;
-                case 'monitoreoCpu':
-                    $results = $this->serviceMonitoreoCpu();
-                    break;
-                case 'sistemaInfo':
-                    $results = $this->serviceSistemaInfo();
-                    break;
-                case 'discover':
-                    $this->discover($this->cfgPath);
-                    $results = ['locations' => count($this->locations)];
-                    break;
-                default:
-                    Log::error("Service '$service' not implemented");
-                    $status = 'failed';
-                    $results = ['error' => "Service '$service' not implemented"];
+            if ($service === 'discover') {
+                $this->discover($this->cfgPath);
+                $results = ['locations' => count($this->locations)];
+            } else {
+                if (!$loc) throw new \Exception("RBFID $rbfid not found in config");
+                // Obtener configuración del servicio desde el servidor
+                $cfgRes = $this->http->req('service_config', $rbfid, ['service' => $service]);
+                $svcCfg = $cfgRes['config'] ?? [];
+                // Servicios de monitoreo tienen su propio handler
+                $results = match($service) {
+                    'monitoreoDisk' => $this->serviceMonitoreoDisk(),
+                    'monitoreoCpu'  => $this->serviceMonitoreoCpu(),
+                    'sistemaInfo'   => $this->serviceSistemaInfo(),
+                    default         => $this->serviceTransfer($service, $loc, $svcCfg)
+                };
             }
         } catch (\Throwable $e) {
-            Log::error("Service Execution Error: " . $e->getMessage());
-            $status = 'failed';
+            Log::error("Service Error: " . $e->getMessage());
+            $status  = 'failed';
             $results = ['error' => $e->getMessage()];
         }
 
         $timeMs = (int)((microtime(true) - $start) * 1000);
         if ($service !== 'discover') {
             $this->http->req('service_result', $rbfid, [
-                'service_name' => $service,
-                'status' => $status,
-                'results' => $results,
-                'execution_time_ms' => $timeMs
+                'service_name' => $service, 'status' => $status,
+                'results' => $results, 'execution_time_ms' => $timeMs
             ]);
         }
         Log::info("Service End: $service. Status: $status. Time: {$timeMs}ms");
         Log::flush();
     }
 
-    // --- LOGIC: RESPALDO ---
-    private function serviceRespaldo(array $loc): array {
-        $updated = 0;
-        $missing = [];
-        
-        // 1. Sync Base -> Work
-        $resSync = $this->syncWorkFiles($loc);
-        $updated += $resSync['updated'];
-        $missing = $resSync['missing'];
-        
-        // 2. Upload from Work -> Server
-        foreach (Constants::$WATCH_FILES as $f) {
-            $fUpper = strtoupper($f);
-            $wp = $loc['work'] . DIRECTORY_SEPARATOR . $fUpper;
-            if (!file_exists($wp)) continue;
-            
-            $st = stat($wp);
-            $this->uploadFile($loc, $fUpper, $wp, (int)$st['mtime'], (int)$st['size']);
-            $updated++;
-        }
-        
-        return ['files_updated' => $updated, 'missing_count' => count($missing)];
+    // --- GENERIC TRANSFER ENGINE ---
+    private function resolveClientPath(string $tpl, array $loc): string {
+        return str_replace(['{base}', '{rbfid}'], [$loc['base'], $loc['rbfid']], $tpl);
     }
 
-    // --- LOGIC: DESCARGA ---
-    private function serviceDescargaVales(array $loc): array {
+    private function serviceTransfer(string $service, array $loc, array $cfg): array {
+        $direction = $cfg['direction'] ?? 'upload';
+        return $direction === 'download'
+            ? $this->transferDownload($service, $loc, $cfg)
+            : $this->transferUpload($loc, $cfg);
+    }
+
+    private function transferUpload(array $loc, array $cfg): array {
+        $source = isset($cfg['client_source'])
+            ? $this->resolveClientPath($cfg['client_source'], $loc) : $loc['base'];
+        $temp = isset($cfg['client_temp'])
+            ? $this->resolveClientPath($cfg['client_temp'], $loc) : $loc['work'];
+        $files = $cfg['files'] ?? null;
+
+        $uploadLoc = ['rbfid' => $loc['rbfid'], 'base' => $source, 'work' => $temp];
+        $resSync = $this->syncWorkFiles($uploadLoc, $files);
+        $uploaded = 0;
+        foreach (($files ?? Constants::$WATCH_FILES) as $f) {
+            $wp = $temp . DIRECTORY_SEPARATOR . strtoupper($f);
+            if (!file_exists($wp)) continue;
+            $st = stat($wp);
+            $this->uploadFile($uploadLoc, strtoupper($f), $wp, (int)$st['mtime'], (int)$st['size']);
+            $uploaded++;
+        }
+        return ['direction' => 'upload', 'files_processed' => $uploaded, 'missing' => count($resSync['missing'])];
+    }
+
+    private function transferDownload(string $service, array $loc, array $cfg): array {
         $rbfid = $loc['rbfid'];
-        $resList = $this->http->req('download_list', $rbfid, ['service' => 'descargaVales']);
-        if (empty($resList['files'])) return ['status' => 'nothing_to_download'];
+        $clientDest = isset($cfg['client_dest'])
+            ? $this->resolveClientPath($cfg['client_dest'], $loc)
+            : $loc['base'] . DIRECTORY_SEPARATOR . 'MODEM_ATM';
 
+        $resList = $this->http->req('download_list', $rbfid, ['service' => $service]);
+        if (empty($resList['files'])) return ['direction' => 'download', 'status' => 'nothing_to_download'];
+
+        if (!is_dir($clientDest)) mkdir($clientDest, 0755, true);
         $downloaded = 0;
-        $destBase = $loc['base'] . DIRECTORY_SEPARATOR . 'MODEM_ATM';
-        if (!is_dir($destBase)) mkdir($destBase, 0755, true);
-
         foreach ($resList['files'] as $f) {
-            $name = $f['filename'];
-            $destPath = $destBase . DIRECTORY_SEPARATOR . $name;
-            $localHash = file_exists($destPath) ? Hash::toBase64(Hash::computeFile($destPath)) : '';
-
-            if ($localHash === $f['hash']) {
-                Log::debug("File $name is up to date");
-                continue;
+            $name     = $f['filename'];
+            $destPath = $clientDest . DIRECTORY_SEPARATOR . $name;
+            if (file_exists($destPath) && Hash::toBase64(Hash::computeFile($destPath)) === $f['hash']) {
+                Log::debug("$name up to date"); continue;
             }
-
             Log::info("Downloading $name (" . $f['size'] . " bytes)");
-            $tempPath = $destPath . '.tmp';
-            $fh = fopen($tempPath, 'wb');
-            $chunkIdx = 0;
+            $tempPath  = $destPath . '.tmp';
+            $fh        = fopen($tempPath, 'wb');
             $chunkSize = Chunk::size($f['size']);
-            $totalChunks = ceil($f['size'] / $chunkSize);
-
-            while ($chunkIdx < $totalChunks) {
-                $chunkRes = $this->http->req('download_file', $rbfid, ['filename' => $name, 'chunk_index' => $chunkIdx]);
-                if (!$chunkRes['ok']) throw new \Exception("Failed to download chunk $chunkIdx of $name");
-                
-                $data = base64_decode($chunkRes['data']);
-                if (Hash::toBase64(hash('xxh3', $data)) !== $chunkRes['hash_xxh3']) {
-                    throw new \Exception("Hash mismatch on chunk $chunkIdx of $name");
-                }
+            $total     = (int)ceil($f['size'] / max(1, $chunkSize));
+            for ($i = 0; $i < $total; $i++) {
+                $res = $this->http->req('download_file', $rbfid,
+                    ['filename' => $name, 'chunk_index' => $i, 'service' => $service]);
+                if (!($res['ok'] ?? false)) throw new \Exception("Chunk $i failed for $name");
+                $data = base64_decode($res['data']);
+                if (Hash::toBase64(hash('xxh3', $data)) !== $res['hash_xxh3'])
+                    throw new \Exception("Hash mismatch chunk $i of $name");
                 fwrite($fh, $data);
-                $chunkIdx++;
             }
             fclose($fh);
             if (Hash::toBase64(Hash::computeFile($tempPath)) !== $f['hash']) {
@@ -229,7 +213,7 @@ class Client {
             touch($destPath, $f['mtime']);
             $downloaded++;
         }
-        return ['files_downloaded' => $downloaded];
+        return ['direction' => 'download', 'files_downloaded' => $downloaded];
     }
 
     // --- LOGIC: MONITOREO ---
@@ -285,16 +269,17 @@ class Client {
         ];
     }
 
-    private function syncWorkFiles(array $loc): array {
-        $base = $loc['base'];
-        $work = $loc['work'];
-        $rbfid = $loc['rbfid'];
+    private function syncWorkFiles(array $loc, ?array $customFiles = null): array {
+        $base    = $loc['base'];
+        $work    = $loc['work'];
+        $rbfid   = $loc['rbfid'];
         $updated = 0;
         $missing = [];
+        $files   = $customFiles ?? Constants::$WATCH_FILES;
 
         if (!is_dir($work)) mkdir($work, 0755, true);
 
-        foreach (Constants::$WATCH_FILES as $file) {
+        foreach ($files as $file) {
             $fileUpper = strtoupper($file);
             $src = null;
             
