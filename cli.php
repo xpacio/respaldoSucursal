@@ -91,6 +91,15 @@ class Client {
                 case 'descargaVales':
                     $results = $this->serviceDescargaVales($loc);
                     break;
+                case 'monitoreoDisk':
+                    $results = $this->serviceMonitoreoDisk();
+                    break;
+                case 'monitoreoCpu':
+                    $results = $this->serviceMonitoreoCpu();
+                    break;
+                case 'sistemaInfo':
+                    $results = $this->serviceSistemaInfo();
+                    break;
                 case 'discover':
                     $this->discover($this->cfgPath);
                     $results = ['locations' => count($this->locations)];
@@ -191,6 +200,59 @@ class Client {
             $downloaded++;
         }
         return ['files_downloaded' => $downloaded];
+    }
+
+    // --- LOGIC: MONITOREO ---
+    private function serviceMonitoreoDisk(): array {
+        $disks = [];
+        if (Platform::isWindows()) {
+            $output = [];
+            exec('wmic logicaldisk get caption,size,freespace /format:csv', $output);
+            foreach ($output as $line) {
+                if (empty(trim($line)) || str_starts_with($line, 'Node')) continue;
+                $parts = explode(',', $line);
+                if (count($parts) >= 4) {
+                    $disks[] = [
+                        'drive' => $parts[1],
+                        'free_gb' => round((float)$parts[2] / 1024 / 1024 / 1024, 2),
+                        'total_gb' => round((float)$parts[3] / 1024 / 1024 / 1024, 2)
+                    ];
+                }
+            }
+        } else {
+            $output = [];
+            exec('df -h --output=target,size,avail,pcent', $output);
+            foreach ($output as $idx => $line) {
+                if ($idx === 0) continue;
+                $parts = preg_split('/\s+/', trim($line));
+                if (count($parts) >= 4) {
+                    $disks[] = ['mount' => $parts[0], 'size' => $parts[1], 'avail' => $parts[2], 'use_pct' => $parts[3]];
+                }
+            }
+        }
+        return ['disks' => $disks];
+    }
+
+    private function serviceMonitoreoCpu(): array {
+        $load = 0;
+        if (Platform::isWindows()) {
+            $output = [];
+            exec('wmic cpu get loadpercentage', $output);
+            $load = (int)($output[1] ?? 0);
+        } else {
+            $avg = sys_getloadavg();
+            $load = $avg[0] ?? 0;
+        }
+        return ['cpu_load' => $load];
+    }
+
+    private function serviceSistemaInfo(): array {
+        return [
+            'hostname' => gethostname(),
+            'os' => PHP_OS,
+            'php_version' => PHP_VERSION,
+            'uptime' => Platform::isWindows() ? 'WMI pending' : trim(shell_exec('uptime') ?? '')
+        ];
     }
 
     private function syncWorkFiles(array $loc): array {

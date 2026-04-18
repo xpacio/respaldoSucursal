@@ -63,6 +63,7 @@ class Server
             'schedule' => $this->schedule($rbfid),
             'service_result' => $this->serviceResult($rbfid, $body),
             'heartbeat' => $this->heartbeat($rbfid, $body),
+            'metrics' => $this->metrics($rbfid, $body),
             'download_list' => $this->downloadList($rbfid, $body),
             'download_file' => $this->downloadFile($rbfid, $body),
             default => self::err("Action '$action' invalid", 400)
@@ -419,6 +420,14 @@ class Server
                         last_heartbeat = NOW(), orchestrator_status = :s, services_running = :run, system_info = :info",
                         [':r' => $r, ':s' => $status, ':run' => json_encode($running), ':info' => json_encode($info)]);
                         
+        self::json(['ok' => true]);
+    }
+
+    private function metrics(string $r, array $b): void
+    {
+        // Actualizar system_info con nuevas métricas (merge JSONB)
+        $this->db->exec("UPDATE client_health SET system_info = system_info || :m, last_heartbeat = NOW() WHERE client_rbfid = :r", 
+            [':r' => $r, ':m' => json_encode($b)]);
         self::json(['ok' => true]);
     }
 
