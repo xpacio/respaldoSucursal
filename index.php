@@ -80,7 +80,8 @@ class Server
         $sv = substr(md5(implode(',', $files)), 0, 8);
         $res = ['ok' => true, 'rbfid' => $r, 'files_version' => $sv];
         if (($b['files_version'] ?? '') !== $sv) {
-            Log::debug("Config: Versions mismatch (sent: {$b['files_version']}, current: $sv). Sending " . count($files) . " files.");
+            $sentVersion = $b['files_version'] ?? 'none';
+            Log::debug("Config: Versions mismatch (sent: $sentVersion, current: $sv). Sending " . count($files) . " files.");
             $res['files'] = $files;
         } else {
             Log::debug("Config: Versions match ($sv). No files sent.");
