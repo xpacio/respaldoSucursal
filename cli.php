@@ -224,8 +224,18 @@ class Client
             $src = file_exists($base . DIRECTORY_SEPARATOR . $fileUpper) ? $base . DIRECTORY_SEPARATOR . $fileUpper : null;
             if (!$src) { $missing[] = $fileUpper; continue; }
             $dst = $work . DIRECTORY_SEPARATOR . $fileUpper;
-            if (!file_exists($dst) || stat($src)['size'] !== stat($dst)['size']) {
-                if (copy($src, $dst)) { touch($dst, stat($src)['mtime']); $updated++; }
+            $srcStat = stat($src);
+            $dstStat = file_exists($dst) ? stat($dst) : null;
+            
+            $needsCopy = !$dstStat || 
+                         $srcStat['size'] !== $dstStat['size'] || 
+                         $srcStat['mtime'] !== $dstStat['mtime'];
+            
+            if ($needsCopy) {
+                if (copy($src, $dst)) { 
+                    touch($dst, $srcStat['mtime']); 
+                    $updated++; 
+                }
             }
         }
         if (!empty($missing)) $this->http->req('missing', $rbfid, ['missing_files' => $missing]);

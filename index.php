@@ -131,25 +131,23 @@ class Server
                 // continuaremos para actualizar su estado a 'completed' o 'pending'.
                 
                 $workFile = $paths['work'] . '/' . $name;
-                $isCompleted = ($srv && $srv['status'] === 'completed');
-                $hashMatches = ($srv && $srv['file_hash'] === $hash);
+                $destFile = $paths['base'] . '/' . $name;
+                $isCompleted = ($srv && $srv['status'] === 'completed' && file_exists($destFile));
+                $hashMatches = ($srv && trim((string)$srv['file_hash']) === trim((string)$hash));
                 $tempExists = file_exists($workFile);
 
-                // Si el hash es igual y ya está completado, saltar
+                // Si el hash es igual y el archivo físico existe en destino, SALTAMOS.
                 if ($isCompleted && $hashMatches) {
-                    Log::debug("Sync: Skipping $name (already completed and identical)");
+                    Log::debug("Sync: Skipping $name (already exists in destination and hash matches)");
                     continue;
                 }
 
                 // REINICIO DE SINCRONIZACIÓN: 
-                // Si el hash cambió, o si NO está completado y no hay archivo temporal, reiniciamos.
                 if (!$hashMatches || (!$isCompleted && !$tempExists)) {
-                    Log::info("Sync: Resetting/Starting $name (Hash match: " . ($hashMatches?'YES':'NO') . ", Temp exists: " . ($tempExists?'YES':'NO') . ")");
+                    Log::info("Sync: Resetting/Starting $name (Hash match: " . ($hashMatches?'YES':'NO') . ", Completed: " . ($isCompleted?'YES':'NO') . ", Temp: " . ($tempExists?'YES':'NO') . ")");
                     
-                    // Eliminar registros antiguos de bloques
                     $this->db->exec("DELETE FROM file_chunks WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                     
-                    $destFile = $paths['base'] . '/' . $name;
                     $hasExistingFile = false;
                     
                     if ($srv && $srv['status'] === 'completed' && file_exists($destFile)) {
