@@ -132,8 +132,10 @@ class Server
                     continue;
                 }
                 
-                if ($srv && $fileMtime == (int) $srv['file_mtime'] && $fileSize == (int) $srv['file_size']) {
-                    Log::debug("Sync: Skipping $name (identical mtime and size)");
+                // REGLA: El hash es el árbitro final. Si el hash es idéntico, el archivo no cambió.
+                // El mtime solo se usa como dato informativo, nunca para decidir si se sube.
+                if ($srv && $srv['file_hash'] === $hash && $srv['status'] === 'completed') {
+                    Log::debug("Sync: Skipping $name (hash identical, file unchanged)");
                     continue;
                 }
                 
@@ -153,6 +155,7 @@ class Server
                     }
                 }
                 
+                // Si el hash cambió (o no existe) → necesitamos actualizar
                 if (!$srv || $srv['file_hash'] !== $hash) {
                     $cnt = count($chunkHashes);
                     Log::info("Sync: File $name needs update ($cnt chunks)");

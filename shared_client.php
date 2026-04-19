@@ -104,6 +104,15 @@ class HttpClient
         
         $res = json_decode($raw, true) ?: [];
         $ok = (bool) ($res['ok'] ?? false);
+        
+        // Calcular y registrar drift de reloj con el servidor
+        if (isset($res['timestamp'])) {
+            $drift = (int)$res['timestamp'] - time();
+            if (abs($drift) > 5) {
+                Log::add("Clock drift detected: {$drift}s vs server", 'WARN');
+            }
+        }
+        
         Log::add("Server responded to '$action': " . ($ok ? 'OK' : 'FAIL'), $ok ? 'DEBUG' : 'ERROR');
         return $res;
     }
