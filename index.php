@@ -282,10 +282,10 @@ class Server
     {
         try {
             $this->db->begin();
-            $file = $p[1] ?? ($b['filename'] ?? '');
-            $idx = max(0, (int) ($p[2] ?? ($b['chunk_index'] ?? 0)));
+            $file = $b['filename'] ?? '';
+            $idx = max(0, (int) ($b['chunk_index'] ?? 0));
             $sz = max(0, (int) ($b['size'] ?? 0));
-            $hash = $p[3] ?? ($b['chunk_hash'] ?? '');
+            $hash = $b['chunk_hash'] ?? '';
             if ($sz > 5368709120)
                 self::err('File too large');
             $data = base64_decode($b['data'] ?? '');
