@@ -405,7 +405,15 @@ class Server
             
             // Actualizar cronograma para este servicio específico
             $this->updateNextExecution($r, $specificService, (int)$row['frequency_seconds']);
-            self::json(['ok' => true, 'name' => $row['name'], 'type' => $row['type'], 'config' => json_decode($row['config'] ?? '{}', true)]);
+            
+            Log::info("Debug Config Raw ($specificService): " . ($row['config'] ?? 'NULL'));
+            
+            $decodedCfg = json_decode($row['config'] ?? '{}', true);
+            if ($decodedCfg === null && json_last_error() !== JSON_ERROR_NONE) {
+                Log::error("JSON Decode Error: " . json_last_error_msg());
+            }
+
+            self::json(['ok' => true, 'name' => $row['name'], 'type' => $row['type'], 'config' => $decodedCfg]);
             return;
         }
 

@@ -2,3 +2,151 @@
 [2026-04-19 00:30:01] [INFO] Service Start: testRespaldo (roton)
 [2026-04-19 00:30:01] [ERROR] Service Error (testRespaldo): App\Client::transferUpload(): Argument #1 ($service) must be of type string, array given, called in C:\respaldoSucursal\cli.php on line 121
 [2026-04-19 00:30:01] [DEBUG] Server responded to 'service_result': OK
+[2026-04-19 00:40:11] [DEBUG] Server responded to 'schedule': OK
+[2026-04-19 00:40:11] [INFO] Service Start: testRespaldo (roton)
+[2026-04-19 00:40:11] [INFO] Processing Service: testRespaldo | Source: C:\pvsi | Temp: C:\pvsi\quickbck\testRespaldo
+[2026-04-19 00:40:11] [DEBUG] Server responded to 'missing': OK
+[2026-04-19 00:40:11] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:11] [INFO] [testRespaldo] AJTFLU.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:11] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:11] [INFO] [testRespaldo] ASISTE.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:11] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:11] [INFO] [testRespaldo] CAJAS.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:11] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:11] [INFO] [testRespaldo] CANOTA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:12] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:12] [INFO] [testRespaldo] CANOTA.FPT is already up-to-date on server. Skipping.
+[2026-04-19 00:40:12] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:12] [INFO] [testRespaldo] CANOTAEX.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:12] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:12] [INFO] [testRespaldo] CASEMANA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:12] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:12] [INFO] [testRespaldo] CAT_NEG.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:12] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:12] [INFO] [testRespaldo] CATPROD3.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:12] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:12] [INFO] [testRespaldo] CAT_PROD.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:12] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:12] [INFO] [testRespaldo] CCOTIZA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:12] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:12] [INFO] [testRespaldo] CENTER.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:13] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:13] [INFO] [testRespaldo] CFDREL.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:13] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:13] [INFO] [testRespaldo] CLIENTE.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:13] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:13] [INFO] [testRespaldo] COBRANZA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:13] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:13] [INFO] [testRespaldo] COMPRAS.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:13] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:13] [INFO] [testRespaldo] CONCXC.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:13] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:13] [INFO] [testRespaldo] CONVTODO.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:13] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:13] [INFO] [testRespaldo] CPEDIDO.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:13] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:13] [INFO] [testRespaldo] CPENDIE.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:13] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:13] [INFO] [testRespaldo] CRMC_OBS.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:14] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:14] [INFO] [testRespaldo] CUNOTA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:14] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:14] [INFO] [testRespaldo] DD_CONTROL.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:14] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:14] [INFO] [testRespaldo] DD_DATOS.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:14] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:14] [INFO] [testRespaldo] DESEMANA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:14] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:14] [INFO] [testRespaldo] ES_COBRO.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:14] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:14] [INFO] [testRespaldo] EYSIENC.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:14] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:14] [INFO] [testRespaldo] EYSIPAR.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:14] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:14] [INFO] [testRespaldo] FACCFD.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:14] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:14] [INFO] [testRespaldo] FACCFD.FPT is already up-to-date on server. Skipping.
+[2026-04-19 00:40:15] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:15] [INFO] [testRespaldo] FLUJO01.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:15] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:15] [INFO] [testRespaldo] FLUJORES.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:15] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:15] [INFO] [testRespaldo] MASTER.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:15] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:15] [INFO] [testRespaldo] MINTINV.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:15] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:15] [INFO] [testRespaldo] MOVCXCD.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:15] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:15] [INFO] [testRespaldo] MOVSINV.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:15] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:15] [INFO] [testRespaldo] NEGADOS.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:15] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:15] [INFO] [testRespaldo] NOESTA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:16] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:16] [INFO] [testRespaldo] NOHAY.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:16] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:16] [INFO] [testRespaldo] N_RESP_M.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:16] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:16] [INFO] [testRespaldo] N_RESP_M.DBT is already up-to-date on server. Skipping.
+[2026-04-19 00:40:16] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:16] [INFO] [testRespaldo] OBSDOCS.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:16] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:16] [INFO] [testRespaldo] PAGDOCS.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:16] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:16] [INFO] [testRespaldo] PAGMULT.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:16] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:16] [INFO] [testRespaldo] PAGSPEI.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:16] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:16] [INFO] [testRespaldo] PARAMS.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:16] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:16] [INFO] [testRespaldo] PARTCOMP.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:17] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:17] [INFO] [testRespaldo] PARTCOT.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:17] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:17] [INFO] [testRespaldo] PARVALES.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:17] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:17] [INFO] [testRespaldo] PAVACL.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:17] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:17] [INFO] [testRespaldo] PCOTIZA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:17] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:17] [INFO] [testRespaldo] PEDIDO.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:17] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:17] [INFO] [testRespaldo] PEDIDO1.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:17] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:17] [INFO] [testRespaldo] PEDIDO2.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:17] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:17] [INFO] [testRespaldo] PPEDIDO.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:18] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:18] [INFO] [testRespaldo] PPENDIE.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:18] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:18] [INFO] [testRespaldo] R_KUSHKI.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:18] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:18] [INFO] [testRespaldo] SERCFD2.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:18] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:18] [INFO] [testRespaldo] STOCK.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:18] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:18] [INFO] [testRespaldo] TABLA004.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:18] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:18] [INFO] [testRespaldo] TABLA005.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:18] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:18] [INFO] [testRespaldo] TLSERVI.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:18] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:18] [INFO] [testRespaldo] USUARIOS.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:19] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:19] [INFO] [testRespaldo] VACLI.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:19] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:19] [INFO] [testRespaldo] VALES.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:19] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:19] [INFO] [testRespaldo] VENDEDOR.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:19] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:19] [INFO] [testRespaldo] VENTA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:19] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:19] [INFO] [testRespaldo] VENTA.DBT is already up-to-date on server. Skipping.
+[2026-04-19 00:40:19] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:19] [INFO] [testRespaldo] VENTA.FPT is already up-to-date on server. Skipping.
+[2026-04-19 00:40:19] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:19] [INFO] [testRespaldo] VENTAPP.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:19] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 00:40:19] [INFO] [testRespaldo] XCORTE.DBF is already up-to-date on server. Skipping.
+[2026-04-19 00:40:19] [DEBUG] Server responded to 'service_result': OK
+[2026-04-19 00:40:19] [INFO] Service End: testRespaldo. Status: success.
