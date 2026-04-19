@@ -364,9 +364,14 @@ class Server
             $this->db->exec("UPDATE files SET status='completed', chunk_pending=0 WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
             Log::info("File $f finalized & verified for $r");
             self::json(['ok' => true, 'status' => 'complete']);
+            return;
         }
+
+        // Caso de Error de Hash Final
         Log::error("File $f: Final hash mismatch (exp: $target, act: $actualBase64)");
-        self::json(['ok' => true, 'status' => 'error']);
+        if (file_exists($wp)) unlink($wp);
+        $this->db->exec("UPDATE files SET status='failed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
+        self::json(['ok' => false, 'error' => 'Hash mismatch', 'status' => 'error']);
     }
     private function status(string $r): void
     {

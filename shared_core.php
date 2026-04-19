@@ -91,10 +91,7 @@ class Chunk
 {
     public static function size(int $sz): int
     {
-        $sz = max(0, $sz);
-        foreach (Constants::THRESHOLDS as $thr => $cs)
-            if ($sz < $thr)
-                return $cs;
+        // Forzamos 1MB para que los bloques coincidan siempre en el patching
         return Constants::CHUNK_MAX;
     }
 }
