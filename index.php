@@ -165,6 +165,14 @@ class Server
                     $firstPendingChunk = 0;
                     
                     if ($hasExistingFile && file_exists($workFile)) {
+                        // TRUNCAMIENTO: Forzar que el archivo de trabajo tenga el tamaño exacto reportado
+                        // Esto elimina basura al final si el archivo se redujo.
+                        $fh_truncate = fopen($workFile, 'r+b');
+                        if ($fh_truncate) {
+                            ftruncate($fh_truncate, $fileSize);
+                            fclose($fh_truncate);
+                        }
+
                         // Calcular chunk size
                         $chunkSize = \App\Chunk::size($fileSize);
                         $pendingChunks = 0;
