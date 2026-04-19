@@ -132,8 +132,8 @@ class Server
                     continue;
                 }
                 
-                if ($srv && !empty($fileMtime) && (int) $srv['file_mtime'] > (int) $fileMtime) {
-                    Log::debug("Sync: Skipping $name (server file is newer: {$srv['file_mtime']} > {$fileMtime})");
+                if ($srv && $fileMtime == (int) $srv['file_mtime'] && $fileSize == (int) $srv['file_size']) {
+                    Log::debug("Sync: Skipping $name (identical mtime and size)");
                     continue;
                 }
                 
