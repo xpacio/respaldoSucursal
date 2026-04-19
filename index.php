@@ -126,11 +126,8 @@ class Server
                     
                 $srv = $this->db->q("SELECT file_hash, file_mtime, status FROM files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                 
-                // Si el archivo está marcado como 'missing', ignorar la sincronización
-                if ($srv && $srv['status'] === 'missing') {
-                    Log::debug("Sync: Skipping $name (marked as missing)");
-                    continue;
-                }
+                // Si el archivo estaba marcado como 'missing' pero el cliente lo envió, 
+                // continuaremos para actualizar su estado a 'completed' o 'pending'.
                 
                 // REGLA: El hash es el árbitro final. Si el hash es idéntico, el archivo no cambió.
                 // El mtime solo se usa como dato informativo, nunca para decidir si se sube.
