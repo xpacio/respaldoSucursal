@@ -384,7 +384,10 @@ class Server
         $specificService = $b['service'] ?? null;
         
         $sql = "SELECT s.name, s.type, 
-                       COALESCE(cs.config, s.default_config) as config, 
+                       CASE 
+                         WHEN cs.config IS NULL OR cs.config = '{}'::jsonb THEN s.default_config 
+                         ELSE cs.config 
+                       END as config, 
                        COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds 
                 FROM service_config cs
                 JOIN services s ON s.id = cs.service_id
