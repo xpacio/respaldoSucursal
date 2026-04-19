@@ -165,43 +165,36 @@ class Server
                     $firstPendingChunk = 0;
                     
                     if ($hasExistingFile && file_exists($workFile)) {
-                        // TRUNCAMIENTO: Forzar que el archivo de trabajo tenga el tamaño exacto reportado
-                        // Esto elimina basura al final si el archivo se redujo.
                         $fh_truncate = fopen($workFile, 'r+b');
                         if ($fh_truncate) {
                             ftruncate($fh_truncate, $fileSize);
                             fclose($fh_truncate);
                         }
 
-                        // Calcular chunk size
                         $chunkSize = \App\Chunk::size($fileSize);
                         $pendingChunks = 0;
                         $firstPendingChunk = null;
                         
-                        // Comparar cada chunk
+                        Log::info("Sync Patching [$r] $name: Comparing $cnt chunks (Size: $chunkSize)");
+                        
                         for ($i = 0; $i < $cnt; $i++) {
                             $offset = $i * $chunkSize;
                             $length = min($chunkSize, $fileSize - $offset);
-                            
                             if ($length <= 0) continue;
                             
                             $chunkData = file_get_contents($workFile, false, null, $offset, $length);
                             $chunkHash = \App\Hash::toBase64(hash('xxh3', $chunkData));
+                            $expectedHash = $chunkHashes[$i] ?? '';
                             
-                            if ($chunkHash === $chunkHashes[$i]) {
-                                // Chunk coincide, marcarlo como recibido
+                            if ($chunkHash === $expectedHash) {
                                 $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'received', NOW())", 
-                                    [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $chunkHashes[$i]]);
-                                Log::debug("Sync: Chunk $i of $name already matches");
+                                    [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
                             } else {
-                                // Chunk diferente, marcarlo como pendiente
                                 $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
-                                    [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $chunkHashes[$i]]);
+                                    [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
                                 $pendingChunks++;
-                                if ($firstPendingChunk === null) {
-                                    $firstPendingChunk = $i;
-                                }
-                                Log::debug("Sync: Chunk $i of $name needs update");
+                                if ($firstPendingChunk === null) $firstPendingChunk = $i;
+                                Log::debug("Sync: Chunk $i differs (Local: $chunkHash, Remote: $expectedHash)");
                             }
                         }
                     } else {

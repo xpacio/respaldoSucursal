@@ -427,3 +427,25 @@
 [2026-04-19 01:27:04] [DEBUG] Server responded to 'upload': OK
 [2026-04-19 01:27:04] [DEBUG] Server responded to 'service_result': OK
 [2026-04-19 01:27:04] [INFO] Service End: testRespaldo. Status: success.
+[2026-04-19 01:37:37] [DEBUG] Server responded to 'schedule': OK
+[2026-04-19 01:37:37] [INFO] Service Start: testRespaldo (roton)
+[2026-04-19 01:37:37] [INFO] Processing Service: testRespaldo | Source: C:\pvsi | Temp: C:\pvsi/test_tmp
+[2026-04-19 01:37:37] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 01:37:37] [INFO] [testRespaldo] Uploading VENTA.DBF | Chunk 21 | Path: C:\pvsi/test_tmp\VENTA.DBF
+[2026-04-19 01:37:38] [ERROR] Server responded to 'upload': FAIL
+[2026-04-19 01:37:38] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 01:37:38] [INFO] [testRespaldo] Uploading XCORTE.DBF | Chunk 6 | Path: C:\pvsi/test_tmp\XCORTE.DBF
+[2026-04-19 01:37:38] [ERROR] Server responded to 'upload': FAIL
+[2026-04-19 01:37:38] [DEBUG] Server responded to 'service_result': OK
+[2026-04-19 01:37:38] [INFO] Service End: testRespaldo. Status: success.
+[2026-04-19 01:37:42] [DEBUG] Server responded to 'schedule': OK
+[2026-04-19 01:37:42] [INFO] Service Start: testRespaldo (roton)
+[2026-04-19 01:37:42] [INFO] Processing Service: testRespaldo | Source: C:\pvsi | Temp: C:\pvsi/test_tmp
+[2026-04-19 01:37:43] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 01:37:43] [INFO] [testRespaldo] Uploading VENTA.DBF | Chunk 21 | Path: C:\pvsi/test_tmp\VENTA.DBF
+[2026-04-19 01:37:43] [ERROR] Server responded to 'upload': FAIL
+[2026-04-19 01:37:43] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 01:37:43] [INFO] [testRespaldo] Uploading XCORTE.DBF | Chunk 6 | Path: C:\pvsi/test_tmp\XCORTE.DBF
+[2026-04-19 01:37:43] [ERROR] Server responded to 'upload': FAIL
+[2026-04-19 01:37:43] [DEBUG] Server responded to 'service_result': OK
+[2026-04-19 01:37:43] [INFO] Service End: testRespaldo. Status: success.
