@@ -118,7 +118,7 @@ class Client
     private function serviceTransfer(string $service, string $rbfid, string $type, array $cfg, array $loc): array {
         return ($type === 'download')
             ? $this->transferDownload($service, $loc, $cfg)
-            : $this->transferUpload($loc, $cfg);
+            : $this->transferUpload($service, $loc, $cfg);
     }
 
     private function transferUpload(string $service, array $loc, array $cfg): array {
