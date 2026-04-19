@@ -129,36 +129,38 @@ class Server
                 // Si el archivo estaba marcado como 'missing' pero el cliente lo envió, 
                 // continuaremos para actualizar su estado a 'completed' o 'pending'.
                 
-                // REGLA: El hash es el árbitro final. Si el hash es idéntico, el archivo no cambió.
-                // El mtime solo se usa como dato informativo, nunca para decidir si se sube.
-                if ($srv && $srv['file_hash'] === $hash && $srv['status'] === 'completed') {
-                    Log::debug("Sync: Skipping $name (hash identical, file unchanged)");
+                $workFile = $paths['work'] . '/' . $name;
+                $isCompleted = ($srv && $srv['status'] === 'completed');
+                $hashMatches = ($srv && $srv['file_hash'] === $hash);
+                $tempExists = file_exists($workFile);
+
+                // Si el hash es igual y ya está completado, saltar
+                if ($isCompleted && $hashMatches) {
+                    Log::debug("Sync: Skipping $name (already completed and identical)");
                     continue;
                 }
-                
-                // OPTIMIZACIÓN: Si el archivo ya existe completado en destino, copiarlo a work para patching
-                $destFile = $paths['base'] . '/' . $name;
-                $workFile = $paths['work'] . '/' . $name;
-                $hasExistingFile = false;
-                
-                if ($srv && $srv['status'] === 'completed' && file_exists($destFile)) {
-                    Log::debug("Sync: File $name exists at destination, copying to work for patching");
-                    if (!is_dir($paths['work'])) {
-                        mkdir($paths['work'], 0755, true);
-                    }
-                    if (copy($destFile, $workFile)) {
-                        $hasExistingFile = true;
-                        Log::debug("Sync: Copied $name from destination to work directory");
-                    }
-                }
-                
-                // Si el hash cambió (o no existe) → necesitamos actualizar
-                if (!$srv || $srv['file_hash'] !== $hash) {
-                    $cnt = count($chunkHashes);
-                    Log::info("Sync: File $name needs update ($cnt chunks)");
+
+                // REINICIO DE SINCRONIZACIÓN: 
+                // Si el hash cambió, o si NO está completado y no hay archivo temporal, reiniciamos.
+                if (!$hashMatches || (!$isCompleted && !$tempExists)) {
+                    Log::info("Sync: Resetting/Starting $name (Hash match: " . ($hashMatches?'YES':'NO') . ", Temp exists: " . ($tempExists?'YES':'NO') . ")");
                     
-                    // Eliminar registros antiguos
+                    // Eliminar registros antiguos de bloques
                     $this->db->exec("DELETE FROM file_chunks WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
+                    
+                    $destFile = $paths['base'] . '/' . $name;
+                    $hasExistingFile = false;
+                    
+                    if ($srv && $srv['status'] === 'completed' && file_exists($destFile)) {
+                        Log::debug("Sync: File $name exists at destination, copying to work for patching");
+                        if (!is_dir($paths['work'])) {
+                            mkdir($paths['work'], 0755, true);
+                        }
+                        if (copy($destFile, $workFile)) {
+                            $hasExistingFile = true;
+                            Log::debug("Sync: Copied $name from destination to work directory");
+                        }
+                    }
                     
                     // OPTIMIZACIÓN: Si tenemos archivo existente, comparar chunks individualmente
                     $pendingChunks = $cnt; // Por defecto, todos pendientes
