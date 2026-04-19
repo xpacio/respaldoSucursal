@@ -222,7 +222,7 @@ class Server
             
             $this->db->commit();
             Log::info("Sync complete for $r. Pending files: " . count($needs));
-            self::json(['ok' => true, 'sync_id' => $syncId, 'needs_upload' => $needs, 'rate_delay' => 3000]);
+            self::json(['ok' => true, 'needs_upload' => $needs, 'rate_delay' => 3000]);
         } catch (\Throwable $e) {
             $this->db->rollBack();
             self::err("Sync Error: " . $e->getMessage());
