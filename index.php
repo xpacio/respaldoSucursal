@@ -208,7 +208,7 @@ class Server
                     $this->db->exec("INSERT INTO files (rbfid, file_name, chunk_count, chunk_pending, file_hash, status, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :p, :h, 'pending', NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, chunk_pending = :p, file_hash = :h, status = 'pending', updated_at = NOW()", 
                         [':r' => $r, ':n' => $name, ':c' => $cnt, ':p' => $pendingChunks, ':h' => $hash, ':s' => $fileSize, ':m' => $fileMtime]);
                     
-                    Log::info("Sync: File $name has $pendingChunks pending chunks (total: $cnt)");
+                    Log::info("Sync: [$r] $name -> Expecting $cnt chunks | Target Hash: $hash");
                 }
                 
                 // Obtener primer chunk pendiente
@@ -295,7 +295,7 @@ class Server
                 Log::error("Upload: Paths not found for $r");
                 self::err('Client not found', 404);
             }
-            Log::debug("Upload: Saving chunk $idx for $file (" . strlen($data) . " bytes) in {$paths['work']}");
+            Log::info("Upload: [$r] $file | Chunk $idx | Size: " . strlen($data) . " bytes");
             if (!Storage::saveChunk($paths['work'], $file, $idx, $idx * \App\Chunk::size((int) ($b['size'] ?? strlen($data))), $data)) {
                 Log::error("Upload: Storage::saveChunk failed for $file index $idx");
                 self::err('Save failed');
