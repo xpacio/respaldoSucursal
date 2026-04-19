@@ -226,3 +226,25 @@
 [2026-04-19 01:12:26] [DEBUG] Server responded to 'upload': OK
 [2026-04-19 01:12:26] [DEBUG] Server responded to 'service_result': OK
 [2026-04-19 01:12:26] [INFO] Service End: testRespaldo. Status: success.
+[2026-04-19 01:15:39] [DEBUG] Server responded to 'schedule': OK
+[2026-04-19 01:15:39] [INFO] Service Start: testRespaldo (roton)
+[2026-04-19 01:15:39] [INFO] Processing Service: testRespaldo | Source: C:\pvsi | Temp: C:\pvsi/test_tmp
+[2026-04-19 01:15:39] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 01:15:39] [INFO] [testRespaldo] VENTA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 01:15:39] [DEBUG] Server responded to 'sync': OK
+[2026-04-19 01:15:39] [INFO] [testRespaldo] Uploading XCORTE.DBF | Chunk 0 | Path: C:\pvsi/test_tmp\XCORTE.DBF
+[2026-04-19 01:15:40] [DEBUG] Server responded to 'upload': OK
+[2026-04-19 01:15:40] [INFO] [testRespaldo] Uploading XCORTE.DBF | Chunk 1 (Next)
+[2026-04-19 01:15:40] [DEBUG] Server responded to 'upload': OK
+[2026-04-19 01:15:40] [INFO] [testRespaldo] Uploading XCORTE.DBF | Chunk 2 (Next)
+[2026-04-19 01:15:40] [DEBUG] Server responded to 'upload': OK
+[2026-04-19 01:15:40] [INFO] [testRespaldo] Uploading XCORTE.DBF | Chunk 3 (Next)
+[2026-04-19 01:15:40] [DEBUG] Server responded to 'upload': OK
+[2026-04-19 01:15:40] [INFO] [testRespaldo] Uploading XCORTE.DBF | Chunk 4 (Next)
+[2026-04-19 01:15:41] [DEBUG] Server responded to 'upload': OK
+[2026-04-19 01:15:41] [INFO] [testRespaldo] Uploading XCORTE.DBF | Chunk 5 (Next)
+[2026-04-19 01:15:41] [DEBUG] Server responded to 'upload': OK
+[2026-04-19 01:15:41] [INFO] [testRespaldo] Uploading XCORTE.DBF | Chunk 6 (Next)
+[2026-04-19 01:15:41] [DEBUG] Server responded to 'upload': OK
+[2026-04-19 01:15:41] [DEBUG] Server responded to 'service_result': OK
+[2026-04-19 01:15:41] [INFO] Service End: testRespaldo. Status: success.

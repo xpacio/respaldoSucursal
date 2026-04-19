@@ -36,11 +36,12 @@ class Log
         $line = sprintf("[%s] [%s] %s", date('Y-m-d H:i:s'), $level, $msg);
         self::$buffer[] = $line;
         
-        // Enviar a error_log de PHP para monitoreo en tiempo real
-        error_log($line);
-        
-        if (self::$verbose && PHP_SAPI === 'cli')
-            echo $line . PHP_EOL;
+        if (PHP_SAPI === 'cli') {
+            if (self::$verbose) echo $line . PHP_EOL;
+        } else {
+            // Enviar a error_log de PHP solo en modo servidor (Lighttpd/FastCGI)
+            error_log($line);
+        }
     }
 
     public static function debug(string $m): void { self::add($m, 'DEBUG'); }
