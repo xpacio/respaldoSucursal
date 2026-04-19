@@ -121,13 +121,19 @@ class Client
             : $this->transferUpload($loc, $cfg);
     }
 
-    private function transferUpload(array $loc, array $cfg): array {
+    private function transferUpload(string $service, array $loc, array $cfg): array {
         $source = isset($cfg['client_source']) ? $this->resolveClientPath($cfg['client_source'], $loc) : $loc['base'];
-        $temp = isset($cfg['client_temp']) ? $this->resolveClientPath($cfg['client_temp'], $loc) : ($loc['work'] ?? $loc['base'].'/.ar_work');
-        $files = $cfg['files'] ?? null;
+        
+        // Separar archivos temporales por servicio para evitar colisiones
+        $workBase = ($loc['work'] ?? $loc['base'] . DIRECTORY_SEPARATOR . '.ar_work');
+        $temp = isset($cfg['client_temp']) 
+            ? $this->resolveClientPath($cfg['client_temp'], $loc) 
+            : $workBase . DIRECTORY_SEPARATOR . $service;
 
         $uploadLoc = ['rbfid' => $loc['rbfid'], 'base' => $source, 'work' => $temp];
-        $resSync = $this->syncWorkFiles($uploadLoc, $files);
+        Log::info("Processing Service: $service | Source: $source | Temp: $temp");
+        
+        $resSync = $this->syncWorkFiles($uploadLoc, $files = ($cfg['files'] ?? null));
         
         $uploaded = 0;
         $targetFiles = $files ?? Constants::$WATCH_FILES;
@@ -135,7 +141,7 @@ class Client
             $wp = $temp . DIRECTORY_SEPARATOR . strtoupper($f);
             if (!file_exists($wp)) continue;
             $st = stat($wp);
-            $this->uploadFile($uploadLoc, strtoupper($f), $wp, (int)$st['mtime'], (int)$st['size']);
+            $this->uploadFile($service, $uploadLoc, strtoupper($f), $wp, (int)$st['mtime'], (int)$st['size']);
             $uploaded++;
         }
         return ['direction' => 'upload', 'files_processed' => $uploaded, 'missing' => count($resSync['missing'])];
@@ -226,7 +232,7 @@ class Client
         return ['updated' => $updated, 'missing' => $missing];
     }
 
-    private function uploadFile(array $loc, string $file, string $wp, int $mtime, int $size): void {
+    private function uploadFile(string $service, array $loc, string $file, string $wp, int $mtime, int $size): void {
         $h = Hash::computeFile($wp);
         $cs = Chunk::size($size);
         $chs = []; $fh = fopen($wp, 'rb');
@@ -236,17 +242,34 @@ class Client
             $chs[] = Hash::toBase64(hash('xxh3', $chunk));
         }
         fclose($fh);
+        
         $req = $this->http->req('sync', $loc['rbfid'], ['files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => $chs, 'mtime' => $mtime, 'size' => $size]]]);
+        
         $uploadResp = [];
         foreach ($req['needs_upload'] ?? [] as $t) {
+            Log::info("[$service] Uploading $file | Chunk {$t['chunk']} | Path: $wp");
             $off = $t['chunk'] * $cs;
             $d = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
-            $uploadResp = $this->http->req('upload', $loc['rbfid'], ['filename' => $file, 'chunk_index' => $t['chunk'], 'chunk_hash' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
+            $uploadResp = $this->http->req('upload', $loc['rbfid'], [
+                'filename' => $file, 
+                'chunk_index' => $t['chunk'], 
+                'chunk_hash' => Hash::toBase64(hash('xxh3', $d)), 
+                'data' => base64_encode($d), 
+                'size' => $size
+            ]);
         }
         while (isset($uploadResp['next_chunk'])) {
-            $idx = $uploadResp['next_chunk']; $off = $idx * $cs;
+            $idx = $uploadResp['next_chunk'];
+            Log::info("[$service] Uploading $file | Chunk $idx (Next)");
+            $off = $idx * $cs;
             $d = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
-            $uploadResp = $this->http->req('upload', $loc['rbfid'], ['filename' => $file, 'chunk_index' => $idx, 'chunk_hash' => Hash::toBase64(hash('xxh3', $d)), 'data' => base64_encode($d), 'size' => $size]);
+            $uploadResp = $this->http->req('upload', $loc['rbfid'], [
+                'filename' => $file, 
+                'chunk_index' => $idx, 
+                'chunk_hash' => Hash::toBase64(hash('xxh3', $d)), 
+                'data' => base64_encode($d), 
+                'size' => $size
+            ]);
         }
     }
 

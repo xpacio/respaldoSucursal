@@ -104,7 +104,7 @@ class HttpClient
         
         $res = json_decode($raw, true) ?: [];
         $ok = (bool) ($res['ok'] ?? false);
-        Log::add("Server responded to '$action': " . ($ok ? 'OK' : 'FAIL'), $ok ? 'INFO' : 'ERROR');
+        Log::add("Server responded to '$action': " . ($ok ? 'OK' : 'FAIL'), $ok ? 'DEBUG' : 'ERROR');
         return $res;
     }
 
