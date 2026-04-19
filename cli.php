@@ -245,8 +245,13 @@ class Client
         
         $req = $this->http->req('sync', $loc['rbfid'], ['files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => $chs, 'mtime' => $mtime, 'size' => $size]]]);
         
+        $needs = $req['needs_upload'] ?? [];
+        if (empty($needs)) {
+            Log::info("[$service] $file is already up-to-date on server. Skipping.");
+        }
+        
         $uploadResp = [];
-        foreach ($req['needs_upload'] ?? [] as $t) {
+        foreach ($needs as $t) {
             Log::info("[$service] Uploading $file | Chunk {$t['chunk']} | Path: $wp");
             $off = $t['chunk'] * $cs;
             $d = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
