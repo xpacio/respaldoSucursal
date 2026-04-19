@@ -471,3 +471,30 @@
 [2026-04-19 02:11:48] [ERROR] Server responded to 'upload': FAIL
 [2026-04-19 02:11:49] [DEBUG] Server responded to 'service_result': OK
 [2026-04-19 02:11:49] [INFO] Service End: testRespaldo. Status: success.
+[2026-04-19 02:14:20] [DEBUG] Server responded to 'schedule': OK
+[2026-04-19 02:14:20] [INFO] Service Start: testRespaldo (roton)
+[2026-04-19 02:14:20] [INFO] Processing Service: testRespaldo | Source: C:\pvsi | Temp: C:\pvsi/test_tmp
+[2026-04-19 02:14:20] [ERROR] Server responded to 'sync': FAIL
+[2026-04-19 02:14:20] [INFO] [testRespaldo] VENTA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 02:14:20] [ERROR] Server responded to 'sync': FAIL
+[2026-04-19 02:14:20] [INFO] [testRespaldo] XCORTE.DBF is already up-to-date on server. Skipping.
+[2026-04-19 02:14:20] [DEBUG] Server responded to 'service_result': OK
+[2026-04-19 02:14:20] [INFO] Service End: testRespaldo. Status: success.
+[2026-04-19 02:17:44] [DEBUG] Server responded to 'schedule': OK
+[2026-04-19 02:17:44] [INFO] Service Start: testRespaldo (roton)
+[2026-04-19 02:17:44] [INFO] Processing Service: testRespaldo | Source: C:\pvsi | Temp: C:\pvsi/test_tmp
+[2026-04-19 02:17:44] [ERROR] Server responded to 'sync': FAIL
+[2026-04-19 02:17:44] [INFO] [testRespaldo] VENTA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 02:17:44] [ERROR] Server responded to 'sync': FAIL
+[2026-04-19 02:17:44] [INFO] [testRespaldo] XCORTE.DBF is already up-to-date on server. Skipping.
+[2026-04-19 02:17:44] [DEBUG] Server responded to 'service_result': OK
+[2026-04-19 02:17:44] [INFO] Service End: testRespaldo. Status: success.
+[2026-04-19 02:19:38] [DEBUG] Server responded to 'schedule': OK
+[2026-04-19 02:19:38] [INFO] Service Start: testRespaldo (roton)
+[2026-04-19 02:19:38] [INFO] Processing Service: testRespaldo | Source: C:\pvsi | Temp: C:\pvsi/test_tmp
+[2026-04-19 02:19:38] [ERROR] Server responded to 'sync': FAIL
+[2026-04-19 02:19:38] [INFO] [testRespaldo] VENTA.DBF is already up-to-date on server. Skipping.
+[2026-04-19 02:19:38] [ERROR] Server responded to 'sync': FAIL
+[2026-04-19 02:19:38] [INFO] [testRespaldo] XCORTE.DBF is already up-to-date on server. Skipping.
+[2026-04-19 02:19:38] [DEBUG] Server responded to 'service_result': OK
+[2026-04-19 02:19:38] [INFO] Service End: testRespaldo. Status: success.

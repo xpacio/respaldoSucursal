@@ -118,10 +118,11 @@ class Server
                 $name = $f['filename'] ?? '';
                 $hash = $f['hash_completo'] ?? '';
                 $chunkHashes = $f['chunk_hashes'] ?? [];
+                $cnt = count($chunkHashes);
                 $fileSize = $f['size'] ?? 0;
                 $fileMtime = $f['mtime'] ?? 0;
                 
-                if (!$name || !$hash || empty($chunkHashes))
+                if (!$name || !$hash || empty($chunkHashes) || $cnt === 0)
                     continue;
                     
                 $srv = $this->db->q("SELECT file_hash, file_mtime, status FROM files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
@@ -163,8 +164,9 @@ class Server
                     }
                     
                     // OPTIMIZACIÓN: Si tenemos archivo existente, comparar chunks individualmente
-                    $pendingChunks = $cnt; // Por defecto, todos pendientes
+                    $pendingChunks = (int)$cnt; // Por defecto, todos pendientes
                     $firstPendingChunk = 0;
+                    $chunkSize = \App\Chunk::size($fileSize);
                     
                     if ($hasExistingFile && file_exists($workFile)) {
                         $fh_truncate = fopen($workFile, 'r+b');
