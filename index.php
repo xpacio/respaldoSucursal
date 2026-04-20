@@ -251,19 +251,22 @@ class Server
                 // Normalizar nombre a mayúsculas
                 $fileUpper = strtoupper($file);
                 
+                // Si el archivo falta, eliminamos rastro de chunks incompletos
+                $this->db->exec("DELETE FROM file_chunks WHERE rbfid = :r AND file_name = :f", [':r' => $r, ':f' => $fileUpper]);
+
                 // Verificar si el archivo ya existe en la base de datos
                 $existing = $this->db->q("SELECT status FROM files WHERE rbfid = :r AND file_name = :f", [':r' => $r, ':f' => $fileUpper]);
                 
                 if ($existing) {
                     // Si existe pero no está como 'missing', actualizar estado
                     if ($existing['status'] !== 'missing') {
-                        $this->db->exec("UPDATE files SET status = 'missing', updated_at = NOW() WHERE rbfid = :r AND file_name = :f", 
+                        $this->db->exec("UPDATE files SET status = 'missing', chunk_pending = 0, file_hash = NULL, updated_at = NOW() WHERE rbfid = :r AND file_name = :f", 
                             [':r' => $r, ':f' => $fileUpper]);
                         Log::debug("Updated file $fileUpper status to 'missing' for client $r");
                     }
                 } else {
                     // Insertar nuevo registro con estado 'missing'
-                    $this->db->exec("INSERT INTO files (rbfid, file_name, status, updated_at) VALUES (:r, :f, 'missing', NOW())", 
+                    $this->db->exec("INSERT INTO files (rbfid, file_name, status, chunk_pending, updated_at) VALUES (:r, :f, 'missing', 0, NOW())", 
                         [':r' => $r, ':f' => $fileUpper]);
                     Log::debug("Added missing file $fileUpper for client $r");
                 }

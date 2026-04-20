@@ -37,7 +37,8 @@ class Log
         self::$buffer[] = $line;
         
         if (PHP_SAPI === 'cli') {
-            if (self::$verbose) echo $line . PHP_EOL;
+            //if (self::$verbose) echo $line . PHP_EOL;
+            echo $line . PHP_EOL;
         } else {
             // Enviar a error_log de PHP solo en modo servidor (Lighttpd/FastCGI)
             error_log($line);

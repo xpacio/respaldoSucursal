@@ -92,10 +92,13 @@ class Client {
             if (!$res['ok']) throw new \Exception($res['error'] ?? 'Config error');
 
             $cfg = $res['config'] ?? [];
-            $results = $this->transferUpload($service, $loc, $cfg);
+            $data = $this->transferUpload($service, $loc, $cfg);
+            
+            $finalStatus = (count($data['sync_missing']) > 0) ? 'partial' : 'success';
+            if (count($data['sync_ok']) === 0 && count($data['sync_missing']) > 0) $finalStatus = 'failed';
 
             $this->http->req('service_result', $rbfid, [
-                'service' => $service, 'status' => 'success', 'results' => $results,
+                'service' => $service, 'status' => $finalStatus, 'results' => $data,
                 'execution_time_ms' => (int)((microtime(true) - $start) * 1000)
             ]);
         } catch (\Throwable $e) { Log::error("Service Error ($service): " . $e->getMessage()); }
@@ -106,14 +109,23 @@ class Client {
         $work = $loc['work'];
         if (!is_dir($work)) mkdir($work, 0755, true);
 
-        $updated = 0;
         $files = $cfg['files'] ?? Constants::$WATCH_FILES;
+        $results = [
+            'files_count' => count($files),
+            'sync_ok' => [],
+            'sync_missing' => [],
+            'files_sync' => 0
+        ];
 
         foreach ($files as $f) {
             $f = strtoupper($f);
             $src = $source . DIRECTORY_SEPARATOR . $f;
             $dst = $work . DIRECTORY_SEPARATOR . $f;
-            if (!file_exists($src)) continue;
+            
+            if (!file_exists($src)) {
+                $results['sync_missing'][] = $f;
+                continue;
+            }
 
             Log::info("--- Processing: $f ---");
             if (Platform::isWindows()) {
@@ -126,10 +138,16 @@ class Client {
             
             if (file_exists($dst)) {
                 $this->uploadFile($service, $loc, $f, $dst);
-                $updated++;
+                $results['sync_ok'][] = $f;
+                $results['files_sync']++;
             }
         }
-        return ['files_processed' => $updated];
+
+        if (!empty($results['sync_missing'])) {
+            $this->http->req('missing', $loc['rbfid'], ['missing_files' => $results['sync_missing']]);
+        }
+
+        return $results;
     }
 
     private function uploadFile(string $service, array $loc, string $file, string $wp): void {
