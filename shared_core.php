@@ -75,15 +75,17 @@ class Hash
     }
     public static function computeFile(string $p): string
     {
-        return hash_file('xxh3', $p);
+        return hash_file('xxh3', $p) ?: '';
     }
     public static function toBase64(string $hex): string
     {
-        return substr(base64_encode(strrev(hex2bin($hex))), 0, 11);
+        $bin = hex2bin($hex);
+        return $bin ? substr(base64_encode(strrev($bin)), 0, 11) : '';
     }
     public static function fromBase64(string $str): string
     {
-        return bin2hex(strrev(base64_decode(str_pad($str, 12, '='))));
+        $decoded = base64_decode(str_pad($str, 12, '='));
+        return $decoded ? bin2hex(strrev($decoded)) : '';
     }
 }
 

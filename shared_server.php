@@ -78,12 +78,18 @@ class Storage
         if (!is_dir($dir))
             mkdir($dir, 0755, true);
         $p = $dir . '/' . $f;
-        $fh = fopen($p, 'c+b');
+        $fh = @fopen($p, 'c+b');
         if (!$fh)
             return false;
         if (flock($fh, LOCK_EX)) {
             fseek($fh, $off);
-            fwrite($fh, $d);
+            $written = fwrite($fh, $d);
+            if ($written !== strlen($d)) {
+                Log::error("Storage write error: $p at offset $off. Expected " . strlen($d) . " bytes, wrote $written.");
+                flock($fh, LOCK_UN);
+                fclose($fh);
+                return false;
+            }
             fflush($fh);
             flock($fh, LOCK_UN);
             fclose($fh);

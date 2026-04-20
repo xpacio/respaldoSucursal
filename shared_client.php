@@ -69,10 +69,12 @@ class HttpClient
 {
     private $ch;
     private string $baseUrl;
+    private int $timeDrift = 0;
 
     public function __construct(string $url)
     {
         $this->baseUrl = rtrim($url, '/');
+        $this->timeDrift = 0;
         $this->ch = curl_init();
         curl_setopt_array($this->ch, [
             CURLOPT_RETURNTRANSFER => true,
@@ -83,7 +85,7 @@ class HttpClient
 
     public function req(string $action, string $rbfid, array $body): array
     {
-        $ts = time();
+        $ts = time() + $this->timeDrift;
         $tok = Totp::gen($rbfid, $ts);
         $url = $this->baseUrl . '/api/' . $action . '/' . $rbfid;
 
@@ -107,9 +109,10 @@ class HttpClient
         
         // Calcular y registrar drift de reloj con el servidor
         if (isset($res['timestamp'])) {
-            $drift = (int)$res['timestamp'] - time();
-            if (abs($drift) > 5) {
-                Log::add("Clock drift detected: {$drift}s vs server", 'WARN');
+            $serverTs = (int)$res['timestamp'];
+            $this->timeDrift = $serverTs - time();
+            if (abs($this->timeDrift) > 2) {
+                Log::debug("Time drift adjusted: {$this->timeDrift}s");
             }
         }
         

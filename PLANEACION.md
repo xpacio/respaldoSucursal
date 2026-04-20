@@ -189,18 +189,18 @@ POST   /api/monitoring/{rbfid}/metrics
 
 ## 🛠️ Implementación por Fases
 
-### Fase 1: Refactorización Core (rama `evo`)
-1. **Separar `shared.php`** en:
+### Fase 1: Refactorización Core (rama `evo`) [✅ COMPLETADO]
+1. **Separar `shared.php`** en: [✅]
    - `shared_core.php`: Hash, Log, Constants, Chunk
    - `shared_server.php`: DB, Config, Totp, Storage
    - `shared_client.php`: ClientConfig, Platform, ServiceLauncher
 
-2. **Extender `index.php`** con:
+2. **Extender `index.php`** con: [✅]
    - Nuevas tablas en BD
    - Endpoints de scheduling y descarga
    - Sistema de resultados
 
-3. **Reescribir `cli.php`** como:
+3. **Reescribir `cli.php`** como: [✅]
    - Orquestador (sin parámetros)
    - Ejecutor de servicios (con parámetros)
    - Sistema de auto-llamada

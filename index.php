@@ -32,15 +32,16 @@ class Server
             $body = json_decode($input, true) ?: [];
         }
         
-        $pathInfo = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/');
+        $pathInfo = $_SERVER['PATH_INFO'] ?? (isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/');
         $path = trim(preg_replace('#^/api(/index\.php)?#', '', $pathInfo), '/');
         $parts = explode('/', $path);
-        $action = (!empty($parts[0])) ? $parts[0] : (isset($body['action']) ? $body['action'] : 'sync');
-        $rbfid = (!empty($parts[1])) ? $parts[1] : (isset($_SERVER['HTTP_X_RBFID']) ? $_SERVER['HTTP_X_RBFID'] : (isset($body['rbfid']) ? $body['rbfid'] : ''));
-        $token = isset($_SERVER['HTTP_X_TOTP_TOKEN']) ? $_SERVER['HTTP_X_TOTP_TOKEN'] : (isset($_SERVER['HTTP_X_TOKEN']) ? $_SERVER['HTTP_X_TOKEN'] : (isset($body['totp_token']) ? $body['totp_token'] : ''));
+
+        // Estandarización: Acción y RBFID provienen primordialmente de la URI
+        $action = strtolower(trim($parts[0] ?? ''));
+        $rbfid = $parts[1] ?? $_SERVER['HTTP_X_RBFID'] ?? $body['rbfid'] ?? '';
+        $token = $_SERVER['HTTP_X_TOTP_TOKEN'] ?? $_SERVER['HTTP_X_TOKEN'] ?? $body['totp_token'] ?? '';
         
-        $action = strtolower(trim($action));
-        Log::add("Action: [$action] | RBFID: $rbfid | Path: $path");
+        Log::add("Action: [$action] | RBFID: " . ($rbfid ?: 'none') . " | Path: $path");
 
         if ($action !== 'health' && (empty($rbfid) || empty($token))) {
             Log::error("Auth failed: Missing RBFID or Token");
@@ -150,14 +151,17 @@ class Server
                     
                     $hasExistingFile = false;
                     
-                    if ($srv && $srv['status'] === 'completed' && file_exists($destFile)) {
+                    if (file_exists($destFile)) {
                         Log::debug("Sync: File $name exists at destination, copying to work for patching");
                         if (!is_dir($paths['work'])) {
                             mkdir($paths['work'], 0755, true);
                         }
                         if (copy($destFile, $workFile)) {
                             $hasExistingFile = true;
-                            Log::debug("Sync: Copied $name from destination to work directory");
+                            // Asegurar que el archivo tenga el tamaño exacto que espera el cliente ahora
+                            $fh_fix = fopen($workFile, 'r+b');
+                            ftruncate($fh_fix, (int)$fileSize);
+                            fclose($fh_fix);
                         }
                     }
                     
@@ -288,29 +292,41 @@ class Server
             $hash = $b['chunk_hash'] ?? '';
             if ($sz > 5368709120)
                 self::err('File too large');
+
+            // Importante: Obtener info del archivo antes de calcular el offset
+            $fileInfo = $this->db->q("SELECT chunk_count, chunk_pending, file_size FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
+            if (!$fileInfo) {
+                self::err('Sesión de sincronización no encontrada para este archivo', 400);
+            }
+
             $data = base64_decode($b['data'] ?? '');
             if (!$file || !$data)
                 self::err('Missing fields');
             if (strlen($data) > 10485760)
                 self::err('Chunk too large');
+
             $paths = $this->paths($r);
             if (!$paths) {
                 Log::error("Upload: Paths not found for $r");
                 self::err('Client not found', 404);
             }
-            Log::info("Upload: [$r] $file | Chunk $idx | Size: " . strlen($data) . " bytes");
-            if (!Storage::saveChunk($paths['work'], $file, $idx, $idx * \App\Chunk::size((int) ($b['size'] ?? strlen($data))), $data)) {
+
+            // El offset DEBE basarse en el tamaño original registrado en el sync para mantener integridad
+            $chunkSize = \App\Chunk::size((int)$fileInfo['file_size']);
+            $offset = $idx * $chunkSize;
+
+            Log::info("Upload: [$r] $file | Chunk $idx | Offset: $offset | Size: " . strlen($data) . " bytes");
+            if (!Storage::saveChunk($paths['work'], $file, $idx, $offset, $data)) {
                 Log::error("Upload: Storage::saveChunk failed for $file index $idx");
                 self::err('Save failed');
             }
+
             if (hash('xxh3', $data) !== \App\Hash::fromBase64($hash)) {
-                $this->db->exec("UPDATE file_chunks SET status='failed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
-                $this->db->commit();
-                Log::error("Chunk $idx hash mismatch for $file");
-                self::json(['ok' => true, 'status' => 'failed']);
+                Log::error("Chunk $idx hash mismatch for $file. Expected base64: $hash");
+                $this->db->rollBack();
+                self::json(['ok' => false, 'error' => 'Chunk hash mismatch', 'retry' => true]);
             }
-            // Obtener el chunk_count esperado para este archivo
-            $fileInfo = $this->db->q("SELECT chunk_count, chunk_pending FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
+
             $totalChunks = $fileInfo['chunk_count'] ?? 1;
             $currentPending = $fileInfo['chunk_pending'] ?? 1;
             
@@ -359,8 +375,14 @@ class Server
             }
             $dp = $paths['base'] . '/' . $f;
             if (file_exists($dp)) {
-                Log::debug("Finalize: Removing old file $dp");
-                unlink($dp);
+                // Si el archivo nuevo es notablemente más pequeño (< 90%), preservamos el anterior en Cerrados.
+                if (filesize($wp) < (filesize($dp) * 0.90)) {
+                    Log::info("Finalize: New file $f is notably smaller. Archiving old version.");
+                    $this->archiveHistorical($r, $f, $dp, $paths);
+                } else {
+                    Log::debug("Finalize: Removing old file $dp");
+                    unlink($dp);
+                }
             }
             Log::info("Finalize: Moving verified file to $dp");
             rename($wp, $dp);
@@ -376,6 +398,48 @@ class Server
         $this->db->exec("UPDATE files SET status='failed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
         self::json(['ok' => false, 'error' => 'Hash mismatch', 'status' => 'error']);
     }
+
+    private function archiveHistorical(string $r, string $f, string $dp, array $paths): void
+    {
+        $e = $paths['emp'] ?? '_';
+        $p = $paths['plaza'] ?? '_';
+        $cerradosBase = "/srv/cerrados/$e/$p/$r/" . strtoupper($f);
+        
+        if (!is_dir($cerradosBase)) @mkdir($cerradosBase, 0755, true);
+
+        // Filtrar solo carpetas con formato YYMMDD o YYMMDD-YYMMDD
+        $folders = array_filter(scandir($cerradosBase), fn($d) => preg_match('/^\d{6}(-\d{6})?$/', $d));
+        sort($folders);
+        $lastFolder = end($folders);
+
+        $yesterdayTs = strtotime('-1 day');
+        $yesterdayStr = date('ymd', $yesterdayTs);
+        $folderName = "";
+
+        if (!$lastFolder) {
+            // Primera vez: YYMMDD de ayer
+            $folderName = $yesterdayStr;
+        } else {
+            // Siguientes: (Día después del último archivado) - (Ayer)
+            $parts = explode('-', $lastFolder);
+            $lastEndStr = end($parts);
+            $lastEndDate = "20" . substr($lastEndStr, 0, 2) . "-" . substr($lastEndStr, 2, 2) . "-" . substr($lastEndStr, 4, 2);
+            $startDateStr = date('ymd', strtotime($lastEndDate . ' +1 day'));
+            
+            if ($startDateStr >= $yesterdayStr) {
+                $folderName = $yesterdayStr;
+            } else {
+                $folderName = $startDateStr . '-' . $yesterdayStr;
+            }
+        }
+
+        $targetDir = "$cerradosBase/$folderName";
+        if (!is_dir($targetDir)) @mkdir($targetDir, 0755, true);
+
+        Log::info("Archive: Moving historical version to $targetDir/$f");
+        rename($dp, "$targetDir/$f");
+    }
+
     private function status(string $r): void
     {
         $c = $this->db->q("SELECT * FROM clients WHERE rbfid=:r", [':r' => $r]);

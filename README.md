@@ -1,9 +1,11 @@
-# Sistema de Respaldo de Sucursales
+# Sistema de Orquestación y Respaldo de Sucursales
 
-Sistema de respaldo automático para sucursales que mantiene 4 copias de cada archivo y sincroniza incrementalmente entre cliente y servidor.
+Sistema multi-servicio para sucursales que evoluciona el respaldo tradicional a una plataforma de gestión remota (monitoreo, descargas y respaldos) coordinada desde un servidor central.
 
 ## 🚀 Características Principales
 
+- **Arquitectura de Orquestador**: El cliente (`cli.php`) actúa como un agente que ejecuta tareas programadas dinámicamente.
+- **Configuración Centralizada**: El servidor define qué servicios ejecuta cada sucursal y con qué frecuencia.
 - **Detección automática** de ubicaciones en Windows (C:/ D:/) y Linux (/srv/)
 - **4 copias de cada archivo**: origen, quickbck (cliente), temporal (servidor), destino final (servidor)
 - **Sincronización incremental**: solo chunks modificados se transfieren
@@ -11,6 +13,7 @@ Sistema de respaldo automático para sucursales que mantiene 4 copias de cada ar
 - **Reporte de archivos faltantes**: archivos ausentes se marcan como 'missing' en BD
 - **Normalización a mayúsculas**: archivos como `CANOTa.dbf` llegan como `CANOTA.DBF`
 - **Autenticación TOTP**: tokens dinámicos basados en timestamp + rbfid
+- **Health Checks & Métricas**: Reporte periódico del estado del sistema y uso de recursos (CPU/Disco).
 
 ## 📁 Arquitectura del Sistema
 
