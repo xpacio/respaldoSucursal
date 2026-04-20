@@ -70,6 +70,7 @@ class Server
             case 'service_config': $this->serviceConfig($rbfid, $body); break;
             case 'download_list': $this->downloadList($rbfid, $body); break;
             case 'download_file': $this->downloadFile($rbfid, $body); break;
+            case 'list_services': $this->listServices($rbfid); break;
             default: self::err("Action '$action' invalid", 400);
         }
     }
@@ -501,6 +502,23 @@ class Server
         }
         
         self::json(['ok' => true, 'services' => $services]);
+    }
+
+    private function listServices(string $r): void
+    {
+        $sql = "SELECT s.name, s.type, 
+                       COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds,
+                       cs.last_execution,
+                       cs.next_execution,
+                       (SELECT status FROM service_history sh 
+                        WHERE sh.client_rbfid = cs.client_rbfid AND sh.service_name = s.name 
+                        ORDER BY sh.completed_at DESC LIMIT 1) as last_status
+                FROM service_config cs
+                JOIN services s ON s.id = cs.service_id
+                WHERE cs.client_rbfid = :r AND cs.enabled = true
+                ORDER BY s.name";
+        
+        self::json(['ok' => true, 'services' => $this->db->qa($sql, [':r' => $r])]);
     }
 
     private function updateNextExecution(string $r, string $serviceName, int $seconds): void

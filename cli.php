@@ -23,6 +23,45 @@ class Client {
         $this->http = new HttpClient(Constants::DEFAULT_URL);
     }
 
+    public function showStatus(): void {
+        Log::info("=== Status Mode ===");
+        try {
+            $health = $this->http->req('health', 'system', []);
+            Log::info("Server Health: " . ($health['ok'] ? 'ONLINE' : 'OFFLINE'));
+        } catch (\Throwable $e) { Log::error("Health check failed."); }
+
+        foreach ($this->locations as $loc) {
+            Log::info(sprintf("Location Found: [%s] | Path: %s", $loc['rbfid'], $loc['base']));
+        }
+        Log::info("====================");
+    }
+
+    public function listServices(string $rbfid): void {
+        Log::info("Fetching services for [$rbfid]...");
+        try {
+            $res = $this->http->req('list_services', $rbfid, []);
+            if (!$res['ok']) {
+                Log::error("Error: " . ($res['error'] ?? 'Unknown error'));
+                return;
+            }
+
+            if (empty($res['services'])) {
+                Log::info("No services configured or enabled for $rbfid.");
+                return;
+            }
+
+            Log::info(sprintf("%-20s | %-10s | %-8s | %-19s | %-10s", "Service", "Type", "Freq(s)", "Last Execution", "Status"));
+            Log::info(str_repeat("-", 80));
+            foreach ($res['services'] as $svc) {
+                Log::info(sprintf(
+                    "%-20s | %-10s | %-8d | %-19s | %-10s",
+                    $svc['name'], $svc['type'], $svc['frequency_seconds'],
+                    $svc['last_execution'] ?? 'Never', $svc['last_status'] ?? 'N/A'
+                ));
+            }
+        } catch (\Throwable $e) { Log::error("Failed to list services: " . $e->getMessage()); }
+    }
+
     public function runOrchestrator(): void {
         Log::info("Orchestrator started with " . count($this->locations) . " locations.");
         while (true) {
@@ -121,5 +160,33 @@ class Client {
     }
 }
 
+// --- CLI Entry Point ---
 $client = new Client('config.json');
-$client->runOrchestrator();
+$args = $argv;
+array_shift($args); // Quitar nombre del script
+
+if (empty($args)) {
+    $client->showStatus();
+    echo "Uso: php cli.php [--main | -ls {rbfid} | -service {nombre} {rbfid} | -{nombre} {rbfid}]\n";
+    exit(0);
+}
+
+$cmd = $args[0];
+if ($cmd === '--main') {
+    $client->runOrchestrator();
+} elseif ($cmd === '-ls' || $cmd === '-list_services') {
+    $rbfid = $args[1] ?? '';
+    if (empty($rbfid)) die("Error: Se requiere RBFID.\n");
+    $client->listServices($rbfid);
+} elseif (str_starts_with($cmd, '-')) {
+    // Soporta "-service descargaVales roton" o "-descargaVales roton"
+    $serviceName = ($cmd === '-service') ? ($args[1] ?? '') : ltrim($cmd, '-');
+    $rbfid = ($cmd === '-service') ? ($args[2] ?? '') : ($args[1] ?? '');
+
+    if (empty($serviceName) || empty($rbfid)) {
+        die("Error: Se requiere nombre de servicio y RBFID.\n");
+    }
+    $client->executeService($serviceName, $rbfid);
+} else {
+    echo "Parametro no reconocido: $cmd\n";
+}
