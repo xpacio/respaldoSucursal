@@ -219,12 +219,10 @@ class Server
                     Log::info("Sync: [$r] $name -> Expecting $cnt chunks | Target Hash: $hash");
                 }
                 
-                // Obtener primer chunk pendiente
-                $nx = $this->db->q("SELECT chunk_index FROM file_chunks WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index LIMIT 1", [':r' => $r, ':n' => $name]);
-                if ($nx) {
-                $needs[] = ['file' => $name, 'chunk' => (int) $nx['chunk_index'],
-                            'work_path' => $paths['work'] . '/' . $name,
-                            'dest_path' => $paths['base'] . '/' . $name];
+                // Obtener TODOS los chunks pendientes para este archivo (más eficiente)
+                $pending = $this->db->qa("SELECT chunk_index FROM file_chunks WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index", [':r' => $r, ':n' => $name]);
+                foreach ($pending as $p) {
+                    $needs[] = ['file' => $name, 'chunk' => (int) $p['chunk_index']];
                 }
             }
             
@@ -581,7 +579,10 @@ class Server
     {
         $name = $b['service'] ?? '';
         $row = $this->db->q(
-            "SELECT COALESCE(cs.config, s.default_config) as config, 
+            "SELECT CASE 
+                        WHEN cs.config IS NULL OR cs.config = '{}'::jsonb THEN s.default_config 
+                        ELSE cs.config 
+                    END as config, 
                     COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds, 
                     s.type, s.name
              FROM service_config cs JOIN services s ON s.id = cs.service_id

@@ -115,7 +115,7 @@ class Client {
             $dst = $work . DIRECTORY_SEPARATOR . $f;
             if (!file_exists($src)) continue;
 
-            // Usar Robocopy en Windows para manejar archivos DBF bloqueados
+            Log::info("--- Processing: $f ---");
             if (Platform::isWindows()) {
                 $cmd = sprintf('robocopy %s %s %s /R:1 /W:1 /NJH /NJS /NDL /NC /NS', 
                     escapeshellarg($source), escapeshellarg($work), escapeshellarg($f));
@@ -140,21 +140,33 @@ class Client {
         while ($chunk = fread($fh, $cs)) { $chs[] = Hash::toBase64(hash('xxh3', $chunk)); }
         fclose($fh);
 
-        $req = $this->http->req('sync', $loc['rbfid'], [
-            'files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => $chs, 'mtime' => filemtime($wp), 'size' => $size]]
-        ]);
+        // Bucle de sincronización: repetir hasta que no haya más chunks pendientes para este archivo
+        while (true) {
+            Log::debug("  Checking sync status for $file...");
+            $req = $this->http->req('sync', $loc['rbfid'], [
+                'files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => $chs, 'mtime' => filemtime($wp), 'size' => $size]]
+            ]);
 
-        foreach ($req['needs_upload'] ?? [] as $t) {
-            $off = $t['chunk'] * $cs;
-            $data = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
-            $attempts = 0; $success = false;
-            while ($attempts < 3 && !$success) {
-                $res = $this->http->req('upload', $loc['rbfid'], [
-                    'filename' => $file, 'chunk_index' => $t['chunk'], 
-                    'chunk_hash' => Hash::toBase64(hash('xxh3', $data)), 
-                    'data' => base64_encode($data), 'size' => $size
-                ]);
-                if ($res['ok'] ?? false) $success = true; else $attempts++;
+            if (empty($req['needs_upload'])) {
+                Log::info("  File $file is synchronized.");
+                break; 
+            }
+
+            foreach ($req['needs_upload'] as $t) {
+                $perc = round(($t['chunk'] + 1) / (max(1, count($chs))) * 100);
+                Log::info(sprintf("  [%3d%%] Uploading %s chunk %d...", $perc, $file, $t['chunk']));
+                $off = $t['chunk'] * $cs;
+                $data = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
+                $attempts = 0; $success = false;
+                while ($attempts < 3 && !$success) {
+                    $res = $this->http->req('upload', $loc['rbfid'], [
+                        'filename' => $file, 'chunk_index' => $t['chunk'], 
+                        'chunk_hash' => Hash::toBase64(hash('xxh3', $data)), 
+                        'data' => base64_encode($data), 'size' => $size
+                    ]);
+                    if ($res['ok'] ?? false) $success = true; else $attempts++;
+                }
+                if (!$success) throw new \Exception("Failed to upload chunk {$t['chunk']} of $file after 3 attempts");
             }
         }
     }

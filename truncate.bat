@@ -1,0 +1,1 @@
+ssh sync "psql -U postgres -d sync -c 'truncate table file_chunks ; truncate table service_history;  truncate table files;'"
