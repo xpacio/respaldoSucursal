@@ -146,23 +146,32 @@ class AdminUI {
 
     private function viewLogs(): void {
         echo "<h4>Monitoreo de Logs</h4>";
-        echo '<div class="tabs min left-align">';
 
-        $logs = [
+        $logSources = [
             'Syslog' => "tail -n 30 /var/log/syslog | cut -d' ' -f1- | sort -r",
             'Lighttpd' => "tail -n 30 /var/log/lighttpd/access.log | sort -r",
             'PHP-FPM' => "tail -n 30 /var/log/php8.4-fpm.log | cut -d' ' -f1- | sort -r",
             'PostgreSQL' => "tail -n 30 /var/log/postgresql/postgresql-16-main.log | cut -d' ' -f4- | sort -r"
         ];
-        foreach ($logs as $title => $cmd) {
-            echo '<a class="active">'.$title.'</a>';
-            $l = htmlspecialchars(@shell_exec($cmd) ?: "Sin registros o error de permisos ($cmd).");
-            $logs[$title] = '<div class="page padding right">'.$l.'</div>';
+
+        $tabsHtml = '';
+        $pagesHtml = '';
+        $first = true;
+
+        echo '<div class="tabs min left-align">';
+        foreach ($logSources as $title => $cmd) {
+            $tabId = 'log-' . strtolower(str_replace([' ', '-'], '', $title));
+            $activeClass = $first ? 'active' : '';
+            $tabsHtml .= '<a class="' . $activeClass . '" href="#' . $tabId . '">' . $title . '</a>';
+            $logContent = htmlspecialchars(@shell_exec($cmd) ?: "Sin registros o error de permisos ($cmd).");
+            $pagesHtml .= '<div class="page padding right ' . $activeClass . '" id="' . $tabId . '"><pre>' . $logContent . '</pre></div>';
+            $first = false;
         }
+        echo $tabsHtml;
+        echo '</div>'; // Close tabs div
+        echo '<div class="pages">';
+        echo $pagesHtml;
         echo "</div>";
-        echo implode('', $logs);
-        echo "</div>";
-        
     }
 
 }
