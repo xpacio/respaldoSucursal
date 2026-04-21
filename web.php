@@ -148,10 +148,10 @@ class AdminUI {
         echo "<h4>Monitoreo de Logs</h4>";
         echo "<div class='grid'>";
         $logs = [
-            'Servidor (Syslog)' => "tail -n 100 /var/log/syslog | sort -r",
-            'Web (Lighttpd Access)' => 'tail -n 100 /var/log/lighttpd/access.log | sort -r',
-            'PHP-FPM (8.4)' => 'tail -n 100 /var/log/php8.4-fpm.log | sort -r',
-            'Base de Datos (PostgreSQL)' => 'tail -n 100 /var/log/postgresql/postgresql-16-main.log | sort -r'
+            'Servidor (Syslog)' => "tail /var/log/syslog | cut -d' ' -f1- | sort -r",
+            'Web (Lighttpd Access)' => "tail -n 100 /var/log/lighttpd/access.log | sort -r",
+            'PHP-FPM (8.4)' => "tail -n 100 /var/log/php8.4-fpm.log | cut -d' ' -f1- | sort -r",
+            'Base de Datos (PostgreSQL)' => "tail -n 100 /var/log/postgresql/postgresql-16-main.log | cut -d' ' -f4- | sort -r"
         ];
         foreach ($logs as $title => $cmd) {
             echo "<div class='s12 m6'><article class='border padding margin-bottom shadow'>";
