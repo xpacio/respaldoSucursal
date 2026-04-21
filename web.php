@@ -131,19 +131,21 @@ class AdminUI {
 
     private function viewLogs(): void {
         echo "<h4>Monitoreo de Logs</h4>";
+        echo "<div class='grid'>";
         $logs = [
-            'Servidor (Syslog)' => "tail /var/log/syslog | sort -nr | cut -d' ' -f3- ",
-            'Web (Lighttpd Access)' => 'tail /var/log/lighttpd/access.log | sort -nr',
-            'PHP-FPM (8.4)' => 'tail /var/log/php8.4-fpm.log | sort -nr',
-            'Base de Datos (PostgreSQL)' => 'tail /var/log/postgresql/postgresql-16-main.log | sort -nr'
+            'Servidor (Syslog)' => "tail -n 100 /var/log/syslog | sort -r",
+            'Web (Lighttpd Access)' => 'tail -n 100 /var/log/lighttpd/access.log | sort -r',
+            'PHP-FPM (8.4)' => 'tail -n 100 /var/log/php8.4-fpm.log | sort -r',
+            'Base de Datos (PostgreSQL)' => 'tail -n 100 /var/log/postgresql/postgresql-16-main.log | sort -r'
         ];
         foreach ($logs as $title => $cmd) {
-            echo "<article class='border padding margin-bottom'>";
+            echo "<div class='s12 m6'><article class='border padding margin-bottom shadow'>";
             echo "<h6>$title</h6>";
-            echo "<pre class='scroll' style='max-height:300px; font-size:0.75rem; background:#1e1e1e; color:#00ff00; padding:15px; border-radius:4px;'>";
-            echo htmlspecialchars(@shell_exec($cmd) ?: "Log no disponible ($cmd).");
-            echo "</pre></article>";
+            echo "<pre class='scroll' style='max-height:450px; font-size:0.7rem; background:#121212; color:#00ff41; padding:10px; border-radius:4px; overflow:auto; border:1px solid #333;'>";
+            echo htmlspecialchars(@shell_exec($cmd) ?: "Sin registros o error de permisos ($cmd).");
+            echo "</pre></article></div>";
         }
+        echo "</div>";
     }
 }
 
