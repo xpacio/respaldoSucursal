@@ -222,7 +222,7 @@ class Server
                 // Obtener TODOS los chunks pendientes para este archivo (más eficiente)
                 $pending = $this->db->qa("SELECT chunk_index FROM file_chunks WHERE rbfid = :r AND file_name = :n AND status != 'received' ORDER BY chunk_index", [':r' => $r, ':n' => $name]);
                 foreach ($pending as $p) {
-                    $needs[] = ['file' => $name, 'chunk' => (int) $p['chunk_index']];
+                    $needs[] = (int) $p['chunk_index'];
                 }
             }
             

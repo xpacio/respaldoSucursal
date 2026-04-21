@@ -151,16 +151,19 @@ class Client {
     }
 
     private function uploadFile(string $service, array $loc, string $file, string $wp): void {
+
         $size = filesize($wp);
         $h = Hash::computeFile($wp);
         $cs = Chunk::size($size);
         $chs = []; $fh = fopen($wp, 'rb');
         while ($chunk = fread($fh, $cs)) { $chs[] = Hash::toBase64(hash('xxh3', $chunk)); }
         fclose($fh);
+        $totalChunks = count($chs);
+        Log::debug($loc['work'] . " $size :: $h :: $cs x $totalChunks");
 
-        // Bucle de sincronización: repetir hasta que no haya más chunks pendientes para este archivo
+        
         while (true) {
-            Log::debug("  Checking sync status for $file...");
+            // Log::debug("  Checking sync status for $file...");
             $req = $this->http->req('sync', $loc['rbfid'], [
                 'files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => $chs, 'mtime' => filemtime($wp), 'size' => $size]]
             ]);
@@ -169,22 +172,33 @@ class Client {
                 Log::info("  File $file is synchronized.");
                 break; 
             }
+            
+            $chunksToUpload = count($req['needs_upload']);
+            $desfase = number_format(($chunksToUpload / $totalChunks) * 100, 2);
+            Log::info("Sincronizando $file: $chunksToUpload chunks pendientes ($desfase% de desfase)");
 
-            foreach ($req['needs_upload'] as $t) {
-                $perc = round(($t['chunk'] + 1) / (max(1, count($chs))) * 100);
-                Log::info(sprintf("  [%3d%%] Uploading %s chunk %d...", $perc, $file, $t['chunk']));
-                $off = $t['chunk'] * $cs;
+            foreach ($req['needs_upload'] as $chunkIdx) {
+                $off = $chunkIdx * $cs;
                 $data = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
                 $attempts = 0; $success = false;
                 while ($attempts < 3 && !$success) {
                     $res = $this->http->req('upload', $loc['rbfid'], [
-                        'filename' => $file, 'chunk_index' => $t['chunk'], 
+                        'filename' => $file, 'chunk_index' => $chunkIdx, 
                         'chunk_hash' => Hash::toBase64(hash('xxh3', $data)), 
                         'data' => base64_encode($data), 'size' => $size
                     ]);
-                    if ($res['ok'] ?? false) $success = true; else $attempts++;
+
+                    if ($res['ok'] ?? false){ 
+                        $chunksToUpload--;
+                        $progreso = number_format((($totalChunks - $chunksToUpload) / $totalChunks) * 100, 1);
+                        Log::info(sprintf("  [%s%%] Uploaded chunk %d de %s", $progreso, $chunkIdx, $file));
+                        $success = true; 
+                    } else {
+                        $attempts++;
+                        Log::info(" Reintentando chunk $chunkIdx (intento $attempts)");
+                    };
                 }
-                if (!$success) throw new \Exception("Failed to upload chunk {$t['chunk']} of $file after 3 attempts");
+                if (!$success) throw new \Exception("Failed to upload chunk $chunkIdx of $file after 3 attempts");
             }
         }
     }
