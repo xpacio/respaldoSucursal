@@ -329,31 +329,26 @@ class Server
                 self::json(['ok' => false, 'error' => 'Chunk hash mismatch', 'retry' => true]);
             }
 
-            $totalChunks = $fileInfo['chunk_count'] ?? 1;
             $currentPending = $fileInfo['chunk_pending'] ?? 1;
             
             // Decrementar chunk_pending al recibir un chunk exitoso
             $newPending = max(0, $currentPending - 1);
             
-            // Buscar siguiente chunk pendiente (no asumir secuencial)
-            $nextPending = $this->db->q("SELECT chunk_index FROM file_chunks WHERE rbfid=:r AND file_name=:f AND status != 'received' AND chunk_index > :idx ORDER BY chunk_index LIMIT 1", 
+            // Actualizar estado del chunk y contador global
+            $this->db->exec("UPDATE file_chunks SET status='received', updated_at=NOW() WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx", 
                 [':r' => $r, ':f' => $file, ':idx' => $idx]);
-            $nextChunk = $nextPending ? (int) $nextPending['chunk_index'] : null;
-            
-            // Si hay más chunks pendientes
-            if ($nextChunk !== null && $newPending > 0) {
-                // Actualizar el chunk actual como recibido
-                $this->db->exec("UPDATE file_chunks SET status='received', updated_at=NOW() WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx", 
-                    [':r' => $r, ':f' => $file, ':idx' => $idx]);
-                $this->db->exec("UPDATE files SET chunk_pending=:p WHERE rbfid=:r AND file_name=:f", [':p' => $newPending, ':r' => $r, ':f' => $file]);
+            $this->db->exec("UPDATE files SET chunk_pending=:p WHERE rbfid=:r AND file_name=:f", [':p' => $newPending, ':r' => $r, ':f' => $file]);
+
+            if ($newPending > 0) {
+                // Buscar cualquier otro chunk que falte (no necesariamente el siguiente en índice)
+                $next = $this->db->q("SELECT chunk_index FROM file_chunks WHERE rbfid=:r AND file_name=:f AND status != 'received' ORDER BY chunk_index LIMIT 1", 
+                    [':r' => $r, ':f' => $file]);
+                $nextChunk = $next ? (int)$next['chunk_index'] : 0;
+                
                 $this->db->commit();
-                Log::debug("Chunk $idx received ($file), next: $nextChunk, pending: $newPending");
                 self::json(['ok' => true, 'status' => 'received', 'next_chunk' => $nextChunk]);
             } else {
-                // Último chunk recibido, marcar como recibido para proceder a finalizar
-                $this->db->exec("UPDATE file_chunks SET status='received', updated_at=NOW() WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx", 
-                    [':r' => $r, ':f' => $file, ':idx' => $idx]);
-                $this->db->exec("UPDATE files SET chunk_pending=0, status='completed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
+                // No quedan pendientes, finalizar
                 $this->finalize($r, $file, $paths);
                 $this->db->commit();
             }
