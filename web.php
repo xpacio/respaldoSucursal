@@ -132,7 +132,7 @@ class AdminUI {
     private function viewLogs(): void {
         echo "<h4>Monitoreo de Logs</h4>";
         $logs = [
-            'Servidor (Syslog)' => 'tail /var/log/syslog | sort -nr',
+            'Servidor (Syslog)' => "tail /var/log/syslog | sort -nr | cut -d' ' -f3- ",
             'Web (Lighttpd Access)' => 'tail /var/log/lighttpd/access.log | sort -nr',
             'PHP-FPM (8.4)' => 'tail /var/log/php8.4-fpm.log | sort -nr',
             'Base de Datos (PostgreSQL)' => 'tail /var/log/postgresql/postgresql-16-main.log | sort -nr'
