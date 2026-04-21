@@ -21,6 +21,7 @@ class Log
     private static string $prefix = 'ar';
     private static array $buffer = [];
     private static bool $verbose = true;
+    private static bool $syslogEnabled = false;
 
     public static function init(string $d, bool $verbose = true): void
     {
@@ -28,6 +29,12 @@ class Log
         self::$verbose = $verbose;
         if (!is_dir(self::$dir))
             mkdir(self::$dir, 0755, true);
+
+        if (function_exists('openlog')) {
+            openlog('respaldo-sucursal', LOG_PID | LOG_ODELAY, LOG_LOCAL0);
+            self::$syslogEnabled = true;
+        }
+
         register_shutdown_function([self::class, 'flush']);
     }
 
@@ -35,6 +42,15 @@ class Log
     {
         $line = sprintf("[%s] [%s] %s", date('Y-m-d H:i:s'), $level, $msg);
         self::$buffer[] = $line;
+
+        if (self::$syslogEnabled) {
+            $priority = match($level) {
+                'ERROR' => LOG_ERR,
+                'DEBUG' => LOG_DEBUG,
+                default => LOG_INFO
+            };
+            syslog($priority, "[$level] $msg");
+        }
         
         if (PHP_SAPI === 'cli') {
             //if (self::$verbose) echo $line . PHP_EOL;
