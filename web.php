@@ -146,22 +146,25 @@ class AdminUI {
 
     private function viewLogs(): void {
         echo "<h4>Monitoreo de Logs</h4>";
-        echo "<div class='grid'>";
+        echo '<div class="tabs min left-align">';
+
         $logs = [
-            'Servidor (Syslog)' => "tail -n 30 /var/log/syslog | cut -d' ' -f1- | sort -r",
-            'Web (Lighttpd Access)' => "tail -n 30 /var/log/lighttpd/access.log | sort -r",
-            'PHP-FPM (8.4)' => "tail -n 30 /var/log/php8.4-fpm.log | cut -d' ' -f1- | sort -r",
-            'Base de Datos (PostgreSQL)' => "tail -n 30 /var/log/postgresql/postgresql-16-main.log | cut -d' ' -f4- | sort -r"
+            'Syslog' => "tail -n 30 /var/log/syslog | cut -d' ' -f1- | sort -r",
+            'Lighttpd' => "tail -n 30 /var/log/lighttpd/access.log | sort -r",
+            'PHP-FPM' => "tail -n 30 /var/log/php8.4-fpm.log | cut -d' ' -f1- | sort -r",
+            'PostgreSQL' => "tail -n 30 /var/log/postgresql/postgresql-16-main.log | cut -d' ' -f4- | sort -r"
         ];
         foreach ($logs as $title => $cmd) {
-            echo "<div class='s12 m6'><article class='border padding margin-bottom shadow'>";
-            echo "<h6>$title</h6>";
-            echo "<pre class='scroll' style='max-height:450px; font-size:0.7rem; background:#121212; color:#00ff41; padding:10px; border-radius:4px; overflow:auto; border:1px solid #333;'>";
-            echo htmlspecialchars(@shell_exec($cmd) ?: "Sin registros o error de permisos ($cmd).");
-            echo "</pre></article></div>";
+            echo '<a class="active">'.$title.'</a>';
+            $l = htmlspecialchars(@shell_exec($cmd) ?: "Sin registros o error de permisos ($cmd).");
+            $logs[$title] = '<div class="page padding right">'.$l.'</div>';
         }
         echo "</div>";
+        echo implode('', $logs);
+        echo "</div>";
+        
     }
+
 }
 
 try { (new AdminUI())->render(); } 
