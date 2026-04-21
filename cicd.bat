@@ -1,3 +1,6 @@
+git fetch
+git pull
+git status
 git add .
 git commit -m "autocomit :: %date% %time% %computername%"
 git push
