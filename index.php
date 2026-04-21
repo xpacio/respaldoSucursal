@@ -329,17 +329,17 @@ class Server
                 self::json(['ok' => false, 'error' => 'Chunk hash mismatch', 'retry' => true]);
             }
 
-            $currentPending = $fileInfo['chunk_pending'] ?? 1;
-            
-            // Decrementar chunk_pending al recibir un chunk exitoso
-            $newPending = max(0, $currentPending - 1);
-            
-            // Actualizar estado del chunk y contador global
+            // Marcar este chunk como recibido en la base de datos
             $this->db->exec("UPDATE file_chunks SET status='received', updated_at=NOW() WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx", 
                 [':r' => $r, ':f' => $file, ':idx' => $idx]);
-            $this->db->exec("UPDATE files SET chunk_pending=:p WHERE rbfid=:r AND file_name=:f", [':p' => $newPending, ':r' => $r, ':f' => $file]);
 
-            if ($newPending > 0) {
+            // Recalcular chunks pendientes de forma real (evita desincronización por reintentos o concurrencia)
+            $pendingCount = (int) $this->db->q("SELECT COUNT(*) as total FROM file_chunks WHERE rbfid=:r AND file_name=:f AND status != 'received'", 
+                [':r' => $r, ':f' => $file])['total'];
+            
+            $this->db->exec("UPDATE files SET chunk_pending=:p WHERE rbfid=:r AND file_name=:f", [':p' => $pendingCount, ':r' => $r, ':f' => $file]);
+
+            if ($pendingCount > 0) {
                 // Buscar cualquier otro chunk que falte (no necesariamente el siguiente en índice)
                 $next = $this->db->q("SELECT chunk_index FROM file_chunks WHERE rbfid=:r AND file_name=:f AND status != 'received' ORDER BY chunk_index LIMIT 1", 
                     [':r' => $r, ':f' => $file]);
@@ -348,9 +348,9 @@ class Server
                 $this->db->commit();
                 self::json(['ok' => true, 'status' => 'received', 'next_chunk' => $nextChunk]);
             } else {
-                // No quedan pendientes, finalizar
-                $this->finalize($r, $file, $paths);
+                // No quedan pendientes, confirmar transacción y proceder a finalizar ensamblaje
                 $this->db->commit();
+                $this->finalize($r, $file, $paths);
             }
         } catch (\Throwable $e) {
             $this->db->rollBack();
