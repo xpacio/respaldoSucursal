@@ -9,6 +9,8 @@ class AdminUI {
     private DB $db;
     private string $action;
     private string $target;
+    private string $login_error;
+
 
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -39,6 +41,14 @@ class AdminUI {
         $parts = explode('/', trim($uri, '/'));
         $this->action = $parts[0] ?: 'dashboard';
         $this->target = $parts[1] ?? '';
+
+        // Acción de truncar tabla (Solo usuarios autenticados)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['truncate_table']) && ($_SESSION['admin_auth'] ?? false)) {
+            $tbl = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['truncate_table']);
+            $this->db->exec("TRUNCATE TABLE $tbl RESTART IDENTITY CASCADE");
+            header("Location: /table/$tbl");
+            exit;
+        }
     }
 
     private function renderLogin(): void {
@@ -113,7 +123,12 @@ class AdminUI {
         
         $data = $this->db->qa("SELECT * FROM $name ORDER BY $order DESC LIMIT 100");
 
-        echo "<div class='row'><h5>$name</h5><div class='max'></div><a href='/' class='button border'>Regresar</a></div>";
+        echo "<div class='row'><h5>$name</h5><div class='max'></div>";
+        echo "<form method='post' onsubmit='return confirm(\"¿Estás seguro de truncar la tabla $name? Esta acción borrará todos los registros y reiniciará los contadores.\")' class='margin-right'>";
+        echo "<input type='hidden' name='truncate_table' value='$name'>";
+        echo "<button type='submit' class='error border'><i>delete_sweep</i> Truncar Tabla</button>";
+        echo "</form>";
+        echo "<a href='/' class='button border'>Regresar</a></div>";
         echo "<div class='scroll overflow border'><table class='padding'>";
         if (!empty($data)) {
             echo "<thead><tr>";
