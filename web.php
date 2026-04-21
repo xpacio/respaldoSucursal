@@ -11,11 +11,48 @@ class AdminUI {
     private string $target;
 
     public function __construct() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+
+        // Manejo de Logout
+        if (isset($_GET['logout'])) {
+            session_destroy();
+            header("Location: /");
+            exit;
+        }
+
+        // Manejo de Login
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_btn'])) {
+            $user = $_POST['user'] ?? '';
+            $pass = $_POST['pass'] ?? '';
+            // Credenciales básicas (puedes moverlas a Config más adelante)
+            if ($user === 'admin' && $pass === 'admin123') {
+                $_SESSION['admin_auth'] = true;
+                header("Location: /");
+                exit;
+            } else {
+                $this->login_error = "Credenciales inválidas";
+            }
+        }
+
         $this->db = new DB(Config::getDb());
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $parts = explode('/', trim($uri, '/'));
         $this->action = $parts[0] ?: 'dashboard';
         $this->target = $parts[1] ?? '';
+    }
+
+    private function renderLogin(): void {
+        ?>
+        <div class="middle-align center-align" style="height:80vh">
+            <form method="post" class="padding border shadow" style="width:300px">
+                <h5 class="center-align">Acceso Admin</h5>
+                <div class="field label border"> <input type="text" name="user" required> <label>Usuario</label> </div>
+                <div class="field label border"> <input type="password" name="pass" required> <label>Contraseña</label> </div>
+                <button class="extend" name="login_btn" type="submit">Entrar</button>
+                <?php if (isset($this->login_error)) echo "<p class='error-text center-align'>{$this->login_error}</p>"; ?>
+            </form>
+        </div>
+        <?php
     }
 
     public function render(): void {
@@ -34,14 +71,18 @@ class AdminUI {
                 <nav>
                     <button class="circle transparent"><i>menu</i></button>
                     <h5 class="max">Administración Web</h5>
+                    <?php if ($_SESSION['admin_auth'] ?? false): ?>
                     <a href="/" class="button transparent">Tablas</a>
                     <a href="/logs" class="button transparent">Logs</a>
+                    <a href="/?logout=1" class="button transparent"><i>logout</i></a>
+                    <?php endif; ?>
                 </nav>
             </header>
 
             <main class="responsive">
                 <?php
-                if ($this->action === 'table') $this->viewTable($this->target);
+                if (!($_SESSION['admin_auth'] ?? false)) $this->renderLogin();
+                elseif ($this->action === 'table') $this->viewTable($this->target);
                 elseif ($this->action === 'logs') $this->viewLogs();
                 else $this->dashboard();
                 ?>
@@ -91,14 +132,16 @@ class AdminUI {
     private function viewLogs(): void {
         echo "<h4>Monitoreo de Logs</h4>";
         $logs = [
-            'Servidor (Syslog)' => 'grep "respaldo-sucursal" /var/log/syslog | tail -n 50',
-            'Web (Lighttpd Access)' => 'tail -n 50 /var/log/lighttpd/access.log'
+            'Servidor (Syslog)' => 'tail /var/log/syslog | sort -nr',
+            'Web (Lighttpd Access)' => 'tail /var/log/lighttpd/access.log | sort -nr',
+            'PHP-FPM (8.4)' => 'tail /var/log/php8.4-fpm.log | sort -nr',
+            'Base de Datos (PostgreSQL)' => 'tail /var/log/postgresql/postgresql-16-main.log | sort -nr'
         ];
         foreach ($logs as $title => $cmd) {
             echo "<article class='border padding margin-bottom'>";
             echo "<h6>$title</h6>";
             echo "<pre class='scroll' style='max-height:300px; font-size:0.75rem; background:#1e1e1e; color:#00ff00; padding:15px; border-radius:4px;'>";
-            echo htmlspecialchars(@shell_exec($cmd) ?: "Log no disponible (revisa permisos de lectura en /var/log/).");
+            echo htmlspecialchars(@shell_exec($cmd) ?: "Log no disponible ($cmd).");
             echo "</pre></article>";
         }
     }
