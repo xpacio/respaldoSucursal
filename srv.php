@@ -616,32 +616,68 @@ private function serviceConfig(string $r, array $b): void
     private function downloadList(string $r, array $b): void
     {
         $serviceName = $b['service'] ?? '';
-        $paths = $this->paths($r);
+        $clientFiles = $b['files'] ?? [];
+        
+        $paths = $this->paths($r, $serviceName);
         if (!$paths) self::err('Client not found');
         $ctx = ['rbfid' => $r, 'emp' => $paths['emp'], 'plaza' => $paths['plaza']];
 
+        // Obtener config del servicio (nuevas columnas o client_cfg)
         $row = $this->db->q(
-            "SELECT COALESCE(cs.config, s.default_config) as config 
+            "SELECT s.files, s.server_dest, s.client_source, s.direction,
+                    COALESCE(cs.config, '{}'::jsonb) as client_cfg
              FROM service_config cs JOIN services s ON s.id = cs.service_id
-             WHERE cs.client_rbfid = :r AND s.name = :n",
+             WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
             [':r' => $r, ':n' => $serviceName]
         );
-        $cfg = json_decode($row['config'] ?? '{}', true) ?: [];
+        if (!$row) self::err("Service '$serviceName' not found or disabled", 404);
+        
+        // Solo procesar si direction es download
+        if ($row['direction'] !== 'download') {
+            self::err("Service '$serviceName' is not configured for download");
+        }
+        
         $sourceDir = $this->resolvePath(
-            $cfg['server_source'] ?? "/srv/vales/{emp}/{plaza}/{rbfid}",
+            $row['client_source'] ?? ($row['client_cfg']['server_source'] ?? "/srv/vales/{emp}/{plaza}/{rbfid}"),
             $ctx
         );
         if (!is_dir($sourceDir)) { self::json(['ok' => true, 'files' => []]); return; }
 
-        $targetFiles = $cfg['files'] ?? ['EISYENC.DBF', 'EISYPAR.DBF'];
-        $files = [];
-        foreach ($targetFiles as $f) {
-            $p = $sourceDir . '/' . $f;
-            if (file_exists($p))
-                $files[] = ['filename' => $f, 'size' => filesize($p), 'mtime' => filemtime($p),
-                            'hash' => \App\Hash::toBase64(\App\Hash::computeFile($p))];
+        $targetFiles = $row['files'] ? explode(',', $row['files']) : [];
+        $filesToSend = [];
+        $clientFileMap = [];
+        
+        // Mapear archivos del cliente por nombre
+        foreach ($clientFiles as $cf) {
+            $clientFileMap[strtoupper($cf['filename'])] = $cf;
         }
-        self::json(['ok' => true, 'files' => $files]);
+        
+        foreach ($targetFiles as $f) {
+            $f = trim($f);
+            if (empty($f)) continue;
+            
+            // Ignorar máscaras en download por ahora (solo archivos específicos)
+            if (strpos($f, '*') !== false) continue;
+            
+            $p = $sourceDir . '/' . $f;
+            if (!file_exists($p)) continue;
+            
+            $localHash = \App\Hash::toBase64(\App\Hash::computeFile($p));
+            $clientHash = $clientFileMap[strtoupper($f)]['hash'] ?? '';
+            
+            // Si hashes diferentes o cliente no tiene el archivo, agregarlo a enviar
+            if ($localHash !== $clientHash) {
+                $filesToSend[] = [
+                    'filename' => $f,
+                    'size' => filesize($p),
+                    'mtime' => filemtime($p),
+                    'hash' => $localHash
+                ];
+            }
+        }
+        
+        $chunkSize = \App\Chunk::size(0);
+        self::json(['ok' => true, 'files' => $filesToSend, 'chunk_size' => $chunkSize]);
     }
 
     private function downloadFile(string $r, array $b): void
@@ -649,19 +685,26 @@ private function serviceConfig(string $r, array $b): void
         $filename  = $b['filename'] ?? '';
         $chunkIdx  = (int)($b['chunk_index'] ?? 0);
         $serviceName = $b['service'] ?? '';
-        $paths = $this->paths($r);
+        
+        $paths = $this->paths($r, $serviceName);
         if (!$paths) self::err('Client not found');
         $ctx = ['rbfid' => $r, 'emp' => $paths['emp'], 'plaza' => $paths['plaza']];
 
         $row = $this->db->q(
-            "SELECT COALESCE(cs.config, s.default_config) as config 
+            "SELECT s.server_dest, s.client_source, s.direction,
+                    COALESCE(cs.config, '{}'::jsonb) as client_cfg
              FROM service_config cs JOIN services s ON s.id = cs.service_id
-             WHERE cs.client_rbfid = :r AND s.name = :n",
+             WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
             [':r' => $r, ':n' => $serviceName]
         );
-        $cfg = json_decode($row['config'] ?? '{}', true) ?: [];
+        if (!$row) self::err("Service not found", 404);
+        
+        if ($row['direction'] !== 'download') {
+            self::err("Service not configured for download");
+        }
+        
         $sourceDir = $this->resolvePath(
-            $cfg['server_source'] ?? "/srv/vales/{emp}/{plaza}/{rbfid}",
+            $row['client_source'] ?? ($row['client_cfg']['server_source'] ?? "/srv/vales/{emp}/{plaza}/{rbfid}"),
             $ctx
         );
         $p = $sourceDir . '/' . $filename;
