@@ -113,7 +113,14 @@ class Client {
         $clientTempTemplate = $cfg['client_temp'] ?? '%tmp%/respaldoSucursal/{service}';
         $work = str_replace(['%tmp%', '{service}', '{base}'], [sys_get_temp_dir(), $service, $loc['base']], $clientTempTemplate);
         
+        // Crear directorio temporal si no existe
         if (!is_dir($work)) mkdir($work, 0755, true);
+
+        // Verificar que client_source existe
+        if (!is_dir($source)) {
+            Log::error("Source directory does not exist: $source");
+            return ['files_count' => 0, 'sync_ok' => [], 'sync_missing' => [], 'files_sync' => 0, 'error' => "Source directory not found: $source"];
+        }
 
         $files = $cfg['files'] ?? Constants::$WATCH_FILES;
         $results = [
@@ -124,27 +131,32 @@ class Client {
         ];
 
         foreach ($files as $f) {
-            $f = strtoupper($f);
-            $src = $source . DIRECTORY_SEPARATOR . $f;
-            $dst = $work . DIRECTORY_SEPARATOR . $f;
+            $fUpper = strtoupper($f);
+            $srcPath = $source . DIRECTORY_SEPARATOR . $f;
+            $dstPath = $work . DIRECTORY_SEPARATOR . $fUpper;
             
-            if (!file_exists($src)) {
-                $results['sync_missing'][] = $f;
+            // Buscar archivo: si no existe con nombre exacto, buscar cualquier variant (minúsculas en Windows)
+            $srcReal = $this->findRealFile($source, $f);
+            
+            if (!$srcReal) {
+                Log::info("File not found: $f (tried: $srcPath)");
+                $results['sync_missing'][] = $fUpper;
                 continue;
             }
 
-            Log::info("--- Processing: $f ---");
+            Log::info("--- Processing: $fUpper (found: $srcReal) ---");
+            
+            // En Windows, el archivo destino siempre en mayúsculas (solo el archivo, no la carpeta)
             if (Platform::isWindows()) {
-                $cmd = sprintf('robocopy %s %s %s /R:1 /W:1 /NJH /NJS /NDL /NC /NS', 
-                    escapeshellarg($source), escapeshellarg($work), escapeshellarg($f));
-                exec($cmd);
+                // Copiar con nombre en mayúsculas
+                copy($srcReal, $dstPath);
             } else {
-                copy($src, $dst);
+                copy($srcReal, $dstPath);
             }
             
-            if (file_exists($dst)) {
-                $this->uploadFile($service, $loc, $f, $dst);
-                $results['sync_ok'][] = $f;
+            if (file_exists($dstPath)) {
+                $this->uploadFile($service, $loc, $fUpper, $dstPath);
+                $results['sync_ok'][] = $fUpper;
                 $results['files_sync']++;
             }
         }
@@ -209,6 +221,26 @@ class Client {
                 if (!$success) throw new \Exception("Failed to upload chunk $chunkIdx of $file after 3 attempts");
             }
         }
+    }
+
+    private function findRealFile(string $dir, string $filename): ?string {
+        $fullPath = $dir . DIRECTORY_SEPARATOR . $filename;
+        if (file_exists($fullPath)) {
+            return $fullPath;
+        }
+        
+        // En Windows, buscar sin importar mayúsculas/minúsculas
+        if (Platform::isWindows() && is_dir($dir)) {
+            $files = scandir($dir);
+            $filenameLower = strtolower($filename);
+            foreach ($files as $f) {
+                if (strtolower($f) === $filenameLower) {
+                    return $dir . DIRECTORY_SEPARATOR . $f;
+                }
+            }
+        }
+        
+        return null;
     }
 }
 
