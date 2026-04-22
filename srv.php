@@ -584,7 +584,7 @@ private function serviceConfig(string $r, array $b): void
         
         // Buscar config en service_config (JSONB) primero, luego en services (columnas)
         $row = $this->db->q(
-            "SELECT s.type, s.name, s.files, s.direction, s.client_temp, s.server_dest, s.client_source,
+            "SELECT s.type, s.name, s.files, s.direction, s.client_temp, s.server_dest, s.client_source, s.recursive,
                     COALESCE(cs.config, '{}'::jsonb) as client_cfg,
                     COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds
              FROM service_config cs JOIN services s ON s.id = cs.service_id
@@ -601,6 +601,7 @@ private function serviceConfig(string $r, array $b): void
         $cfg['files'] = $row['files'] ? explode(',', $row['files']) : ($row['client_cfg']['files'] ?? []);
         $cfg['direction'] = $row['direction'] ?? ($row['client_cfg']['direction'] ?? 'upload');
         $cfg['client_source'] = $row['client_source'] ?? ($row['client_cfg']['client_source'] ?? '{base}');
+        $cfg['recursive'] = $row['recursive'] ?? ($row['client_cfg']['recursive'] ?? false);
         
         // client_temp y server_dest se envían con placeholders para que el cliente los procese
         // {service} va en client_temp para el cliente, no se resuelve aquí

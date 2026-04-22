@@ -122,49 +122,92 @@ class Client {
             return ['files_count' => 0, 'sync_ok' => [], 'sync_missing' => [], 'files_sync' => 0, 'error' => "Source directory not found: $source"];
         }
 
+        $recursive = $cfg['recursive'] ?? false;
         $files = $cfg['files'] ?? Constants::$WATCH_FILES;
+        $filesList = is_array($files) ? $files : explode(',', $files);
+        
         $results = [
-            'files_count' => count($files),
+            'files_count' => 0,
             'sync_ok' => [],
             'sync_missing' => [],
             'files_sync' => 0
         ];
 
-        foreach ($files as $f) {
-            $fUpper = strtoupper($f);
-            $dstPath = $work . DIRECTORY_SEPARATOR . $fUpper;
+        foreach ($filesList as $item) {
+            $item = trim($item);
+            if (empty($item)) continue;
             
-            // Buscar archivo en mayúsculas o cualquier variant (minúsculas en Windows)
-            $srcReal = $this->findRealFile($source, $fUpper);
-            
-            if (!$srcReal) {
-                Log::info("File not found: $f (tried: $srcPath)");
-                $results['sync_missing'][] = $fUpper;
-                continue;
-            }
-
-            Log::info("--- Processing: $fUpper (found: $srcReal) ---");
-            
-            // En Windows, el archivo destino siempre en mayúsculas (solo el archivo, no la carpeta)
-            if (Platform::isWindows()) {
-                // Copiar con nombre en mayúsculas
-                copy($srcReal, $dstPath);
+            // Detectar si es máscara (contiene * o ?)
+            if (strpos($item, '*') !== false || strpos($item, '?') !== false) {
+                // Máscara: usar robocopy directamente
+                $robocopyFlag = $recursive ? '/S' : '/E';
+                Log::info("--- Processing mask: $item (recursive: $recursive) ---");
+                $cmd = sprintf('robocopy %s %s %s %s /R:1 /W:1 /NJH /NJS /NDL /NC /NS', 
+                    escapeshellarg($source), 
+                    escapeshellarg($work), 
+                    escapeshellarg($item),
+                    escapeshellarg($robocopyFlag));
+                exec($cmd);
+                // No hay tracking de archivos para máscaras
+                $results['files_count']++;
             } else {
+                // Archivo individual: lógica existente
+                $fUpper = strtoupper($item);
+                $dstPath = $work . DIRECTORY_SEPARATOR . $item;
+                
+                // Extraer carpeta y archivo para preservar estructura
+                $parts = explode('/', str_replace('\\', '/', $item));
+                $fileBaseName = array_pop($parts);
+                $subPath = implode(DIRECTORY_SEPARATOR, $parts);
+                $dstPath = $work . ($subPath ? DIRECTORY_SEPARATOR . $subPath : '') . DIRECTORY_SEPARATOR . strtoupper($fileBaseName);
+                
+                // Crear carpetas destino si no existen
+                $dstDir = dirname($dstPath);
+                if (!is_dir($dstDir)) mkdir($dstDir, 0755, true);
+                
+                // Buscar archivo origen (case-insensitive)
+                $srcReal = $this->findFileCaseInsensitive($source, $item);
+                
+                if (!$srcReal) {
+                    Log::info("File not found: $item");
+                    $results['sync_missing'][] = $fUpper;
+                    continue;
+                }
+
+                Log::info("--- Processing: $fUpper (found: $srcReal) ---");
+                
                 copy($srcReal, $dstPath);
-            }
-            
-            if (file_exists($dstPath)) {
-                $this->uploadFile($service, $loc, $fUpper, $dstPath);
-                $results['sync_ok'][] = $fUpper;
-                $results['files_sync']++;
+                $results['files_count']++;
+                
+                if (file_exists($dstPath)) {
+                    $this->uploadFile($service, $loc, $fUpper, $dstPath);
+                    $results['sync_ok'][] = $fUpper;
+                    $results['files_sync']++;
+                }
             }
         }
 
         if (!empty($results['sync_missing'])) {
-            $this->http->req('missing', $loc['rbfid'], ['missing_files' => $results['sync_missing']]);
+            $this->http->req('missing', $loc['rbfid'], ['service' => $service, 'missing_files' => $results['sync_missing']]);
         }
 
         return $results;
+    }
+
+    private function findFileCaseInsensitive(string $dir, string $filename): ?string {
+        $fullPath = $dir . DIRECTORY_SEPARATOR . $filename;
+        if (file_exists($fullPath)) return $fullPath;
+        
+        if (Platform::isWindows() && is_dir($dir)) {
+            $files = scandir($dir);
+            $filenameLower = strtolower($filename);
+            foreach ($files as $f) {
+                if (strtolower($f) === $filenameLower) {
+                    return $dir . DIRECTORY_SEPARATOR . $f;
+                }
+            }
+        }
+        return null;
     }
 
     private function uploadFile(string $service, array $loc, string $file, string $wp): void {
@@ -220,28 +263,6 @@ class Client {
                 if (!$success) throw new \Exception("Failed to upload chunk $chunkIdx of $file after 3 attempts");
             }
         }
-    }
-
-    private function findRealFile(string $dir, string $filename): ?string {
-        $filenameUpper = strtoupper($filename);
-        $fullPath = $dir . DIRECTORY_SEPARATOR . $filenameUpper;
-        
-        if (file_exists($fullPath)) {
-            return $fullPath;
-        }
-        
-        // En Windows, buscar sin importar mayúsculas/minúsculas
-        if (Platform::isWindows() && is_dir($dir)) {
-            $files = scandir($dir);
-            $filenameLower = strtolower($filename);
-            foreach ($files as $f) {
-                if (strtolower($f) === $filenameLower) {
-                    return $dir . DIRECTORY_SEPARATOR . $f;
-                }
-            }
-        }
-        
-        return null;
     }
 }
 
