@@ -53,14 +53,30 @@ class AdminUI {
 
     private function renderLogin(): void {
         ?>
-        <div class="middle-align center-align" style="height:80vh">
-            <form method="post" class="padding border shadow" style="width:300px">
-                <h5 class="center-align">Acceso Admin</h5>
-                <div class="field label border"> <input type="text" name="user" required> <label>Usuario</label> </div>
-                <div class="field label border"> <input type="password" name="pass" required> <label>Contraseña</label> </div>
-                <button class="extend" name="login_btn" type="submit">Entrar</button>
-                <?php if (isset($this->login_error)) echo "<p class='error-text center-align'>{$this->login_error}</p>"; ?>
-            </form>
+        <div class="page-center">
+            <div class="page-body">
+                <div class="container-tight">
+                    <div class="card card-md">
+                        <div class="card-body">
+                            <h2 class="card-title text-center mb-4">Acceso Admin</h2>
+                            <form method="post">
+                                <div class="mb-3">
+                                    <label class="form-label">Usuario</label>
+                                    <input type="text" name="user" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Contraseña</label>
+                                    <input type="password" name="pass" class="form-control" required>
+                                </div>
+                                <button type="submit" name="login_btn" class="btn btn-primary w-100">Entrar</button>
+                                <?php if (isset($this->login_error)): ?>
+                                <div class="alert alert-danger mt-3"><?= $this->login_error ?></div>
+                                <?php endif; ?>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <?php
     }
@@ -72,31 +88,43 @@ class AdminUI {
         <head>
             <meta charset="UTF-8">
             <title>Admin Servidor</title>
-            <link href="https://cdn.jsdelivr.net/npm/beercss@3.5.1/dist/cdn/beer.min.css" rel="stylesheet">
-            <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.5.1/dist/cdn/beer.min.js"></script>
-            <style>body { background-color: #f8f9fa; } main { padding-top: 2rem; }</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css" />
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler-icons.min.css" />
         </head>
         <body>
-            <header class="primary shadow">
-                <nav>
-                    <button class="circle transparent"><i>menu</i></button>
-                    <h5 class="max">Administración Web</h5>
+            <div class="page-wrapper">
+            <header class="navbar navbar-expand-md d-print-none">
+                <div class="container-xl">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <h1 class="navbar-brand navbar-brand-autodark">
+                        Administración Web
+                    </h1>
                     <?php if ($_SESSION['admin_auth'] ?? false): ?>
-                    <a href="/" class="button transparent">Tablas</a>
-                    <a href="/logs" class="button transparent">Logs</a>
-                    <a href="/?logout=1" class="button transparent"><i>logout</i></a>
+                    <div class="navbar-nav flex-row-order-md-last">
+                        <a href="/" class="nav-link">Tablas</a>
+                        <a href="/logs" class="nav-link">Logs</a>
+                        <a href="/?logout=1" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v7a2 2 0 0 0 2 2h7"/><path d="M9 12h12"/><path d="M12 15l3 -3"/><path d="M21 12a9 9 0 1 1 -18 0 9 9 0 0 1 18 0z"/></svg>
+                        </a>
+                    </div>
                     <?php endif; ?>
-                </nav>
+                </div>
             </header>
 
-            <main class="responsive">
+            <div class="page-body">
+                <div class="container-xl">
                 <?php
                 if (!($_SESSION['admin_auth'] ?? false)) $this->renderLogin();
                 elseif ($this->action === 'table') $this->viewTable($this->target);
                 elseif ($this->action === 'logs') $this->viewLogs();
                 else $this->dashboard();
                 ?>
-            </main>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
         </body>
         </html>
         <?php
@@ -104,12 +132,15 @@ class AdminUI {
 
     private function dashboard(): void {
         $tables = $this->db->qa("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' ORDER BY table_name");
-        echo "<h4>Base de Datos</h4><div class='grid'>";
+        echo "<h3>Base de Datos</h3>";
+        echo "<div class='row row-cards'>";
         foreach ($tables as $t) {
             $name = $t['table_name'];
-            echo "<div class='s12 m4 l3'><a href='/table/$name' class='card padding border center-align middle-align'>
-                    <i class='extra'>table_chart</i><div class='max'>$name</div>
-                  </a></div>";
+            echo "<div class='col-sm-6 col-lg-3'>";
+            echo "<a href='/table/$name' class='card card-link'>";
+            echo "<div class='card-body'>";
+            echo "<div class='h1 m-0'><svg xmlns='http://www.w3.org/2000/svg' class='icon icon-lg' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><line x1='3' y1='9' x2='21' y2='9'/><line x1='9' y1='21' x2='9' y2='9'/></svg> $name</div>";
+            echo "</div></a></div>";
         }
         echo "</div>";
     }
@@ -118,34 +149,37 @@ class AdminUI {
         $name = preg_replace('/[^a-zA-Z0-9_]/', '', $name);
         $cols = $this->db->qa("SELECT column_name FROM information_schema.columns WHERE table_name = :t", [':t' => $name]);
         $order = "1";
-        // Intentar ordenar por campos de tiempo o ID descendente
         foreach ($cols as $c) if (in_array($c['column_name'], ['updated_at', 'id', 'created_at', 'completed_at'])) { $order = $c['column_name']; break; }
         
         $data = $this->db->qa("SELECT * FROM $name ORDER BY $order DESC LIMIT 100");
 
-        echo "<div class='row'><h5>$name</h5><div class='max'></div>";
-        echo "<form method='post' onsubmit='return confirm(\"¿Estás seguro de truncar la tabla $name? Esta acción borrará todos los registros y reiniciará los contadores.\")' class='margin-right'>";
+        echo "<div class='d-flex justify-content-between align-items-center mb-3'>";
+        echo "<h3 class='m-0'>$name</h3>";
+        echo "<div>";
+        echo "<a href='/' class='btn btn-secondary me-2'>Regresar</a>";
+        echo "<form method='post' class='d-inline' onsubmit=\"return confirm('¿Estás seguro de truncar la tabla $name? Esta acción borrará todos los registros.')\">";
         echo "<input type='hidden' name='truncate_table' value='$name'>";
-        echo "<button type='submit' class='error border'><i>delete_sweep</i> Truncar Tabla</button>";
+        echo "<button type='submit' class='btn btn-danger'>Truncar Tabla</button>";
         echo "</form>";
-        echo "<a href='/' class='button border'>Regresar</a></div>";
-        echo "<div class='scroll overflow border'><table class='padding'>";
+        echo "</div></div>";
+        
+        echo "<div class='card'><div class='table-responsive'><table class='table table-vcenter card-table table-striped'>";
         if (!empty($data)) {
             echo "<thead><tr>";
             foreach (array_keys($data[0]) as $h) echo "<th>$h</th>";
             echo "</tr></thead><tbody>";
             foreach ($data as $row) {
                 echo "<tr>";
-                foreach ($row as $v) echo "<td>" . (is_array($v) || is_object($v) ? json_encode($v) : $v) . "</td>";
+                foreach ($row as $v) echo "<td>" . (is_array($v) || is_object($v) ? json_encode($v) : htmlspecialchars((string)$v)) . "</td>";
                 echo "</tr>";
             }
             echo "</tbody>";
         } else { echo "<tr><td>Sin registros disponibles</td></tr>"; }
-        echo "</table></div>";
+        echo "</table></div></div>";
     }
 
     private function viewLogs(): void {
-        echo "<h4>Monitoreo de Logs</h4>";
+        echo "<h3>Monitoreo de Logs</h3>";
 
         $logSources = [
             'Syslog' => "tail -n 30 /var/log/syslog | cut -d' ' -f1- | sort -r",
@@ -154,24 +188,32 @@ class AdminUI {
             'PostgreSQL' => "tail -n 30 /var/log/postgresql/postgresql-16-main.log | cut -d' ' -f4- | sort -r"
         ];
 
-        $tabsHtml = '';
-        $pagesHtml = '';
+        echo '<div class="card">';
+        echo '<div class="card-header"><ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">';
+        
         $first = true;
-
-        echo '<div class="tabs min left-align">';
+        $tabIds = [];
         foreach ($logSources as $title => $cmd) {
-            $tabId = 'log-' . strtolower(str_replace([' ', '-'], '', $title));
+            $tabId = 'log-' . strtolower(str_replace([' ', '-', '-'], '', $title));
+            $tabIds[$title] = $tabId;
             $activeClass = $first ? 'active' : '';
-            $tabsHtml .= '<a class="' . $activeClass . '" href="#' . $tabId . '">' . $title . '</a>';
-            $logContent = htmlspecialchars(@shell_exec($cmd) ?: "Sin registros o error de permisos ($cmd).");
-            $pagesHtml .= '<div class="page padding right ' . $activeClass . '" id="' . $tabId . '"><pre>' . $logContent . '</pre></div>';
+            echo '<li class="nav-item"><a href="#' . $tabId . '" class="nav-link ' . $activeClass . '" data-bs-toggle="tab">' . $title . '</a></li>';
             $first = false;
         }
-        echo $tabsHtml;
-        echo '</div>'; // Close tabs div
-        echo '<div class="pages">';
-        echo $pagesHtml;
-        echo "</div>";
+        
+        echo '</ul></div>';
+        echo '<div class="card-body"><div class="tab-content">';
+        
+        $first = true;
+        foreach ($logSources as $title => $cmd) {
+            $tabId = $tabIds[$title];
+            $activeClass = $first ? 'active show' : '';
+            $logContent = htmlspecialchars(@shell_exec($cmd) ?: "Sin registros o error de permisos ($cmd).");
+            echo '<div class="tab-pane ' . $activeClass . '" id="' . $tabId . '"><pre class="m-0">' . $logContent . '</pre></div>';
+            $first = false;
+        }
+        
+        echo '</div></div></div>';
     }
 
 }
