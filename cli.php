@@ -123,6 +123,9 @@ class Client {
         }
 
         $recursive = $cfg['recursive'] ?? false;
+        $excludeMasks = $cfg['exclude'] ?? '';
+        $excludeList = $excludeMasks ? array_map('trim', explode(',', $excludeMasks)) : [];
+        $maxage = $cfg['maxage'] ?? null;
         $files = $cfg['files'] ?? Constants::$WATCH_FILES;
         $filesList = is_array($files) ? $files : explode(',', $files);
         
@@ -130,6 +133,7 @@ class Client {
             'files_count' => 0,
             'sync_ok' => [],
             'sync_missing' => [],
+            'sync_excluded' => [],
             'files_sync' => 0
         ];
 
@@ -141,14 +145,18 @@ class Client {
             if (strpos($item, '*') !== false || strpos($item, '?') !== false) {
                 // Máscara: usar robocopy directamente
                 $robocopyFlag = $recursive ? '/S' : '/E';
-                Log::info("--- Processing mask: $item (recursive: $recursive) ---");
-                $cmd = sprintf('robocopy %s %s %s %s /R:1 /W:1 /NJH /NJS /NDL /NC /NS', 
-                    escapeshellarg($source), 
-                    escapeshellarg($work), 
-                    escapeshellarg($item),
-                    escapeshellarg($robocopyFlag));
-                exec($cmd);
-                // No hay tracking de archivos para máscaras
+                $robocopyCmd = 'robocopy ' . escapeshellarg($source) . ' ' . escapeshellarg($work) . ' ' . escapeshellarg($item) . ' ' . escapeshellarg($robocopyFlag) . ' /R:1 /W:1 /NJH /NJS /NDL /NC /NS';
+                
+                if ($maxage) {
+                    $robocopyCmd .= ' /maxage:' . (int)$maxage;
+                }
+                
+                Log::info("--- Processing mask: $item (recursive: $recursive, maxage: $maxage) ---");
+                exec($robocopyCmd);
+                
+                // Procesar archivos copiados y aplicar exclude
+                $this->processUploadedFiles($service, $loc, $work, $excludeList, $results);
+                
                 $results['files_count']++;
             } else {
                 // Archivo individual: lógica existente
@@ -192,6 +200,30 @@ class Client {
         }
 
         return $results;
+    }
+
+    private function processUploadedFiles(string $service, array $loc, string $workDir, array $excludeList, array &$results): void {
+        if (empty($excludeList)) return;
+        
+        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($workDir));
+        foreach ($files as $file) {
+            if (!$file->isFile()) continue;
+            
+            $filename = $file->getFilename();
+            foreach ($excludeList as $mask) {
+                if ($this->matchMask($filename, trim($mask))) {
+                    Log::info("Excluding file (matched mask $mask): " . $filename);
+                    $results['sync_excluded'][] = $filename;
+                    unlink($file->getPathname());
+                    break;
+                }
+            }
+        }
+    }
+
+    private function matchMask(string $filename, string $mask): bool {
+        $regex = str_replace(['.', '*', '?'], ['\.', '.*', '.'], $mask);
+        return preg_match('/^' . $regex . '$/i', $filename);
     }
 
     private function findFileCaseInsensitive(string $dir, string $filename): ?string {
