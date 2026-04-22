@@ -113,7 +113,9 @@ class Server
     {
         try {
             $this->db->begin();
-            $paths = $this->paths($r);
+            $serviceName = $b['service'] ?? '';
+            $paths = $this->paths($r, $serviceName);
+            Log::info("Sync: Using paths - work: {$paths['work']}, base: {$paths['base']}, service: $serviceName");
             $needs = [];
             
             foreach ($b['files'] ?? [] as $f) {
@@ -288,6 +290,7 @@ class Server
     {
         try {
             $this->db->begin();
+            $serviceName = $b['service'] ?? '';
             $file = $b['filename'] ?? '';
             $idx = max(0, (int) ($b['chunk_index'] ?? 0));
             $sz = max(0, (int) ($b['size'] ?? 0));
@@ -307,11 +310,13 @@ class Server
             if (strlen($data) > 10485760)
                 self::err('Chunk too large');
 
-            $paths = $this->paths($r);
+            $paths = $this->paths($r, $serviceName);
             if (!$paths) {
                 Log::error("Upload: Paths not found for $r");
                 self::err('Client not found', 404);
             }
+
+            Log::info("Upload: Using paths - work: {$paths['work']}, base: {$paths['base']}, service: $serviceName");
 
             // El offset DEBE basarse en el tamaño original registrado en el sync para mantener integridad
             $chunkSize = \App\Chunk::size((int)$fileInfo['file_size']);
@@ -381,10 +386,10 @@ class Server
                     unlink($dp);
                 }
             }
-            Log::info("Finalize: Moving verified file to $dp");
+            Log::info("Finalize: Moving verified file from {$paths['work']}/$f to $dp (hash: $actualBase64)");
             rename($wp, $dp);
             $this->db->exec("UPDATE files SET status='completed', chunk_pending=0 WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
-            Log::info("File $f finalized & verified for $r");
+            Log::info("File $f finalized & verified for $r | Final path: $dp");
             self::json(['ok' => true, 'status' => 'complete']);
             return;
         }
@@ -671,14 +676,35 @@ class Server
         readfile($p);
         exit;
     }
-    private function paths(string $r): ?array
+    private function paths(string $r, string $serviceName = ''): ?array
     {
         $c = $this->db->q("SELECT emp, plaza FROM clients WHERE rbfid=:r", [':r' => $r]);
         if (!$c)
             return null;
         $e = $c['emp'] ?: '_';
         $p = $c['plaza'] ?: '_';
-        return ['emp' => $e, 'plaza' => $p, 'base' => "/srv/qbck/$e/$p/$r", 'work' => "/tmp/ar/$r"];
+        
+        $workDir = "/tmp/respaldoSucursal/$r";
+        $baseDir = "/srv/qbck/$e/$p/$r";
+        
+        if ($serviceName) {
+            $svc = $this->db->q("SELECT server_dest, client_temp FROM services WHERE name = :n", [':n' => $serviceName]);
+            if ($svc && $svc['server_dest']) {
+                $baseDir = $svc['server_dest'];
+                $baseDir = str_replace(['{emp}', '{plaza}', '{rbfid}'], [$e, $p, $r], $baseDir);
+            }
+            if ($svc && $svc['client_temp']) {
+                $tempTemplate = $svc['client_temp'];
+                if (str_starts_with($tempTemplate, '%tmp%')) {
+                    $tempTemplate = str_replace('%tmp%', '/tmp', $tempTemplate);
+                    $tempTemplate = str_replace('{base}', "/srv/qbck/$e/$p/$r", $tempTemplate);
+                    $tempTemplate = str_replace('{service}', $serviceName, $tempTemplate);
+                    $workDir = $tempTemplate;
+                }
+            }
+        }
+        
+        return ['emp' => $e, 'plaza' => $p, 'base' => $baseDir, 'work' => $workDir];
     }
 }
 

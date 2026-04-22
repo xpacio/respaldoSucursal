@@ -165,6 +165,7 @@ class Client {
         while (true) {
             // Log::debug("  Checking sync status for $file...");
             $req = $this->http->req('sync', $loc['rbfid'], [
+                'service' => $service,
                 'files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => $chs, 'mtime' => filemtime($wp), 'size' => $size]]
             ]);
 
@@ -183,6 +184,7 @@ class Client {
                 $attempts = 0; $success = false;
                 while ($attempts < 3 && !$success) {
                     $res = $this->http->req('upload', $loc['rbfid'], [
+                        'service' => $service,
                         'filename' => $file, 'chunk_index' => $chunkIdx, 
                         'chunk_hash' => Hash::toBase64(hash('xxh3', $data)), 
                         'data' => base64_encode($data), 'size' => $size
