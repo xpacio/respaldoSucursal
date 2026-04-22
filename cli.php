@@ -132,11 +132,10 @@ class Client {
 
         foreach ($files as $f) {
             $fUpper = strtoupper($f);
-            $srcPath = $source . DIRECTORY_SEPARATOR . $f;
             $dstPath = $work . DIRECTORY_SEPARATOR . $fUpper;
             
-            // Buscar archivo: si no existe con nombre exacto, buscar cualquier variant (minúsculas en Windows)
-            $srcReal = $this->findRealFile($source, $f);
+            // Buscar archivo en mayúsculas o cualquier variant (minúsculas en Windows)
+            $srcReal = $this->findRealFile($source, $fUpper);
             
             if (!$srcReal) {
                 Log::info("File not found: $f (tried: $srcPath)");
@@ -224,7 +223,9 @@ class Client {
     }
 
     private function findRealFile(string $dir, string $filename): ?string {
-        $fullPath = $dir . DIRECTORY_SEPARATOR . $filename;
+        $filenameUpper = strtoupper($filename);
+        $fullPath = $dir . DIRECTORY_SEPARATOR . $filenameUpper;
+        
         if (file_exists($fullPath)) {
             return $fullPath;
         }
