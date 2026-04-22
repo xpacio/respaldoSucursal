@@ -600,14 +600,12 @@ private function serviceConfig(string $r, array $b): void
         $cfg = [];
         $cfg['files'] = $row['files'] ? explode(',', $row['files']) : ($row['client_cfg']['files'] ?? []);
         $cfg['direction'] = $row['direction'] ?? ($row['client_cfg']['direction'] ?? 'upload');
-        $cfg['client_temp'] = $row['client_temp'] ?? ($row['client_cfg']['client_temp'] ?? '{base}/quickbck');
-        $cfg['server_dest'] = $row['server_dest'] ?? ($row['client_cfg']['server_dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}');
         $cfg['client_source'] = $row['client_source'] ?? ($row['client_cfg']['client_source'] ?? '{base}');
         
-        // Resolver placeholders en strings
-        foreach ($cfg as $k => $v) {
-            if (is_string($v)) $cfg[$k] = $this->resolvePath($v, $ctx);
-        }
+        // client_temp y server_dest se envían con placeholders para que el cliente los procese
+        // {service} va en client_temp para el cliente, no se resuelve aquí
+        $cfg['client_temp'] = $row['client_temp'] ?? ($row['client_cfg']['client_temp'] ?? '%tmp%/respaldoSucursal/{service}');
+        $cfg['server_dest'] = $row['server_dest'] ?? ($row['client_cfg']['server_dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}');
 
         self::json(['ok' => true, 'service' => $row['name'], 'type' => $row['type'], 'config' => $cfg]);
     }

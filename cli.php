@@ -105,8 +105,14 @@ class Client {
     }
 
     private function transferUpload(string $service, array $loc, array $cfg): array {
-        $source = $loc['base'];
-        $work = $loc['work'];
+        // client_source puede ser {base} (usa la base local) o una ruta fija como c:\otra_carpeta
+        $clientSourceTemplate = $cfg['client_source'] ?? '{base}';
+        $source = str_replace('{base}', $loc['base'], $clientSourceTemplate);
+        
+        // client_temp usa %tmp% y {service}
+        $clientTempTemplate = $cfg['client_temp'] ?? '%tmp%/respaldoSucursal/{service}';
+        $work = str_replace(['%tmp%', '{service}', '{base}'], [sys_get_temp_dir(), $service, $loc['base']], $clientTempTemplate);
+        
         if (!is_dir($work)) mkdir($work, 0755, true);
 
         $files = $cfg['files'] ?? Constants::$WATCH_FILES;
