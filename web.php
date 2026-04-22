@@ -54,7 +54,7 @@ class AdminUI {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service']) && ($_SESSION['admin_auth'] ?? false)) {
             $id = (int)($_POST['service_id'] ?? 0);
             $name = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['name'] ?? '');
-            $type = preg_replace('/[^a-zA-Z]/', '', $_POST['type'] ?? 'upload');
+            $type = preg_replace('/[^a-zA-Z]/', '', $_POST['type'] ?? 'sync');
             $files = $_POST['files'] ?? '';
             $direction = $_POST['direction'] ?? 'upload';
             $client_temp = $_POST['client_temp'] ?? '%tmp%/respaldoSucursal/{service}';
@@ -253,21 +253,18 @@ class AdminUI {
         $services = $this->db->qa("SELECT * FROM services ORDER BY name");
         
         echo "<div class='card'><table class='table table-striped mb-0'>";
-        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Files</th><th>Direction</th><th>Recursive</th><th>Exclude</th><th>MaxAge</th><th>client_temp</th><th>server_dest</th><th>client_source</th><th>Acciones</th></tr></thead>";
+        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Files</th><th>Recursive</th><th>Exclude</th><th>MaxAge</th><th>Acciones</th></tr></thead>";
         echo "<tbody>";
         foreach ($services as $s) {
-            echo "<tr>";
+echo "<tr>";
             echo "<td>{$s['id']}</td>";
             echo "<td><strong>{$s['name']}</strong></td>";
-            echo "<td>{$s['type']}</td>";
-            echo "<td><small>" . htmlspecialchars(substr($s['files'] ?? '', 0, 50)) . "</small></td>";
-            echo "<td>{$s['direction']}</td>";
+            echo "<td><span class='badge bg-blue-lt'>{$s['type']}</span></td>";
+            echo "<td><span class='badge bg-green-lt'>{$s['direction']}</span></td>";
+            echo "<td><small>" . htmlspecialchars(substr($s['files'] ?? '', 0, 40)) . "</small></td>";
             echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
             echo "<td><small>" . htmlspecialchars($s['exclude'] ?? '') . "</small></td>";
             echo "<td>" . ($s['maxage'] ?? '-') . "</td>";
-            echo "<td><small>" . htmlspecialchars($s['client_temp'] ?? '') . "</small></td>";
-            echo "<td><small>" . htmlspecialchars($s['server_dest'] ?? '') . "</small></td>";
-            echo "<td><small>" . htmlspecialchars($s['client_source'] ?? '') . "</small></td>";
             echo "<td><a href='/services/edit/{$s['id']}' class='btn btn-sm btn-outline-primary'>Editar</a></td>";
             echo "</tr>";
         }
@@ -288,8 +285,17 @@ class AdminUI {
         echo "<input type='hidden' name='service_id' value='{$service['id']}'>";
         
         echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>Nombre</label><input type='text' name='name' class='form-control' value='" . htmlspecialchars($service['name']) . "' required></div>";
-        echo "<div class='col-md-6'><label class='form-label'>Tipo</label><select name='type' class='form-select'><option value='upload'" . ($service['type']==='upload'?' selected':'') . ">Upload</option><option value='download'" . ($service['type']==='download'?' selected':'') . ">Download</option></select></div>";
+        echo "<div class='col-md-4'><label class='form-label'>Nombre</label><input type='text' name='name' class='form-control' value='" . htmlspecialchars($service['name']) . "' required></div>";
+        echo "<div class='col-md-4'><label class='form-label'>Tipo</label><select name='type' class='form-select'>
+            <option value='sync'" . ($service['type']==='sync'?' selected':'') . ">Sync</option>
+            <option value='transfer'" . ($service['type']==='transfer'?' selected':'') . ">Transfer</option>
+            <option value='command'" . ($service['type']==='command'?' selected':'') . ">Command</option>
+            <option value='monitor'" . ($service['type']==='monitor'?' selected':'') . ">Monitor</option>
+        </select></div>";
+        echo "<div class='col-md-4'><label class='form-label'>Direction</label><select name='direction' class='form-select'>
+            <option value='upload'" . ($service['direction']==='upload'?' selected':'') . ">Upload (Cliente → Servidor)</option>
+            <option value='download'" . ($service['direction']==='download'?' selected':'') . ">Download (Servidor → Cliente)</option>
+        </select></div>";
         echo "</div>";
         
         echo "<div class='mb-3'><label class='form-label'>Files (separados por coma)</label><input type='text' name='files' class='form-control' value='" . htmlspecialchars($service['files'] ?? '') . "' placeholder='VENTA.DBF,*.DBF,carpeta/*'></div>";
