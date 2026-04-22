@@ -578,26 +578,37 @@ class Server
         return $tpl;
     }
 
-    private function serviceConfig(string $r, array $b): void
+private function serviceConfig(string $r, array $b): void
     {
         $name = $b['service'] ?? '';
+        
+        // Buscar config en service_config (JSONB) primero, luego en services (columnas)
         $row = $this->db->q(
-            "SELECT CASE 
-                        WHEN cs.config IS NULL OR cs.config = '{}'::jsonb THEN s.default_config 
-                        ELSE cs.config 
-                    END as config, 
-                    COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds, 
-                    s.type, s.name
+            "SELECT s.type, s.name, s.files, s.direction, s.client_temp, s.server_dest, s.client_source,
+                    COALESCE(cs.config, '{}'::jsonb) as client_cfg,
+                    COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds
              FROM service_config cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
             [':r' => $r, ':n' => $name]
         );
         if (!$row) self::err("Service '$name' not configured for $r", 404);
-        $paths = $this->paths($r);
+        
+        $paths = $this->paths($r, $name);
         $ctx = ['rbfid' => $r, 'emp' => $paths['emp'] ?? '_', 'plaza' => $paths['plaza'] ?? '_'];
-        $cfg = json_decode($row['config'] ?? '{}', true) ?: [];
-        foreach ($cfg as $k => $v)
+        
+        // Usar columnas de services (prioridad) o client_cfg (JSONB)
+        $cfg = [];
+        $cfg['files'] = $row['files'] ? explode(',', $row['files']) : ($row['client_cfg']['files'] ?? []);
+        $cfg['direction'] = $row['direction'] ?? ($row['client_cfg']['direction'] ?? 'upload');
+        $cfg['client_temp'] = $row['client_temp'] ?? ($row['client_cfg']['client_temp'] ?? '{base}/quickbck');
+        $cfg['server_dest'] = $row['server_dest'] ?? ($row['client_cfg']['server_dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}');
+        $cfg['client_source'] = $row['client_source'] ?? ($row['client_cfg']['client_source'] ?? '{base}');
+        
+        // Resolver placeholders en strings
+        foreach ($cfg as $k => $v) {
             if (is_string($v)) $cfg[$k] = $this->resolvePath($v, $ctx);
+        }
+
         self::json(['ok' => true, 'service' => $row['name'], 'type' => $row['type'], 'config' => $cfg]);
     }
 
@@ -688,20 +699,13 @@ class Server
         $baseDir = "/srv/qbck/$e/$p/$r";
         
         if ($serviceName) {
-            $svc = $this->db->q("SELECT server_dest, client_temp FROM services WHERE name = :n", [':n' => $serviceName]);
+            $svc = $this->db->q("SELECT server_dest FROM services WHERE name = :n", [':n' => $serviceName]);
             if ($svc && $svc['server_dest']) {
                 $baseDir = $svc['server_dest'];
                 $baseDir = str_replace(['{emp}', '{plaza}', '{rbfid}'], [$e, $p, $r], $baseDir);
             }
-            if ($svc && $svc['client_temp']) {
-                $tempTemplate = $svc['client_temp'];
-                if (str_starts_with($tempTemplate, '%tmp%')) {
-                    $tempTemplate = str_replace('%tmp%', '/tmp', $tempTemplate);
-                    $tempTemplate = str_replace('{base}', "/srv/qbck/$e/$p/$r", $tempTemplate);
-                    $tempTemplate = str_replace('{service}', $serviceName, $tempTemplate);
-                    $workDir = $tempTemplate;
-                }
-            }
+            // Ruta temporal del servidor: /tmp/respaldoSucursal/{rbfid}/{service}
+            $workDir = "/tmp/respaldoSucursal/$r/$serviceName";
         }
         
         return ['emp' => $e, 'plaza' => $p, 'base' => $baseDir, 'work' => $workDir];
