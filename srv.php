@@ -744,12 +744,11 @@ private function serviceConfig(string $r, array $b): void
         $baseDir = "/srv/qbck/$e/$p/$r";
         
         if ($serviceName) {
-            $svc = $this->db->q("SELECT server_dest FROM services WHERE name = :n", [':n' => $serviceName]);
-            if ($svc && $svc['server_dest']) {
-                $baseDir = $svc['server_dest'];
+            $svc = $this->db->q("SELECT dest FROM services WHERE name = :n", [':n' => $serviceName]);
+            if ($svc && $svc['dest']) {
+                $baseDir = $svc['dest'];
                 $baseDir = str_replace(['{emp}', '{plaza}', '{rbfid}'], [$e, $p, $r], $baseDir);
             }
-            // Ruta temporal del servidor: /tmp/respaldoSucursal/{rbfid}/{service}
             $workDir = "/tmp/respaldoSucursal/$r/$serviceName";
         }
         

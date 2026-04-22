@@ -92,7 +92,10 @@ class Client {
             if (!$res['ok']) throw new \Exception($res['error'] ?? 'Config error');
 
             $cfg = $res['config'] ?? [];
-            $data = $this->transferUpload($service, $loc, $cfg);
+            $direction = $cfg['direction'] ?? 'upload';
+            $data = ($direction === 'download') 
+                ? $this->transferDownload($service, $loc, $cfg) 
+                : $this->transferUpload($service, $loc, $cfg);
             
             $finalStatus = (count($data['sync_missing']) > 0) ? 'partial' : 'success';
             if (count($data['sync_ok']) === 0 && count($data['sync_missing']) > 0) $finalStatus = 'failed';
@@ -224,6 +227,128 @@ class Client {
     private function matchMask(string $filename, string $mask): bool {
         $regex = str_replace(['.', '*', '?'], ['\.', '.*', '.'], $mask);
         return preg_match('/^' . $regex . '$/i', $filename);
+    }
+
+    private function transferDownload(string $service, array $loc, array $cfg): array {
+        // En download, source es la carpeta del servidor y dest es donde llegan localmente
+        $sourceTemplate = $cfg['source'] ?? '{base}';
+        $source = str_replace('{base}', $loc['base'], $sourceTemplate);
+        
+        $destTemplate = $cfg['dest'] ?? '{base}';
+        $dest = str_replace('{base}', $loc['base'], $destTemplate);
+        
+        $tempTemplate = $cfg['temp'] ?? '%tmp%/respaldoSucursal/{service}';
+        $work = str_replace(['%tmp%', '{service}', '{base}'], [sys_get_temp_dir(), $service, $loc['base']], $tempTemplate);
+        
+        if (!is_dir($work)) mkdir($work, 0755, true);
+
+        // Listar archivos locales para enviar al servidor
+        $files = $cfg['files'] ?? [];
+        $filesList = is_array($files) ? $files : explode(',', $files);
+        $localFiles = [];
+        
+        foreach ($filesList as $f) {
+            $f = trim($f);
+            if (empty($f) || strpos($f, '*') !== false) continue;
+            
+            $p = $source . DIRECTORY_SEPARATOR . $f;
+            if (file_exists($p)) {
+                $localFiles[] = [
+                    'filename' => strtoupper($f),
+                    'size' => filesize($p),
+                    'hash' => Hash::toBase64(Hash::computeFile($p)),
+                    'mtime' => filemtime($p)
+                ];
+            }
+        }
+        
+        // Solicitar lista de archivos a recibir del servidor
+        Log::info("Requesting download list for service: $service");
+        $res = $this->http->req('download_list', $loc['rbfid'], [
+            'service' => $service,
+            'files' => $localFiles
+        ]);
+        
+        if (!$res['ok']) {
+            Log::error("Download list error: " . ($res['error'] ?? 'Unknown'));
+            return ['files_count' => 0, 'sync_ok' => [], 'sync_missing' => [], 'files_sync' => 0];
+        }
+        
+        $results = [
+            'files_count' => 0,
+            'sync_ok' => [],
+            'sync_missing' => [],
+            'files_sync' => 0
+        ];
+        
+        $filesToReceive = $res['files'] ?? [];
+        Log::info("Files to receive: " . count($filesToReceive));
+        
+        foreach ($filesToReceive as $fInfo) {
+            $filename = $fInfo['filename'] ?? '';
+            $fileSize = (int)($fInfo['size'] ?? 0);
+            
+            if (empty($filename)) continue;
+            
+            // Extraer subcarpeta si existe
+            $parts = explode('/', str_replace('\\', '/', $filename));
+            $fileBaseName = array_pop($parts);
+            $subPath = implode(DIRECTORY_SEPARATOR, $parts);
+            $workFile = $work . DIRECTORY_SEPARATOR . $filename;
+            $destFile = $dest . DIRECTORY_SEPARATOR . $filename;
+            
+            // Crear carpetas
+            if (!is_dir(dirname($workFile))) mkdir(dirname($workFile), 0755, true);
+            
+            Log::info("Downloading file: $filename (" . number_format($fileSize) . " bytes)");
+            
+            // Descargar chunks
+            $chunkSize = \App\Chunk::size($fileSize);
+            $totalChunks = (int)ceil($fileSize / $chunkSize);
+            $allChunks = [];
+            
+            for ($i = 0; $i < $totalChunks; $i++) {
+                $chunkRes = $this->http->req('download_file', $loc['rbfid'], [
+                    'service' => $service,
+                    'filename' => $filename,
+                    'chunk_index' => $i,
+                    'size' => $fileSize
+                ]);
+                
+                if (!($chunkRes['ok'] ?? false)) {
+                    Log::error("Chunk $i download failed for $filename");
+                    break;
+                }
+                
+                $data = base64_decode($chunkRes['data'] ?? '');
+                if (!empty($data)) {
+                    $allChunks[$i] = $data;
+                }
+            }
+            
+            // Ensamblar archivo en temp
+            $fh = fopen($workFile, 'wb');
+            for ($i = 0; $i < $totalChunks; $i++) {
+                if (isset($allChunks[$i])) {
+                    fwrite($fh, $allChunks[$i]);
+                }
+            }
+            fclose($fh);
+            
+            // Mover a destino final
+            if (is_dir(dirname($destFile))) {
+                rename($workFile, $destFile);
+                Log::info("File saved: $destFile");
+                $results['sync_ok'][] = strtoupper($filename);
+                $results['files_sync']++;
+            } else {
+                Log::error("Destination directory not found: " . dirname($destFile));
+            }
+            
+            $results['files_count']++;
+        }
+        
+        return $results;
     }
 
     private function findFileCaseInsensitive(string $dir, string $filename): ?string {
