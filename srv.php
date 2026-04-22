@@ -584,7 +584,7 @@ private function serviceConfig(string $r, array $b): void
         
         // Buscar config en service_config (JSONB) primero, luego en services (columnas)
         $row = $this->db->q(
-            "SELECT s.type, s.name, s.files, s.direction, s.client_temp, s.server_dest, s.client_source, s.recursive, s.exclude, s.maxage,
+            "SELECT s.type, s.name, s.files, s.direction, s.temp, s.dest, s.source, s.recursive, s.exclude, s.maxage,
                     COALESCE(cs.config, '{}'::jsonb) as client_cfg,
                     COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds
              FROM service_config cs JOIN services s ON s.id = cs.service_id
@@ -600,15 +600,15 @@ private function serviceConfig(string $r, array $b): void
         $cfg = [];
         $cfg['files'] = $row['files'] ? explode(',', $row['files']) : ($row['client_cfg']['files'] ?? []);
         $cfg['direction'] = $row['direction'] ?? ($row['client_cfg']['direction'] ?? 'upload');
-        $cfg['client_source'] = $row['client_source'] ?? ($row['client_cfg']['client_source'] ?? '{base}');
+        $cfg['source'] = $row['source'] ?? ($row['client_cfg']['source'] ?? '{base}');
         $cfg['recursive'] = $row['recursive'] ?? ($row['client_cfg']['recursive'] ?? false);
         $cfg['exclude'] = $row['exclude'] ?? ($row['client_cfg']['exclude'] ?? '');
         $cfg['maxage'] = $row['maxage'] ?? ($row['client_cfg']['maxage'] ?? null);
         
-        // client_temp y server_dest se envían con placeholders para que el cliente los procese
-        // {service} va en client_temp para el cliente, no se resuelve aquí
-        $cfg['client_temp'] = $row['client_temp'] ?? ($row['client_cfg']['client_temp'] ?? '%tmp%/respaldoSucursal/{service}');
-        $cfg['server_dest'] = $row['server_dest'] ?? ($row['client_cfg']['server_dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}');
+        // temp y dest se envían con placeholders para que el cliente los procese
+        // {service} va en temp para el cliente, no se resuelve aquí
+        $cfg['temp'] = $row['temp'] ?? ($row['client_cfg']['temp'] ?? '%tmp%/respaldoSucursal/{service}');
+        $cfg['dest'] = $row['dest'] ?? ($row['client_cfg']['dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}');
 
         self::json(['ok' => true, 'service' => $row['name'], 'type' => $row['type'], 'config' => $cfg]);
     }
@@ -624,7 +624,7 @@ private function serviceConfig(string $r, array $b): void
 
         // Obtener config del servicio (nuevas columnas o client_cfg)
         $row = $this->db->q(
-            "SELECT s.files, s.server_dest, s.client_source, s.direction,
+            "SELECT s.files, s.dest, s.source, s.direction,
                     COALESCE(cs.config, '{}'::jsonb) as client_cfg
              FROM service_config cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
@@ -637,8 +637,9 @@ private function serviceConfig(string $r, array $b): void
             self::err("Service '$serviceName' is not configured for download");
         }
         
+        // En download, source es la carpeta del servidor (dest en upload es donde llegan los archivos)
         $sourceDir = $this->resolvePath(
-            $row['client_source'] ?? ($row['client_cfg']['server_source'] ?? "/srv/vales/{emp}/{plaza}/{rbfid}"),
+            $row['source'] ?? ($row['client_cfg']['source'] ?? $row['dest'] ?? "/srv/vales/{emp}/{plaza}/{rbfid}"),
             $ctx
         );
         if (!is_dir($sourceDir)) { self::json(['ok' => true, 'files' => []]); return; }
@@ -691,7 +692,7 @@ private function serviceConfig(string $r, array $b): void
         $ctx = ['rbfid' => $r, 'emp' => $paths['emp'], 'plaza' => $paths['plaza']];
 
         $row = $this->db->q(
-            "SELECT s.server_dest, s.client_source, s.direction,
+            "SELECT s.dest, s.source, s.direction,
                     COALESCE(cs.config, '{}'::jsonb) as client_cfg
              FROM service_config cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
@@ -704,7 +705,7 @@ private function serviceConfig(string $r, array $b): void
         }
         
         $sourceDir = $this->resolvePath(
-            $row['client_source'] ?? ($row['client_cfg']['server_source'] ?? "/srv/vales/{emp}/{plaza}/{rbfid}"),
+            $row['source'] ?? ($row['client_cfg']['source'] ?? $row['dest'] ?? "/srv/vales/{emp}/{plaza}/{rbfid}"),
             $ctx
         );
         $p = $sourceDir . '/' . $filename;

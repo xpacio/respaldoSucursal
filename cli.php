@@ -105,13 +105,13 @@ class Client {
     }
 
     private function transferUpload(string $service, array $loc, array $cfg): array {
-        // client_source puede ser {base} (usa la base local) o una ruta fija como c:\otra_carpeta
-        $clientSourceTemplate = $cfg['client_source'] ?? '{base}';
-        $source = str_replace('{base}', $loc['base'], $clientSourceTemplate);
+        // source puede ser {base} (usa la base local) o una ruta fija como c:\otra_carpeta
+        $sourceTemplate = $cfg['source'] ?? '{base}';
+        $source = str_replace('{base}', $loc['base'], $sourceTemplate);
         
-        // client_temp usa %tmp% y {service}
-        $clientTempTemplate = $cfg['client_temp'] ?? '%tmp%/respaldoSucursal/{service}';
-        $work = str_replace(['%tmp%', '{service}', '{base}'], [sys_get_temp_dir(), $service, $loc['base']], $clientTempTemplate);
+        // temp usa %tmp% y {service}
+        $tempTemplate = $cfg['temp'] ?? '%tmp%/respaldoSucursal/{service}';
+        $work = str_replace(['%tmp%', '{service}', '{base}'], [sys_get_temp_dir(), $service, $loc['base']], $tempTemplate);
         
         // Crear directorio temporal si no existe
         if (!is_dir($work)) mkdir($work, 0755, true);

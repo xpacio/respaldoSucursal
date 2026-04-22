@@ -57,19 +57,19 @@ class AdminUI {
             $type = preg_replace('/[^a-zA-Z]/', '', $_POST['type'] ?? 'sync');
             $files = $_POST['files'] ?? '';
             $direction = $_POST['direction'] ?? 'upload';
-            $client_temp = $_POST['client_temp'] ?? '%tmp%/respaldoSucursal/{service}';
-            $server_dest = $_POST['server_dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}';
-            $client_source = $_POST['client_source'] ?? '{base}';
+            $temp = $_POST['temp'] ?? '%tmp%/respaldoSucursal/{service}';
+            $dest = $_POST['dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}';
+            $source = $_POST['source'] ?? '{base}';
             $recursive = isset($_POST['recursive']) ? 'true' : 'false';
             $exclude = $_POST['exclude'] ?? '';
             $maxage = (int)($_POST['maxage'] ?? 0) ?: 'NULL';
             
             if ($id > 0) {
-                $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, client_temp=:ct, server_dest=:sd, client_source=:cs, recursive=:r, exclude=:e, maxage=:m WHERE id=:id", 
-                    [':id'=>$id, ':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':ct'=>$client_temp, ':sd'=>$server_dest, ':cs'=>$client_source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage]);
+                $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, temp=:temp, dest=:dest, source=:source, recursive=:r, exclude=:e, maxage=:m WHERE id=:id", 
+                    [':id'=>$id, ':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage]);
             } else {
-                $this->db->exec("INSERT INTO services (name, type, files, direction, client_temp, server_dest, client_source, recursive, exclude, maxage) VALUES (:n, :t, :f, :d, :ct, :sd, :cs, :r, :e, :m)", 
-                    [':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':ct'=>$client_temp, ':sd'=>$server_dest, ':cs'=>$client_source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage]);
+                $this->db->exec("INSERT INTO services (name, type, files, direction, temp, dest, source, recursive, exclude, maxage) VALUES (:n, :t, :f, :d, :temp, :dest, :source, :r, :e, :m)", 
+                    [':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage]);
             }
             header("Location: /services");
             exit;
@@ -262,7 +262,7 @@ echo "<tr>";
             echo "<td><span class='badge bg-blue-lt'>{$s['type']}</span></td>";
             echo "<td><span class='badge bg-green-lt'>{$s['direction']}</span></td>";
             echo "<td><small>" . htmlspecialchars(substr($s['files'] ?? '', 0, 40)) . "</small></td>";
-            echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
+echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
             echo "<td><small>" . htmlspecialchars($s['exclude'] ?? '') . "</small></td>";
             echo "<td>" . ($s['maxage'] ?? '-') . "</td>";
             echo "<td><a href='/services/edit/{$s['id']}' class='btn btn-sm btn-outline-primary'>Editar</a></td>";
@@ -272,7 +272,7 @@ echo "<tr>";
     }
 
     private function editService(int $id): void {
-        $service = ['id'=>0, 'name'=>'', 'type'=>'upload', 'files'=>'', 'direction'=>'upload', 'client_temp'=>'%tmp%/respaldoSucursal/{service}', 'server_dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'client_source'=>'{base}', 'recursive'=>'f', 'exclude'=>'', 'maxage'=>null];
+        $service = ['id'=>0, 'name'=>'', 'type'=>'sync', 'files'=>'', 'direction'=>'upload', 'temp'=>'%tmp%/respaldoSucursal/{service}', 'dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'source'=>'{base}', 'recursive'=>'f', 'exclude'=>'', 'maxage'=>null];
         if ($id > 0) {
             $row = $this->db->q("SELECT * FROM services WHERE id=:id", [':id'=>$id]);
             if ($row) $service = array_merge($service, $row);
@@ -301,13 +301,11 @@ echo "<tr>";
         echo "<div class='mb-3'><label class='form-label'>Files (separados por coma)</label><input type='text' name='files' class='form-control' value='" . htmlspecialchars($service['files'] ?? '') . "' placeholder='VENTA.DBF,*.DBF,carpeta/*'></div>";
         
         echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>Direction</label><select name='direction' class='form-select'><option value='upload'" . ($service['direction']==='upload'?' selected':'') . ">Upload</option><option value='download'" . ($service['direction']==='download'?' selected':'') . ">Download</option></select></div>";
-        echo "<div class='col-md-6'><label class='form-label'>Client Source</label><input type='text' name='client_source' class='form-control' value='" . htmlspecialchars($service['client_source'] ?? '{base}') . "' placeholder='{base}'></div>";
+        echo "<div class='col-md-6'><label class='form-label'>Source (carpeta origen)</label><input type='text' name='source' class='form-control' value='" . htmlspecialchars($service['source'] ?? '{base}') . "' placeholder='{base}'></div>";
+        echo "<div class='col-md-6'><label class='form-label'>Temp (carpeta temporal)</label><input type='text' name='temp' class='form-control' value='" . htmlspecialchars($service['temp'] ?? '%tmp%/respaldoSucursal/{service}') . "' placeholder='%tmp%/respaldoSucursal/{service}'></div>";
         echo "</div>";
         
-        echo "<div class='mb-3'><label class='form-label'>Client Temp</label><input type='text' name='client_temp' class='form-control' value='" . htmlspecialchars($service['client_temp'] ?? '%tmp%/respaldoSucursal/{service}') . "' placeholder='%tmp%/respaldoSucursal/{service}'></div>";
-        
-        echo "<div class='mb-3'><label class='form-label'>Server Dest</label><input type='text' name='server_dest' class='form-control' value='" . htmlspecialchars($service['server_dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}') . "'></div>";
+        echo "<div class='mb-3'><label class='form-label'>Dest (carpeta destino)</label><input type='text' name='dest' class='form-control' value='" . htmlspecialchars($service['dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}') . "'></div>";
         
         echo "<div class='row mb-3'>";
         echo "<div class='col-md-4'><div class='form-check'><input type='checkbox' name='recursive' class='form-check-input' id='recursive'" . ($service['recursive']==='t'|| $service['recursive']===true?' checked':'') . "><label class='form-check-label' for='recursive'>Recursive</label></div></div>";
