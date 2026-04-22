@@ -49,6 +49,31 @@ class AdminUI {
             header("Location: /table/$tbl");
             exit;
         }
+        
+        // Guardar servicio (Solo usuarios autenticados)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service']) && ($_SESSION['admin_auth'] ?? false)) {
+            $id = (int)($_POST['service_id'] ?? 0);
+            $name = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['name'] ?? '');
+            $type = preg_replace('/[^a-zA-Z]/', '', $_POST['type'] ?? 'upload');
+            $files = $_POST['files'] ?? '';
+            $direction = $_POST['direction'] ?? 'upload';
+            $client_temp = $_POST['client_temp'] ?? '%tmp%/respaldoSucursal/{service}';
+            $server_dest = $_POST['server_dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}';
+            $client_source = $_POST['client_source'] ?? '{base}';
+            $recursive = isset($_POST['recursive']) ? 'true' : 'false';
+            $exclude = $_POST['exclude'] ?? '';
+            $maxage = (int)($_POST['maxage'] ?? 0) ?: 'NULL';
+            
+            if ($id > 0) {
+                $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, client_temp=:ct, server_dest=:sd, client_source=:cs, recursive=:r, exclude=:e, maxage=:m WHERE id=:id", 
+                    [':id'=>$id, ':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':ct'=>$client_temp, ':sd'=>$server_dest, ':cs'=>$client_source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage]);
+            } else {
+                $this->db->exec("INSERT INTO services (name, type, files, direction, client_temp, server_dest, client_source, recursive, exclude, maxage) VALUES (:n, :t, :f, :d, :ct, :sd, :cs, :r, :e, :m)", 
+                    [':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':ct'=>$client_temp, ':sd'=>$server_dest, ':cs'=>$client_source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage]);
+            }
+            header("Location: /services");
+            exit;
+        }
     }
 
     private function renderLogin(): void {
@@ -104,6 +129,7 @@ class AdminUI {
                     <?php if ($_SESSION['admin_auth'] ?? false): ?>
                     <div class="navbar-nav flex-row-order-md-last">
                         <a href="/" class="nav-link">Tablas</a>
+                        <a href="/services" class="nav-link">Servicios</a>
                         <a href="/logs" class="nav-link">Logs</a>
                         <a href="/?logout=1" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v7a2 2 0 0 0 2 2h7"/><path d="M9 12h12"/><path d="M12 15l3 -3"/><path d="M21 12a9 9 0 1 1 -18 0 9 9 0 0 1 18 0z"/></svg>
@@ -119,6 +145,8 @@ class AdminUI {
                 if (!($_SESSION['admin_auth'] ?? false)) $this->renderLogin();
                 elseif ($this->action === 'table') $this->viewTable($this->target);
                 elseif ($this->action === 'logs') $this->viewLogs();
+                elseif ($this->action === 'services' && in_array($this->target, ['new', 'edit'])) $this->editService((int)explode('/', $this->target)[1] ?? 0);
+                elseif ($this->action === 'services') $this->viewServices();
                 else $this->dashboard();
                 ?>
                 </div>
@@ -214,6 +242,78 @@ class AdminUI {
         }
         
         echo '</div></div></div>';
+    }
+
+    private function viewServices(): void {
+        echo "<h3>Servicios</h3>";
+        echo "<div class='mb-3'>";
+        echo "<a href='/services/new' class='btn btn-primary'>Nuevo Servicio</a>";
+        echo "</div>";
+        
+        $services = $this->db->qa("SELECT * FROM services ORDER BY name");
+        
+        echo "<div class='card'><table class='table table-striped mb-0'>";
+        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Files</th><th>Direction</th><th>Recursive</th><th>Exclude</th><th>MaxAge</th><th>client_temp</th><th>server_dest</th><th>client_source</th><th>Acciones</th></tr></thead>";
+        echo "<tbody>";
+        foreach ($services as $s) {
+            echo "<tr>";
+            echo "<td>{$s['id']}</td>";
+            echo "<td><strong>{$s['name']}</strong></td>";
+            echo "<td>{$s['type']}</td>";
+            echo "<td><small>" . htmlspecialchars(substr($s['files'] ?? '', 0, 50)) . "</small></td>";
+            echo "<td>{$s['direction']}</td>";
+            echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
+            echo "<td><small>" . htmlspecialchars($s['exclude'] ?? '') . "</small></td>";
+            echo "<td>" . ($s['maxage'] ?? '-') . "</td>";
+            echo "<td><small>" . htmlspecialchars($s['client_temp'] ?? '') . "</small></td>";
+            echo "<td><small>" . htmlspecialchars($s['server_dest'] ?? '') . "</small></td>";
+            echo "<td><small>" . htmlspecialchars($s['client_source'] ?? '') . "</small></td>";
+            echo "<td><a href='/services/edit/{$s['id']}' class='btn btn-sm btn-outline-primary'>Editar</a></td>";
+            echo "</tr>";
+        }
+        echo "</tbody></table></div>";
+    }
+
+    private function editService(int $id): void {
+        $service = ['id'=>0, 'name'=>'', 'type'=>'upload', 'files'=>'', 'direction'=>'upload', 'client_temp'=>'%tmp%/respaldoSucursal/{service}', 'server_dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'client_source'=>'{base}', 'recursive'=>'f', 'exclude'=>'', 'maxage'=>null];
+        if ($id > 0) {
+            $row = $this->db->q("SELECT * FROM services WHERE id=:id", [':id'=>$id]);
+            if ($row) $service = array_merge($service, $row);
+        }
+        
+        echo "<h3>" . ($id > 0 ? "Editar" : "Nuevo") . " Servicio</h3>";
+        echo "<div class='card mb-3'><div class='card-body'>";
+        echo "<form method='post'>";
+        echo "<input type='hidden' name='save_service' value='1'>";
+        echo "<input type='hidden' name='service_id' value='{$service['id']}'>";
+        
+        echo "<div class='row mb-3'>";
+        echo "<div class='col-md-6'><label class='form-label'>Nombre</label><input type='text' name='name' class='form-control' value='" . htmlspecialchars($service['name']) . "' required></div>";
+        echo "<div class='col-md-6'><label class='form-label'>Tipo</label><select name='type' class='form-select'><option value='upload'" . ($service['type']==='upload'?' selected':'') . ">Upload</option><option value='download'" . ($service['type']==='download'?' selected':'') . ">Download</option></select></div>";
+        echo "</div>";
+        
+        echo "<div class='mb-3'><label class='form-label'>Files (separados por coma)</label><input type='text' name='files' class='form-control' value='" . htmlspecialchars($service['files'] ?? '') . "' placeholder='VENTA.DBF,*.DBF,carpeta/*'></div>";
+        
+        echo "<div class='row mb-3'>";
+        echo "<div class='col-md-6'><label class='form-label'>Direction</label><select name='direction' class='form-select'><option value='upload'" . ($service['direction']==='upload'?' selected':'') . ">Upload</option><option value='download'" . ($service['direction']==='download'?' selected':'') . ">Download</option></select></div>";
+        echo "<div class='col-md-6'><label class='form-label'>Client Source</label><input type='text' name='client_source' class='form-control' value='" . htmlspecialchars($service['client_source'] ?? '{base}') . "' placeholder='{base}'></div>";
+        echo "</div>";
+        
+        echo "<div class='mb-3'><label class='form-label'>Client Temp</label><input type='text' name='client_temp' class='form-control' value='" . htmlspecialchars($service['client_temp'] ?? '%tmp%/respaldoSucursal/{service}') . "' placeholder='%tmp%/respaldoSucursal/{service}'></div>";
+        
+        echo "<div class='mb-3'><label class='form-label'>Server Dest</label><input type='text' name='server_dest' class='form-control' value='" . htmlspecialchars($service['server_dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}') . "'></div>";
+        
+        echo "<div class='row mb-3'>";
+        echo "<div class='col-md-4'><div class='form-check'><input type='checkbox' name='recursive' class='form-check-input' id='recursive'" . ($service['recursive']==='t'|| $service['recursive']===true?' checked':'') . "><label class='form-check-label' for='recursive'>Recursive</label></div></div>";
+        echo "<div class='col-md-4'><label class='form-label'>Exclude (máscaras)</label><input type='text' name='exclude' class='form-control' value='" . htmlspecialchars($service['exclude'] ?? '') . "' placeholder='*.log,*2025*'></div>";
+        echo "<div class='col-md-4'><label class='form-label'>MaxAge (días)</label><input type='number' name='maxage' class='form-control' value='" . htmlspecialchars($service['maxage'] ?? '') . "' placeholder='30'></div>";
+        echo "</div>";
+        
+        echo "<div class='mb-3'>";
+        echo "<button type='submit' class='btn btn-primary'>Guardar</button>";
+        echo "<a href='/services' class='btn btn-secondary ms-2'>Cancelar</a>";
+        echo "</div>";
+        echo "</form></div></div>";
     }
 
 }
