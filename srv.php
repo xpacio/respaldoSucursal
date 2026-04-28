@@ -43,11 +43,11 @@ class Server
         
         Log::add("Action: [$action] | RBFID: " . ($rbfid ?: 'none') . " | Path: $path");
 
-        if ($action !== 'health' && (empty($rbfid) || empty($token))) {
+        if ($action !== 'health' && $action !== 'download' && (empty($rbfid) || empty($token))) {
             Log::error("Auth failed: Missing RBFID or Token");
             self::err('Auth required', 401);
         }
-        if ($action !== 'health' && !Totp::verify($this->db, $rbfid, $token)) {
+        if ($action !== 'health' && $action !== 'download' && !Totp::verify($this->db, $rbfid, $token)) {
             Log::error("Auth failed: Invalid TOTP token for $rbfid");
             self::err('Token dinamico invalido', 401);
         }
@@ -171,16 +171,12 @@ class Server
                     // OPTIMIZACIÓN: Si tenemos archivo existente, comparar chunks individualmente
                     $pendingChunks = (int)$cnt; // Por defecto, todos pendientes
                     $firstPendingChunk = 0;
-                    $chunkSize = \App\Chunk::size($fileSize);
-                    
-                    if ($hasExistingFile && file_exists($workFile)) {
-                        $fh_truncate = fopen($workFile, 'r+b');
-                        if ($fh_truncate) {
-                            ftruncate($fh_truncate, $fileSize);
-                            fclose($fh_truncate);
-                        }
-
-                        $chunkSize = \App\Chunk::size($fileSize);
+if ($hasExistingFile && file_exists($workFile)) {
+                            $fh_truncate = fopen($workFile, 'r+b');
+                            if ($fh_truncate) {
+                                ftruncate($fh_truncate, $fileSize);
+                                fclose($fh_truncate);
+                            }
                         $pendingChunks = 0;
                         $firstPendingChunk = null;
                         

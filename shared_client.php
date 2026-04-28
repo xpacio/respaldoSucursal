@@ -26,7 +26,7 @@ class Platform
 
     public static function scanDisk(): array {
         $locs = [];
-        $drives = self::isWindows() ? ['C','D','E','F','G'] : ['/mnt','/media'];
+        $drives = self::isWindows() ? ['C','D','E','F','G'] : ['/mnt','/media','/srv'];
         foreach ($drives as $d) {
             $base = self::isWindows() ? "$d:\\pvsi" : "$d/pvsi";
             if (!is_dir($base)) continue;
