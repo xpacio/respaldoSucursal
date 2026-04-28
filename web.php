@@ -66,13 +66,14 @@ class AdminUI {
             $description = $_POST['description'] ?? '';
             $defaultConfig = '{}';
             $defaultFrequency = 300;
+            $enabled = isset($_POST['enabled']) ? 'true' : 'false';
             
             if ($id > 0) {
-                $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, temp=:temp, dest=:dest, source=:source, recursive=:r, exclude=:e, maxage=:m, description=:desc WHERE id=:id", 
-                    [':id'=>$id, ':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage, ':desc'=>$description]);
+                $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, temp=:temp, dest=:dest, source=:source, recursive=:r, exclude=:e, maxage=:m, description=:desc, enabled=:en WHERE id=:id", 
+                    [':id'=>$id, ':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage, ':desc'=>$description, ':en'=>$enabled]);
             } else {
-                $this->db->exec("INSERT INTO services (name, type, files, direction, temp, dest, source, recursive, exclude, maxage, description, default_config, default_frequency_seconds) VALUES (:n, :t, :f, :d, :temp, :dest, :source, :r, :e, :m, :desc, :cfg, :freq)", 
-                    [':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage, ':desc'=>$description, ':cfg'=>$defaultConfig, ':freq'=>$defaultFrequency]);
+                $this->db->exec("INSERT INTO services (name, type, files, direction, temp, dest, source, recursive, exclude, maxage, description, default_config, default_frequency_seconds, enabled) VALUES (:n, :t, :f, :d, :temp, :dest, :source, :r, :e, :m, :desc, :cfg, :freq, :en)", 
+                    [':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage, ':desc'=>$description, ':cfg'=>$defaultConfig, ':freq'=>$defaultFrequency, ':en'=>$enabled]);
             }
             header("Location: /services");
             exit;
@@ -290,7 +291,7 @@ echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
     }
 
     private function editService(int $id): void {
-        $service = ['id'=>0, 'name'=>'', 'type'=>'sync', 'files'=>'', 'direction'=>'upload', 'temp'=>'%tmp%/respaldoSucursal/{service}', 'dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'source'=>'{base}', 'recursive'=>'f', 'exclude'=>'', 'maxage'=>null, 'description'=>''];
+        $service = ['id'=>0, 'name'=>'', 'type'=>'sync', 'files'=>'', 'direction'=>'upload', 'temp'=>'%tmp%/respaldoSucursal/{service}', 'dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'source'=>'{base}', 'recursive'=>false, 'exclude'=>'', 'maxage'=>null, 'description'=>'', 'enabled'=>true];
         if ($id > 0) {
             $row = $this->db->q("SELECT * FROM services WHERE id=:id", [':id'=>$id]);
             if ($row) $service = array_merge($service, $row);
@@ -328,7 +329,8 @@ echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
         echo "<div class='mb-3'><label class='form-label'>Dest (carpeta destino)</label><input type='text' name='dest' class='form-control' value='" . htmlspecialchars($service['dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}') . "'></div>";
         
         echo "<div class='row mb-3'>";
-        echo "<div class='col-md-4'><div class='form-check'><input type='checkbox' name='recursive' class='form-check-input' id='recursive'" . ($service['recursive']==='t'|| $service['recursive']===true?' checked':'') . "><label class='form-check-label' for='recursive'>Recursive</label></div></div>";
+        echo "<div class='col-md-4'><div class='form-check'><input type='checkbox' name='recursive' class='form-check-input' id='recursive'" . ($service['recursive']===true || $service['recursive']==='t'?' checked':'') . "><label class='form-check-label' for='recursive'>Recursive</label></div>";
+        echo "<div class='form-check'><input type='checkbox' name='enabled' class='form-check-input' id='enabled'" . ($service['enabled']===true || $service['enabled']==='t'?' checked':'') . "><label class='form-check-label' for='enabled'>Enabled</label></div></div>";
         echo "<div class='col-md-4'><label class='form-label'>Exclude (máscaras)</label><input type='text' name='exclude' class='form-control' value='" . htmlspecialchars($service['exclude'] ?? '') . "' placeholder='*.log,*2025*'></div>";
         echo "<div class='col-md-4'><label class='form-label'>MaxAge (días)</label><input type='number' name='maxage' class='form-control' value='" . htmlspecialchars($service['maxage'] ?? '') . "' placeholder='30'></div>";
         echo "</div>";
