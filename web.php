@@ -60,9 +60,9 @@ class AdminUI {
             $temp = $_POST['temp'] ?? '%tmp%/respaldoSucursal/{service}';
             $dest = $_POST['dest'] ?? '/srv/qbck/{emp}/{plaza}/{rbfid}';
             $source = $_POST['source'] ?? '{base}';
-            $recursive = isset($_POST['recursive']) ? 'true' : 'false';
+            $recursive = isset($_POST['recursive']) ? 't' : 'f';
             $exclude = $_POST['exclude'] ?? '';
-            $maxage = (int)($_POST['maxage'] ?? 0) ?: 'NULL';
+            $maxage = ($_POST['maxage'] ?? '') !== '' ? (int)$_POST['maxage'] : null;
             
             if ($id > 0) {
                 $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, temp=:temp, dest=:dest, source=:source, recursive=:r, exclude=:e, maxage=:m WHERE id=:id", 
@@ -145,7 +145,8 @@ class AdminUI {
                 if (!($_SESSION['admin_auth'] ?? false)) $this->renderLogin();
                 elseif ($this->action === 'table') $this->viewTable($this->target);
                 elseif ($this->action === 'logs') $this->viewLogs();
-                elseif ($this->action === 'services' && in_array($this->target, ['new', 'edit'])) $this->editService((int)explode('/', $this->target)[1] ?? 0);
+                elseif ($this->action === 'services' && str_starts_with($this->target, 'edit/')) $this->editService((int)(explode('/', $this->target)[1] ?? 0));
+                elseif ($this->action === 'services' && $this->target === 'new') $this->editService(0);
                 elseif ($this->action === 'services') $this->viewServices();
                 else $this->dashboard();
                 ?>
