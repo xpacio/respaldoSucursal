@@ -266,7 +266,7 @@ class AdminUI {
 private function viewServices(): void {
         
         echo "<div class='card'><table class='table table-striped mb-0'>";
-        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Files</th><th>Recursive</th><th>Exclude</th><th>MaxAge</th><th>Acciones</th></tr></thead>";
+        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Files</th><th>Recursive</th><th>Enabled</th><th>Acciones</th></tr></thead>";
         echo "<tbody>";
         $services = $this->db->qa("SELECT * FROM services ORDER BY name");
         foreach ($services as $s) {
@@ -276,9 +276,8 @@ echo "<tr>";
             echo "<td>" . $this->iconType($s['type']) . "</td>";
             echo "<td>" . $this->iconDirection($s['direction']) . "</td>";
             echo "<td><small>" . htmlspecialchars(substr($s['files'] ?? '', 0, 40)) . "</small></td>";
-echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
-            echo "<td><small>" . htmlspecialchars($s['exclude'] ?? '') . "</small></td>";
-            echo "<td>" . ($s['maxage'] ?? '-') . "</td>";
+            echo "<td>" . $this->iconRecursive($s['recursive']) . "</td>";
+            echo "<td>" . $this->iconEnabled($s['enabled']) . "</td>";
             echo "<td><a href='/services/edit/{$s['id']}' class='btn btn-sm btn-outline-primary'>Editar</a></td>";
             echo "</tr>";
         }
@@ -305,6 +304,20 @@ echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
         ];
         $icon = $icons[$direction] ?? '<span class="text-muted">?</span>';
         return "$icon <span class='ms-1'>{$direction}</span>";
+    }
+
+    private function iconRecursive(?bool $recursive): string {
+        if ($recursive === true) {
+            return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-primary"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 3h3l2 2h5a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" /><path d="M17 16v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h2" /></svg>';
+        }
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-muted"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2" /></svg>';
+    }
+
+    private function iconEnabled(?bool $enabled): string {
+        if ($enabled === true) {
+            return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-success"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>';
+        }
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-danger"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 10h.01" /><path d="M15 10h.01" /><path d="M9.5 15.5a3.5 3.5 0 0 0 5 0" /></svg>';
     }
 
     private function editService(int $id): void {
