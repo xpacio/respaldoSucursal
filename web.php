@@ -304,8 +304,6 @@ echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
         $icon = $icons[$direction] ?? '<span class="text-muted">?</span>';
         return "$icon <span class='ms-1'>{$direction}</span>";
     }
-        echo "</tbody></table></div>";
-    }
 
     private function editService(int $id): void {
         $service = ['id'=>0, 'name'=>'', 'type'=>'sync', 'files'=>'', 'direction'=>'upload', 'temp'=>'%tmp%/respaldoSucursal/{service}', 'dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'source'=>'{base}', 'recursive'=>false, 'exclude'=>'', 'maxage'=>null, 'description'=>'', 'enabled'=>true];
