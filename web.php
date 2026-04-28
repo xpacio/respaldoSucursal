@@ -263,23 +263,18 @@ class AdminUI {
         echo '</div></div></div>';
     }
 
-    private function viewServices(): void {
-        echo "<h3>Servicios</h3>";
-        echo "<div class='mb-3'>";
-        echo "<a href='/services/new' class='btn btn-primary'>Nuevo Servicio</a>";
-        echo "</div>";
-        
-        $services = $this->db->qa("SELECT * FROM services ORDER BY name");
+private function viewServices(): void {
         
         echo "<div class='card'><table class='table table-striped mb-0'>";
         echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Files</th><th>Recursive</th><th>Exclude</th><th>MaxAge</th><th>Acciones</th></tr></thead>";
         echo "<tbody>";
+        $services = $this->db->qa("SELECT * FROM services ORDER BY name");
         foreach ($services as $s) {
 echo "<tr>";
             echo "<td>{$s['id']}</td>";
             echo "<td><strong>{$s['name']}</strong></td>";
-            echo "<td><span class='badge bg-blue-lt'>{$s['type']}</span></td>";
-            echo "<td><span class='badge bg-green-lt'>{$s['direction']}</span></td>";
+            echo "<td>" . $this->iconType($s['type']) . "</td>";
+            echo "<td>" . $this->iconDirection($s['direction']) . "</td>";
             echo "<td><small>" . htmlspecialchars(substr($s['files'] ?? '', 0, 40)) . "</small></td>";
 echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
             echo "<td><small>" . htmlspecialchars($s['exclude'] ?? '') . "</small></td>";
@@ -287,6 +282,28 @@ echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
             echo "<td><a href='/services/edit/{$s['id']}' class='btn btn-sm btn-outline-primary'>Editar</a></td>";
             echo "</tr>";
         }
+        echo "</tbody></table></div>";
+    }
+
+    private function iconType(string $type): string {
+        $icons = [
+            'sync' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-info"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>',
+            'monitor' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-danger"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 5a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1l0 -10" /><path d="M7 20h10" /><path d="M9 16v4" /><path d="M15 16v4" /><path d="M7 10h2l2 3l2 -6l1 3h3" /></svg>',
+            'download' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-warning"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 12h-3.586a1 1 0 0 1 -.707 -1.707l6.586 -6.586a1 1 0 0 1 1.414 0l6.586 6.586a1 1 0 0 1 -.707 1.707h-3.586v3h-6v-3" /><path d="M9 21h6" /><path d="M9 18h6" /></svg>',
+            'upload' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-success"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 12h-3.586a1 1 0 0 1 -.707 -1.707l6.586 -6.586a1 1 0 0 1 1.414 0l6.586 6.586a1 1 0 0 1 -.707 1.707h-3.586v3h-6v-3" /><path d="M9 21h6" /><path d="M9 18h6" /></svg>',
+        ];
+        $icon = $icons[$type] ?? '<span class="text-muted">?</span>';
+        return "$icon <span class='ms-1'>{$type}</span>";
+    }
+
+    private function iconDirection(string $direction): string {
+        $icons = [
+            'upload' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-success"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 3h1a1 1 0 0 1 1 1v2h3v-2a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2h3v-2a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1v4.394a2 2 0 0 1 -.336 1.11l-1.328 1.992a2 2 0 0 0 -.336 1.11v7.394a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-7.394a2 2 0 0 0 -.336 -1.11l-1.328 -1.992a2 2 0 0 1 -.336 -1.11v-4.394a1 1 0 0 1 1 -1" /><path d="M10 21v-5a2 2 0 1 1 4 0v5" /></svg>',
+            'download' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-warning"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 21l18 0" /><path d="M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2 -4h14l2 4" /><path d="M5 21l0 -10.15" /><path d="M19 21l0 -10.15" /><path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4" /></svg>',
+        ];
+        $icon = $icons[$direction] ?? '<span class="text-muted">?</span>';
+        return "$icon <span class='ms-1'>{$direction}</span>";
+    }
         echo "</tbody></table></div>";
     }
 
