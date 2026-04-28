@@ -116,23 +116,38 @@ class Client {
         if (!$loc) return;
 
         try {
-            Log::info("Service Start: $service ($rbfid)");
+            Log::info("=== Service Start: $service ($rbfid) ===");
             $res = $this->http->req('service_config', $rbfid, ['service' => $service]);
             if (!$res['ok']) throw new \Exception($res['error'] ?? 'Config error');
 
             $cfg = $res['config'] ?? [];
             $direction = $cfg['direction'] ?? 'upload';
+            
+            Log::info("[DEBUG] Service Config: direction=$direction, source=" . ($cfg['source'] ?? '{base}') . 
+                ", temp=" . ($cfg['temp'] ?? '%tmp%') . ", files=" . json_encode($cfg['files'] ?? []) . 
+                ", recursive=" . ($cfg['recursive'] ?? false ? 'true' : 'false') . 
+                ", exclude=" . ($cfg['exclude'] ?? '') . ", maxage=" . ($cfg['maxage'] ?? 'null'));
             $data = ($direction === 'download') 
                 ? $this->transferDownload($service, $loc, $cfg) 
                 : $this->transferUpload($service, $loc, $cfg);
             
             $finalStatus = (count($data['sync_missing']) > 0) ? 'partial' : 'success';
             if (count($data['sync_ok']) === 0 && count($data['sync_missing']) > 0) $finalStatus = 'failed';
+            
+            Log::info("[RESULT] files_count=" . $data['files_count'] . 
+                ", sync_ok=" . count($data['sync_ok']) . 
+                ", sync_missing=" . count($data['sync_missing']) . 
+                ", sync_excluded=" . count($data['sync_excluded'] ?? []) . 
+                ", files_sync=" . $data['files_sync']);
+            if (!empty($data['sync_ok'])) Log::info("[OK] " . implode(', ', $data['sync_ok']));
+            if (!empty($data['sync_missing'])) Log::warn("[MISSING] " . implode(', ', $data['sync_missing']));
 
             $this->http->req('service_result', $rbfid, [
                 'service' => $service, 'status' => $finalStatus, 'results' => $data,
                 'execution_time_ms' => (int)((microtime(true) - $start) * 1000)
             ]);
+            
+            Log::info("=== Service End: $service | Status: $finalStatus ===");
         } catch (\Throwable $e) { Log::error("Service Error ($service): " . $e->getMessage()); }
     }
 
@@ -160,6 +175,10 @@ class Client {
         $maxage = $cfg['maxage'] ?? null;
         $files = $cfg['files'] ?? Constants::$WATCH_FILES;
         $filesList = is_array($files) ? $files : explode(',', $files);
+        
+        Log::info("[UPLOAD] Source: $source, Work: $work, Recursive: " . ($recursive ? 'yes' : 'no') . 
+            ", Exclude: " . ($excludeMasks ?: 'none') . ", MaxAge: " . ($maxage ?? 'none') . 
+            ", Files(" . count($filesList) . "): " . implode(', ', array_map('trim', $filesList)));
         
         $results = [
             'files_count' => 0,
@@ -270,6 +289,8 @@ class Client {
         $work = str_replace(['%tmp%', '{service}', '{base}'], [sys_get_temp_dir(), $service, $loc['base']], $tempTemplate);
         
         if (!is_dir($work)) mkdir($work, 0755, true);
+
+        Log::info("[DOWNLOAD] Source: $source, Dest: $dest, Work: $work");
 
         // Listar archivos locales para enviar al servidor
         $files = $cfg['files'] ?? [];
