@@ -142,13 +142,27 @@ class AdminUI {
             <div class="page-body">
                 <div class="container-xl">
                 <?php
-                if (!($_SESSION['admin_auth'] ?? false)) $this->renderLogin();
-                elseif ($this->action === 'table') $this->viewTable($this->target);
-                elseif ($this->action === 'logs') $this->viewLogs();
-                elseif ($this->action === 'services' && str_starts_with($this->target, 'edit/')) $this->editService((int)(explode('/', $this->target)[1] ?? 0));
-                elseif ($this->action === 'services' && $this->target === 'new') $this->editService(0);
-                elseif ($this->action === 'services') $this->viewServices();
-                else $this->dashboard();
+                if (!($_SESSION['admin_auth'] ?? false)) {
+                    $this->renderLogin();
+                } elseif ($this->action === 'table') {
+                    $this->viewTable($this->target);
+                } elseif ($this->action === 'logs') {
+                    $this->viewLogs();
+                } else {
+                    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+                    $uriParts = explode('/', trim($uri, '/'));
+                    $serviceId = ($this->action === 'services' && $this->target === 'edit' && isset($uriParts[2])) ? (int)$uriParts[2] : 0;
+                    
+                    if ($this->action === 'services' && $serviceId > 0) {
+                        $this->editService($serviceId);
+                    } elseif ($this->action === 'services' && $this->target === 'new') {
+                        $this->editService(0);
+                    } elseif ($this->action === 'services') {
+                        $this->viewServices();
+                    } else {
+                        $this->dashboard();
+                    }
+                }
                 ?>
                 </div>
             </div>
