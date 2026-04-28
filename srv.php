@@ -118,6 +118,13 @@ class Server
             Log::info("Sync: Using paths - work: {$paths['work']}, base: {$paths['base']}, service: $serviceName");
             $needs = [];
             
+            // Debug: mostrar tamaño de archivo recibido
+            $debugSizes = [];
+            foreach ($b['files'] ?? [] as $f) {
+                $debugSizes[] = ($f['filename'] ?? '?') . '=' . ($f['size'] ?? 0);
+            }
+            Log::debug("Sync: File sizes from client: " . implode(', ', $debugSizes));
+            
             foreach ($b['files'] ?? [] as $f) {
                 $name = $f['filename'] ?? '';
                 $hash = $f['hash_completo'] ?? '';
@@ -211,7 +218,7 @@ if ($hasExistingFile && file_exists($workFile)) {
                     }
                     
                     // Actualizar registro principal del archivo: guardamos el hash meta y ponemos estado pending
-                    $this->db->exec("INSERT INTO files (rbfid, file_name, chunk_count, chunk_pending, file_hash, status, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :p, :h, 'pending', NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, chunk_pending = :p, file_hash = :h, status = 'pending', updated_at = NOW()", 
+                    $this->db->exec("INSERT INTO files (rbfid, file_name, chunk_count, chunk_pending, file_hash, status, updated_at, file_size, file_mtime) VALUES (:r, :n, :c, :p, :h, 'pending', NOW(), :s, :m) ON CONFLICT (rbfid, file_name) DO UPDATE SET chunk_count = :c, chunk_pending = :p, file_hash = :h, file_size = :s, file_mtime = :m, status = 'pending', updated_at = NOW()", 
                         [':r' => $r, ':n' => $name, ':c' => $cnt, ':p' => $pendingChunks, ':h' => $hash, ':s' => $fileSize, ':m' => $fileMtime]);
                     
                     Log::info("Sync: [$r] $name -> Expecting $cnt chunks | Target Hash: $hash");
@@ -366,10 +373,17 @@ if ($hasExistingFile && file_exists($workFile)) {
     private function finalize(string $r, string $f, array $paths): void
     {
         $wp = $paths['work'] . '/' . $f;
-        $row = $this->db->q("SELECT file_hash FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
+        $row = $this->db->q("SELECT file_hash, file_size, chunk_count FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
         $target = $row['file_hash'] ?? '';
+        $expectedSize = (int)($row['file_size'] ?? 0);
+        $chunkCount = (int)($row['chunk_count'] ?? 0);
+        
+        $actualSize = file_exists($wp) ? filesize($wp) : 0;
         $actual = \App\Hash::computeFile($wp);
         $actualBase64 = \App\Hash::toBase64($actual);
+        
+        Log::debug("Finalize: $f | Expected size: $expectedSize, Actual: $actualSize, Chunks: $chunkCount");
+        Log::debug("Finalize: $f | Target hash: $target, Actual hash: $actualBase64");
 
         if ($target === $actualBase64) {
             if (!is_dir($paths['base'])) {

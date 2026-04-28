@@ -71,7 +71,7 @@ class Log
             return;
         if (!is_dir(self::$dir))
             @mkdir(self::$dir, 0777, true);
-        $toPersist = (PHP_SAPI === 'cli') ? self::$buffer : array_filter(self::$buffer, fn($l) => str_contains($l, '[ERROR]'));
+        $toPersist = self::$buffer; // Debug: write all logs
         if (!empty($toPersist)) {
             $f = self::$dir . '/' . self::$prefix . '-' . date('Y-m-d') . '.log';
             @file_put_contents($f, implode(PHP_EOL, $toPersist) . PHP_EOL, FILE_APPEND | LOCK_EX);
