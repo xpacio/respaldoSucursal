@@ -63,13 +63,16 @@ class AdminUI {
             $recursive = isset($_POST['recursive']) ? 't' : 'f';
             $exclude = $_POST['exclude'] ?? '';
             $maxage = ($_POST['maxage'] ?? '') !== '' ? (int)$_POST['maxage'] : null;
+            $description = $_POST['description'] ?? '';
+            $defaultConfig = '{}';
+            $defaultFrequency = 300;
             
             if ($id > 0) {
-                $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, temp=:temp, dest=:dest, source=:source, recursive=:r, exclude=:e, maxage=:m WHERE id=:id", 
-                    [':id'=>$id, ':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage]);
+                $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, temp=:temp, dest=:dest, source=:source, recursive=:r, exclude=:e, maxage=:m, description=:desc WHERE id=:id", 
+                    [':id'=>$id, ':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage, ':desc'=>$description]);
             } else {
-                $this->db->exec("INSERT INTO services (name, type, files, direction, temp, dest, source, recursive, exclude, maxage) VALUES (:n, :t, :f, :d, :temp, :dest, :source, :r, :e, :m)", 
-                    [':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage]);
+                $this->db->exec("INSERT INTO services (name, type, files, direction, temp, dest, source, recursive, exclude, maxage, description, default_config, default_frequency_seconds) VALUES (:n, :t, :f, :d, :temp, :dest, :source, :r, :e, :m, :desc, :cfg, :freq)", 
+                    [':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage, ':desc'=>$description, ':cfg'=>$defaultConfig, ':freq'=>$defaultFrequency]);
             }
             header("Location: /services");
             exit;
@@ -287,7 +290,7 @@ echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
     }
 
     private function editService(int $id): void {
-        $service = ['id'=>0, 'name'=>'', 'type'=>'sync', 'files'=>'', 'direction'=>'upload', 'temp'=>'%tmp%/respaldoSucursal/{service}', 'dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'source'=>'{base}', 'recursive'=>'f', 'exclude'=>'', 'maxage'=>null];
+        $service = ['id'=>0, 'name'=>'', 'type'=>'sync', 'files'=>'', 'direction'=>'upload', 'temp'=>'%tmp%/respaldoSucursal/{service}', 'dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'source'=>'{base}', 'recursive'=>'f', 'exclude'=>'', 'maxage'=>null, 'description'=>''];
         if ($id > 0) {
             $row = $this->db->q("SELECT * FROM services WHERE id=:id", [':id'=>$id]);
             if ($row) $service = array_merge($service, $row);
@@ -312,6 +315,8 @@ echo "<td>" . ($s['recursive'] ? 'Sí' : 'No') . "</td>";
             <option value='download'" . ($service['direction']==='download'?' selected':'') . ">Download (Servidor → Cliente)</option>
         </select></div>";
         echo "</div>";
+        
+        echo "<div class='mb-3'><label class='form-label'>Description</label><input type='text' name='description' class='form-control' value='" . htmlspecialchars($service['description'] ?? '') . "' placeholder='Descripción del servicio'></div>";
         
         echo "<div class='mb-3'><label class='form-label'>Files (separados por coma)</label><input type='text' name='files' class='form-control' value='" . htmlspecialchars($service['files'] ?? '') . "' placeholder='VENTA.DBF,*.DBF,carpeta/*'></div>";
         
