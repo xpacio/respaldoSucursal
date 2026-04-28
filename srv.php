@@ -136,7 +136,7 @@ class Server
                 if (!$name || !$hash || empty($chunkHashes) || $cnt === 0)
                     continue;
                     
-                $srv = $this->db->q("SELECT file_hash, file_mtime, status FROM files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
+                $srv = $this->db->q("SELECT file_hash, file_mtime, status, file_size FROM files WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                 
                 // Si el archivo estaba marcado como 'missing' pero el cliente lo envió, 
                 // continuaremos para actualizar su estado a 'completed' o 'pending'.
@@ -153,9 +153,11 @@ class Server
                     continue;
                 }
 
+                $sizeChanged = $srv && $srv['file_size'] !== null && (int)$srv['file_size'] !== (int)$fileSize;
+
                 // REINICIO DE SINCRONIZACIÓN: 
-                if (!$hashMatches || (!$isCompleted && !$tempExists)) {
-                    Log::info("Sync: Resetting/Starting $name (Hash match: " . ($hashMatches?'YES':'NO') . ", Completed: " . ($isCompleted?'YES':'NO') . ", Temp: " . ($tempExists?'YES':'NO') . ")");
+                if ($sizeChanged || !$hashMatches || (!$isCompleted && !$tempExists)) {
+                    Log::info("Sync: Resetting/Starting $name (Hash match: " . ($hashMatches?'YES':'NO') . ", Completed: " . ($isCompleted?'YES':'NO') . ", Temp: " . ($tempExists?'YES':'NO') . ", SizeChanged: " . ($sizeChanged?'YES':'NO') . ")");
                     
                     $this->db->exec("DELETE FROM file_chunks WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                     
@@ -186,6 +188,7 @@ if ($hasExistingFile && file_exists($workFile)) {
                             }
                         $pendingChunks = 0;
                         $firstPendingChunk = null;
+                        $chunkSize = \App\Chunk::size($fileSize);
                         
                         Log::info("Sync Patching [$r] $name: Comparing $cnt chunks (Size: $chunkSize)");
                         
