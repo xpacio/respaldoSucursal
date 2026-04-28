@@ -97,11 +97,14 @@ class Hash
     public static function toBase64(string $hex): string
     {
         $bin = hex2bin($hex);
-        return $bin ? substr(base64_encode(strrev($bin)), 0, 11) : '';
+        return $bin ? rtrim(base64_encode(strrev($bin)), '=') : '';
     }
     public static function fromBase64(string $str): string
     {
-        $decoded = base64_decode(str_pad($str, 12, '='));
+        $decoded = base64_decode($str, true);
+        if ($decoded === false) {
+            $decoded = base64_decode(str_pad($str, strlen($str) + (4 - strlen($str) % 4) % 4, '='), true);
+        }
         return $decoded ? bin2hex(strrev($decoded)) : '';
     }
 }

@@ -324,8 +324,13 @@ if ($hasExistingFile && file_exists($workFile)) {
                 self::err('Save failed');
             }
 
-            if (hash('xxh3', $data) !== \App\Hash::fromBase64($hash)) {
-                Log::error("Chunk $idx hash mismatch for $file. Expected base64: $hash");
+            $computedHash = hash('xxh3', $data);
+            $decodedHash = \App\Hash::fromBase64($hash);
+            $hashMatch = ($computedHash === $decodedHash);
+            Log::debug("Upload Hash Check: computed=$computedHash, decoded=$decodedHash, match=" . ($hashMatch ? 'YES' : 'NO'));
+            
+            if (!$hashMatch) {
+                Log::error("Chunk $idx hash mismatch for $file. Expected base64: $hash, computed hex: $computedHash, decoded hex: $decodedHash");
                 $this->db->rollBack();
                 self::json(['ok' => false, 'error' => 'Chunk hash mismatch', 'retry' => true]);
             }
