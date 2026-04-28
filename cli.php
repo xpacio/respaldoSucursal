@@ -15,9 +15,11 @@ use App\HttpClient;
 
 class Client {
     private array $locations = [];
+    private string $configPath;
     private HttpClient $http;
 
     public function __construct(string $cfgPath) {
+        $this->configPath = $cfgPath;
         $data = \App\ClientConfig::load($cfgPath);
         $this->locations = $data['locations'] ?? [];
         $this->http = new HttpClient(Constants::DEFAULT_URL);
@@ -34,6 +36,33 @@ class Client {
             Log::info(sprintf("Location Found: [%s] | Path: %s", $loc['rbfid'], $loc['base']));
         }
         Log::info("====================");
+    }
+
+    public function scanAndCreateConfig(): void {
+        Log::info("=== Scan Disk Mode ===");
+        $locations = Platform::scanDisk();
+        
+        if (empty($locations)) {
+            Log::error("No locations found. Asegúrate de tener un directorio /pvsi con archivo .rbfid o rbf/rbf.ini.");
+            return;
+        }
+        
+        Log::info("Found " . count($locations) . " location(s):");
+        foreach ($locations as $loc) {
+            Log::info(sprintf("  - [%s] Base: %s | Work: %s", $loc['rbfid'], $loc['base'], $loc['work']));
+        }
+        
+        // Cargar config existente para preservar otras configuraciones
+        $config = \App\ClientConfig::load($this->configPath);
+        $config['locations'] = $locations;
+        $config['watch_files'] = Constants::$WATCH_FILES;
+        $config['files_version'] = substr(md5(implode(',', Constants::$WATCH_FILES)),0, 8);
+        
+        if (\App\ClientConfig::save($this->configPath, $config)) {
+            Log::info("Config saved to: {$this->configPath}");
+        } else {
+            Log::error("Failed to save config to: {$this->configPath}");
+        }
     }
 
     public function listServices(string $rbfid): void {
@@ -424,19 +453,22 @@ class Client {
 }
 
 // --- CLI Entry Point ---
+Log::info("cli.php version: 0.60428a");
 $client = new Client('config.json');
 $args = $argv;
 array_shift($args); // Quitar nombre del script
 
 if (empty($args)) {
     $client->showStatus();
-    echo "Uso: php cli.php [--main | -ls {rbfid} | -service {nombre} {rbfid} | -{nombre} {rbfid}]\n";
+    echo "Uso: php cli.php [--main | --scan | -ls {rbfid} | -service {nombre} {rbfid} | -{nombre} {rbfid} | -ls-rbfid]\n";
     exit(0);
 }
 
 $cmd = $args[0];
 if ($cmd === '--main') {
     $client->runOrchestrator();
+} elseif ($cmd === '--scan' || $cmd === '-scan' || $cmd === '-ls-rbfid') {
+    $client->scanAndCreateConfig();
 } elseif ($cmd === '-ls' || $cmd === '-list_services') {
     $rbfid = $args[1] ?? '';
     if (empty($rbfid)) die("Error: Se requiere RBFID.\n");
