@@ -60,7 +60,7 @@ class AdminUI {
             $enabled = isset($_POST['enabled']) ? 'true' : 'false';
             
             if (strlen($rbfid) > 0) {
-                $this->db->exec("INSERT INTO clients (rbfid, emp, plaza, razon_social, tipo, enabled) VALUES (:r, :e, :p, :rz, :t, :en) ON CONFLICT (rbfid) DO UPDATE SET emp=:e, plaza=:p, razon_social=:rz, tipo=:t, enabled=:en",
+                $this->db->exec("INSERT INTO clients (rbfid, emp, plaza, razon_social, tipo, enabled) VALUES (:r, :e, :p, :rz, :t, :en) ON CONFLICT (rbfid) DO UPDATE SET emp=EXCLUDED.emp, plaza=EXCLUDED.plaza, razon_social=EXCLUDED.razon_social, tipo=EXCLUDED.tipo, enabled=EXCLUDED.enabled",
                     [':r' => $rbfid, ':e' => $emp, ':p' => $plaza, ':rz' => $razon, ':t' => $tipo, ':en' => $enabled]);
                 header("Location: /clients");
                 exit;
