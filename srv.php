@@ -117,6 +117,7 @@ class Server
             $paths = $this->paths($r, $serviceName);
             Log::info("Sync: Using paths - work: {$paths['work']}, base: {$paths['base']}, service: $serviceName");
             $needs = [];
+            $fileChanges = [];
             
             // Debug: mostrar tamaño de archivo recibido
             $debugSizes = [];
@@ -222,6 +223,22 @@ class Server
                         [':r' => $r, ':n' => $name, ':c' => $cnt, ':p' => $pendingChunks, ':h' => $hash, ':s' => $fileSize, ':m' => $fileMtime]);
                     
                     Log::info("Sync: [$r] $name -> Expecting $cnt chunks | Target Hash: $hash");
+                    
+                    // Track file size changes
+                    if ($srv && $srv['file_size'] !== null) {
+                        $oldSize = (int)$srv['file_size'];
+                        $newSize = (int)$fileSize;
+                        $diffBytes = $newSize - $oldSize;
+                        $growthPct = $oldSize > 0 ? round(($diffBytes / $oldSize) * 100, 2) : 0;
+                        $fileChanges[] = [
+                            'file' => $name,
+                            'old_size' => $oldSize,
+                            'new_size' => $newSize,
+                            'diff_bytes' => $diffBytes,
+                            'growth_pct' => $growthPct
+                        ];
+                        Log::info("Sync: File $name size change: $oldSize -> $newSize (diff: $diffBytes bytes, $growthPct%)");
+                    }
                 }
                 
                 // Obtener TODOS los chunks pendientes para este archivo (más eficiente)
@@ -233,7 +250,7 @@ class Server
             
             $this->db->commit();
             Log::info("Sync complete for $r. Pending files: " . count($needs));
-            self::json(['ok' => true, 'needs_upload' => $needs, 'rate_delay' => 3000]);
+            self::json(['ok' => true, 'needs_upload' => $needs, 'file_changes' => $fileChanges, 'rate_delay' => 3000]);
         } catch (\Throwable $e) {
             $this->db->rollBack();
             self::err("Sync Error: " . $e->getMessage());
