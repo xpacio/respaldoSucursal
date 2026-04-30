@@ -295,7 +295,7 @@ private function viewServices(): void {
         <?php
         
         echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
-        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Files Count</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Acciones</th></tr></thead>";
+        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Archivos</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Acciones</th></tr></thead>";
         echo "<tbody>";
         $services = $this->db->qa("SELECT * FROM services ORDER BY name");
         foreach ($services as $s) {
@@ -309,8 +309,8 @@ echo "<tr>";
             echo "<td><strong>{$s['name']}</strong></td>";
             echo "<td>" . $this->iconType($s['type']) . "</td>";
             echo "<td>" . $this->iconDirection($s['direction']) . "</td>";
-            echo "<td><span class='badge bg-info'>{$fileCount}</span></td>";
-            echo "<td>" . ($maxage !== '-' ? "<span class='badge bg-warning'>{$maxage}</span>" : "-") . "</td>";
+            echo "<td>{$fileCount}</td>";
+            echo "<td>" . ($maxage !== '-' ? $maxage : "-") . "</td>";
             echo "<td><small>" . htmlspecialchars(substr($exclude, 0, 30)) . "</small></td>";
             echo "<td>" . $this->iconRecursive($s['recursive']) . "</td>";
             echo "<td>" . $this->iconEnabled($s['enabled']) . "</td>";
