@@ -256,6 +256,8 @@ class Server
                         
                         $fileChanges[] = [
                             'file' => $name,
+                            'hash' => $hash,
+                            'dest' => $paths['base'] . '/' . $name,
                             'old_size' => $oldSize,
                             'new_size' => $newSize,
                             'diff_bytes' => $diffBytes,

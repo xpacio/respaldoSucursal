@@ -438,6 +438,22 @@ class Client {
 
             if (empty($req['needs_upload'])) {
                 Log::info("  File $file is synchronized.");
+                // Show file changes if available
+                if (!empty($req['file_changes'])) {
+                    foreach ($req['file_changes'] as $fc) {
+                        $file = $fc['file'] ?? '?';
+                        $hash = $fc['hash'] ?? 'N/A';
+                        $dest = $fc['dest'] ?? 'N/A';
+                        $oldFmt = $fc['old_size_fmt'] ?? '?';
+                        $newFmt = $fc['new_size_fmt'] ?? '?';
+                        $diffFmt = $fc['diff_fmt'] ?? '?';
+                        $pct = $fc['growth_pct'] ?? 0;
+                        $timeFmt = $fc['time_diff_fmt'] ?? '?';
+                        Log::info("  [$file] Hash: $hash | Dest: $dest");
+                        Log::info("  Size: $oldFmt -> $newFmt (diff: $diffFmt, $pct%)");
+                        Log::info("  Time diff: $timeFmt");
+                    }
+                }
                 break; 
             }
             
