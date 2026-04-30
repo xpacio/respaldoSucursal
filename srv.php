@@ -111,6 +111,9 @@ class Server
     }
     private function sync(string $r, array $b): void
     {
+        $startTime = microtime(true);
+        $totalBytes = 0;
+        
         try {
             $this->db->begin();
             $serviceName = $b['service'] ?? '';
@@ -118,6 +121,7 @@ class Server
             Log::info("Sync: Using paths - work: {$paths['work']}, base: {$paths['base']}, service: $serviceName");
             $needs = [];
             $fileChanges = [];
+            $filesProcessed = 0;
             
             // Debug: mostrar tamaño de archivo recibido
             $debugSizes = [];
@@ -127,6 +131,7 @@ class Server
             Log::debug("Sync: File sizes from client: " . implode(', ', $debugSizes));
             
             foreach ($b['files'] ?? [] as $f) {
+                $filesProcessed++;
                 $name = $f['filename'] ?? '';
                 $hash = $f['hash_completo'] ?? '';
                 $chunkHashes = $f['chunk_hashes'] ?? [];
@@ -144,28 +149,28 @@ class Server
                 
                 $chunkDir = $paths['work'] . '/.chunks/' . $name;
                 $destFile = $paths['base'] . '/' . $name;
-                $isCompleted = ($srv && $srv['status'] === 'completed' && file_exists($destFile));
+                $destFileExists = file_exists($destFile);
                 $hashMatches = ($srv && trim((string)$srv['file_hash']) === trim((string)$hash));
                 $tempExists = is_dir($chunkDir) && count(glob($chunkDir . '/*')) > 0;
-
+                
                 // Si el hash es igual y el archivo físico existe en destino, SALTAMOS.
-                if ($isCompleted && $hashMatches) {
+                if ($destFileExists && $hashMatches) {
                     Log::debug("Sync: Skipping $name (already exists in destination and hash matches)");
                     continue;
                 }
 
                 $sizeChanged = $srv && $srv['file_size'] !== null && (int)$srv['file_size'] !== (int)$fileSize;
-
+                
                 // REINICIO DE SINCRONIZACIÓN: 
-                if ($sizeChanged || !$hashMatches || (!$isCompleted && !$tempExists)) {
-                    Log::info("Sync: Resetting/Starting $name (Hash match: " . ($hashMatches?'YES':'NO') . ", Completed: " . ($isCompleted?'YES':'NO') . ", Temp: " . ($tempExists?'YES':'NO') . ", SizeChanged: " . ($sizeChanged?'YES':'NO') . ")");
+                if ($sizeChanged || !$hashMatches || (!$destFileExists && !$tempExists)) {
+                    Log::info("Sync: Resetting/Starting $name (Hash match: " . ($hashMatches?'YES':'NO') . ", DestExists: " . ($destFileExists?'YES':'NO') . ", Temp: " . ($tempExists?'YES':'NO') . ", SizeChanged: " . ($sizeChanged?'YES':'NO') . ")");
                     
                     $this->db->exec("DELETE FROM file_chunks WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                     
                     $pendingChunks = (int)$cnt; // Por defecto, todos pendientes
                     
                     // CASO ESPECIAL: Archivo en destino, mismo tamaño, pero hash cambió
-                    if (!$hashMatches && $isCompleted && file_exists($destFile) && !$sizeChanged) {
+                    if (!$hashMatches && $destFileExists && !$sizeChanged) {
                         // Comparar chunks del archivo destino con los nuevos hashes del cliente
                         Log::info("Sync: File unchanged size but hash differs. Comparing dest file chunks for $name");
                         
@@ -284,8 +289,19 @@ class Server
             }
             
             $this->db->commit();
-            Log::info("Sync complete for $r. Pending files: " . count($needs));
-            self::json(['ok' => true, 'needs_upload' => $needs, 'file_changes' => $fileChanges, 'rate_delay' => 3000]);
+            $execTime = round((microtime(true) - $startTime) * 1000, 2);
+            Log::info("Sync complete for $r. Pending files: " . count($needs) . " | Time: {$execTime}ms | Files: $filesProcessed | Bytes: " . ($totalBytes ?? 0));
+            
+            // Calculate total file size increase
+            $totalIncrease = 0;
+            foreach ($fileChanges as $fc) {
+                $totalIncrease += $fc['diff_bytes'] ?? 0;
+            }
+            
+            self::json(['ok' => true, 'needs_upload' => $needs, 'file_changes' => $fileChanges, 
+                'exec_time_ms' => $execTime, 'files_processed' => $filesProcessed, 
+                'bytes_transferred' => $totalBytes ?? 0, 'total_size_increase' => $totalIncrease,
+                'rate_delay' => 3000]);
         } catch (\Throwable $e) {
             $this->db->rollBack();
             self::err("Sync Error: " . $e->getMessage());
@@ -371,8 +387,10 @@ class Server
             }
 
             Log::info("Upload: Using paths - work: {$paths['work']}, base: {$paths['base']}, service: $serviceName");
-
-            Log::info("Upload: [$r] $file | Chunk $idx | Size: " . strlen($data) . " bytes");
+            
+            $dataLen = strlen($data);
+            $GLOBALS['totalBytes'] = ($GLOBALS['totalBytes'] ?? 0) + $dataLen;
+            Log::info("Upload: [$r] $file | Chunk $idx | Size: $dataLen bytes");
             $chunkDir = $paths['work'] . '/.chunks/' . $file;
             if (!is_dir($chunkDir)) {
                 @mkdir($chunkDir, 0755, true);
