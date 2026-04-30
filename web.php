@@ -301,7 +301,7 @@ private function viewServices(): void {
         foreach ($services as $s) {
             $filesStr = trim($s['files'] ?? '');
             $fileCount = $filesStr === '' ? 0 : count(explode(',', $filesStr));
-            $maxage = $s['maxage'] ?? '-';
+            $maxage = $s['maxage'] ?? '';
             $exclude = $s['exclude'] ?? '';
             
 echo "<tr>";
@@ -310,7 +310,7 @@ echo "<tr>";
             echo "<td>" . $this->iconType($s['type']) . "</td>";
             echo "<td>" . $this->iconDirection($s['direction']) . "</td>";
             echo "<td>{$fileCount}</td>";
-            echo "<td>" . ($maxage !== '-' ? $maxage : "-") . "</td>";
+            echo "<td>" . ($maxage !== '' ? $maxage : "") . "</td>";
             echo "<td><small>" . htmlspecialchars(substr($exclude, 0, 30)) . "</small></td>";
             echo "<td>" . $this->iconRecursive($s['recursive']) . "</td>";
             echo "<td>" . $this->iconEnabled($s['enabled']) . "</td>";
