@@ -372,10 +372,11 @@ class Server
     }
     private function finalize(string $r, string $f, array $paths): void
     {
-        $row = $this->db->q("SELECT file_hash, file_size, chunk_count FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
+        $row = $this->db->q("SELECT file_hash, file_size, chunk_count, file_mtime FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
         $target = $row['file_hash'] ?? '';
         $expectedSize = (int)($row['file_size'] ?? 0);
         $chunkCount = (int)($row['chunk_count'] ?? 0);
+        $originalMtime = (int)($row['file_mtime'] ?? 0);
         $wp = $paths['work'] . '/' . $f;
         $chunkDir = $paths['work'] . '/.chunks/' . $f;
         
@@ -424,6 +425,15 @@ class Server
         Log::debug("Finalize: $f | Target: $target, Actual: $actualBase64");
         
         if ($target === $actualBase64) {
+            // Apply original timestamp from client before moving to destination
+            if ($originalMtime > 0) {
+                if (touch($assemblyFile, $originalMtime)) {
+                    Log::debug("Finalize: Applied original mtime $originalMtime to assembly file");
+                } else {
+                    Log::warn("Finalize: Failed to apply mtime to assembly file");
+                }
+            }
+            
             // Success - move to work dir, then to destination
             rename($assemblyFile, $wp);
             
@@ -449,8 +459,8 @@ class Server
             array_map('unlink', glob($chunkDir . '/*'));
             rmdir($chunkDir);
             
-            Log::info("File $f finalized successfully for $r");
-            self::json(['ok' => true, 'status' => 'complete']);
+            Log::info("File $f finalized successfully for $r | Dest: $dp | Hash: $actualBase64");
+            self::json(['ok' => true, 'status' => 'complete', 'dest' => $dp, 'hash' => $actualBase64]);
             return;
         }
         
