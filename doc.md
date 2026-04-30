@@ -1,5 +1,20 @@
 # Documentación de la tabla `service_config`
 
+## Formato de Versión
+El sistema usa versiones con formato: `X.YMMDDc`
+- `X`: Versión mayor (0=inicial, 1, 2, etc.)
+- `Y`: Ǘltimo dígito del año (6=2026, 7=2027, etc.)
+- `MM`: Mes (01-12)
+- `DD`: Día (01-31)
+- `c`: Letra del commit (a-z, donde 'a' es el primer commit del día)
+
+**Ejemplo:** `0.60428a`
+- Versión mayor: 0
+- Año: 6 → 2026
+- Mes: 04 (abril)
+- Día: 28
+- Commit: 'a' (primer commit del día)
+
 ## Propósito
 Almacena la configuración **específica por cliente y por servicio** del sistema de respaldo de sucursales, permitiendo sobrescribir los valores por defecto definidos en la tabla `services` para casos particulares de cada cliente.
 
@@ -66,6 +81,18 @@ SELECT COUNT(*) FROM service_config;
 ```
 
 **Nota:** En su estado actual (todos los registros con `config = {}`), la tabla funcionaba como un "enable/disable" por cliente-servicio usando la columna `enabled`. Como no había personalizaciones reales, su utilidad era limitada. El sistema puede operar usando solo `services` con sus valores por defecto hasta que se necesite configuración personalizada por cliente.
+
+## Cambios implementados (Opción C)
+
+El sistema ahora funciona con **fallback a `services`** cuando `service_config` está vacío:
+
+1. **`schedule()`**: Si no hay registros en `service_config` para el cliente, usa `services` directamente
+2. **`listServices()`**: Muestra servicios habilitados desde `services` si no hay personalizaciones
+3. **`serviceConfig()`**: Entrega configuración de `services` por defecto, solo consulta `service_config` si existe personalización
+4. **`downloadList()`**: Igual, usa `services` si no hay entrada en `service_config`
+5. **`updateNextExecution()`**: Solo actualiza `service_config` si existe el registro, sino omite (usa valores por defecto)
+
+**Ventaja**: No requiere registros vacíos en `service_config`. La tabla solo se usa para casos especiales (frecuencia diferente, configuración personalizada por cliente).
 
 ## ¿Debe tener datos repetidos?
 **No**. La clave primaria `(client_rbfid, service_id)` lo impide a nivel de BD.

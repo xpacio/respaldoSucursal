@@ -242,6 +242,18 @@ class Server
                         $newFmt = $formatSize($newSize);
                         $diffFmt = $formatSize(abs($diffBytes));
                         
+                        // Time difference tracking
+                        $oldMtime = (int)($srv['file_mtime'] ?? 0);
+                        $newMtime = (int)$fileMtime;
+                        $timeDiffSec = abs($newMtime - $oldMtime);
+                        
+                        $formatTime = function($secs) {
+                            if ($secs < 60) return $secs . 's';
+                            if ($secs < 3600) return round($secs / 60, 1) . 'm';
+                            if ($secs < 86400) return round($secs / 3600, 1) . 'h';
+                            return round($secs / 86400, 1) . 'd';
+                        };
+                        
                         $fileChanges[] = [
                             'file' => $name,
                             'old_size' => $oldSize,
@@ -252,9 +264,13 @@ class Server
                             'growth_pct' => $growthPct,
                             'old_size_fmt' => $oldFmt,
                             'new_size_fmt' => $newFmt,
-                            'diff_fmt' => $diffFmt
+                            'diff_fmt' => $diffFmt,
+                            'old_mtime' => $oldMtime,
+                            'new_mtime' => $newMtime,
+                            'time_diff_sec' => $timeDiffSec,
+                            'time_diff_fmt' => $formatTime($timeDiffSec)
                         ];
-                        Log::info("Sync: File $name size change: $oldFmt -> $newFmt (diff: $diffFmt, $growthPct%)");
+                        Log::info("Sync: File $name size change: $oldFmt -> $newFmt (diff: $diffFmt, $growthPct%) | Time: {$formatTime($timeDiffSec)}");
                     }
                 }
                 
