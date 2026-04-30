@@ -50,6 +50,22 @@ class AdminUI {
             exit;
         }
         
+        // Guardar cliente (Solo usuarios autenticados)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_client']) && ($_SESSION['admin_auth'] ?? false)) {
+            $rbfid = preg_replace('/[^A-Z0-9]/', '', $_POST['rbfid'] ?? '');
+            $emp = preg_replace('/[^A-Z0-9]/', '', $_POST['emp'] ?? '');
+            $plaza = preg_replace('/[^A-Z0-9]/', '', $_POST['plaza'] ?? '');
+            $razon = $_POST['razon_social'] ?? '';
+            $enabled = isset($_POST['enabled']) ? 'true' : 'false';
+            
+            if (strlen($rbfid) > 0) {
+                $this->db->exec("INSERT INTO clients (rbfid, emp, plaza, razon_social, enabled) VALUES (:r, :e, :p, :rz, :en) ON CONFLICT (rbfid) DO UPDATE SET emp=:e, plaza=:p, razon_social=:rz, enabled=:en",
+                    [':r' => $rbfid, ':e' => $emp, ':p' => $plaza, ':rz' => $razon, ':en' => $enabled]);
+                header("Location: /table/clients");
+                exit;
+            }
+        }
+        
         // Guardar servicio (Solo usuarios autenticados)
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service']) && ($_SESSION['admin_auth'] ?? false)) {
             $id = (int)($_POST['service_id'] ?? 0);
@@ -223,6 +239,22 @@ class AdminUI {
             echo "</tbody>";
         } else { echo "<tr><td>Sin registros disponibles</td></tr>"; }
         echo "</table></div></div>";
+        
+        // Formulario para nuevo cliente (solo en tabla clients)
+        if ($name === 'clients' && ($_SESSION['admin_auth'] ?? false)) {
+            echo "<div class='card mt-3'><div class='card-header'><h3 class='card-title'>Nuevo Cliente</h3></div><div class='card-body'>";
+            echo "<form method='post'>";
+            echo "<input type='hidden' name='save_client' value='1'>";
+            echo "<div class='row mb-3'>";
+            echo "<div class='col-md-3'><label class='form-label'>RBFID</label><input type='text' name='rbfid' class='form-control' maxlength='5' required placeholder='Ej: ABC12'></div>";
+            echo "<div class='col-md-3'><label class='form-label'>Emp</label><input type='text' name='emp' class='form-control' maxlength='3' placeholder='Ej: SIV'></div>";
+            echo "<div class='col-md-3'><label class='form-label'>Plaza</label><input type='text' name='plaza' class='form-control' maxlength='5' placeholder='Ej: XALAP'></div>";
+            echo "<div class='col-md-3'><label class='form-label'>Razón Social</label><input type='text' name='razon_social' class='form-control' placeholder='Ej: Sucursal Xalapa'></div>";
+            echo "</div>";
+            echo "<div class='mb-3'><div class='form-check'><input type='checkbox' name='enabled' class='form-check-input' id='client_enabled' checked><label class='form-check-label' for='client_enabled'>Enabled</label></div></div>";
+            echo "<button type='submit' class='btn btn-primary'>Guardar Cliente</button>";
+            echo "</form></div></div>";
+        }
     }
 
     private function viewLogs(): void {
