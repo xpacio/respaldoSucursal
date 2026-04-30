@@ -264,18 +264,54 @@ class AdminUI {
     }
 
 private function viewServices(): void {
+        ?>
+        <div class="page-header d-print-none" aria-label="Page header">
+          <div class="container-xl">
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <div class="page-pretitle">Services</div>
+                <h2 class="page-title">Services</h2>
+              </div>
+              <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                  <a href="/services/new" class="btn btn-primary d-none d-sm-inline-block">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-2">
+                      <path d="M12 5l0 14"></path>
+                      <path d="M5 12l14 0"></path>
+                    </svg>
+                    Create new service
+                  </a>
+                  <a href="/services/new" class="btn btn-primary d-sm-none btn-icon" aria-label="Create new service">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-2">
+                      <path d="M12 5l0 14"></path>
+                      <path d="M5 12l14 0"></path>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <?php
         
-        echo "<div class='card'><table class='table table-striped mb-0'>";
-        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Files</th><th>Recursive</th><th>Enabled</th><th>Acciones</th></tr></thead>";
+        echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
+        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Files Count</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Acciones</th></tr></thead>";
         echo "<tbody>";
         $services = $this->db->qa("SELECT * FROM services ORDER BY name");
         foreach ($services as $s) {
+            $filesStr = trim($s['files'] ?? '');
+            $fileCount = $filesStr === '' ? 0 : count(explode(',', $filesStr));
+            $maxage = $s['maxage'] ?? '-';
+            $exclude = $s['exclude'] ?? '';
+            
 echo "<tr>";
             echo "<td>{$s['id']}</td>";
             echo "<td><strong>{$s['name']}</strong></td>";
             echo "<td>" . $this->iconType($s['type']) . "</td>";
             echo "<td>" . $this->iconDirection($s['direction']) . "</td>";
-            echo "<td><small>" . htmlspecialchars(substr($s['files'] ?? '', 0, 40)) . "</small></td>";
+            echo "<td><span class='badge bg-info'>{$fileCount}</span></td>";
+            echo "<td>" . ($maxage !== '-' ? "<span class='badge bg-warning'>{$maxage}</span>" : "-") . "</td>";
+            echo "<td><small>" . htmlspecialchars(substr($exclude, 0, 30)) . "</small></td>";
             echo "<td>" . $this->iconRecursive($s['recursive']) . "</td>";
             echo "<td>" . $this->iconEnabled($s['enabled']) . "</td>";
             echo "<td><a href='/services/edit/{$s['id']}' class='btn btn-sm btn-outline-primary'>Editar</a></td>";
