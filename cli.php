@@ -474,7 +474,7 @@ class Client {
 }
 
 // --- CLI Entry Point ---
-Log::info("cli.php version: 0.60428a");
+        Log::info("cli.php version: 0.60430j");
 $client = new Client('config.json');
 $args = $argv;
 array_shift($args); // Quitar nombre del script
