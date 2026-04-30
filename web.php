@@ -56,18 +56,29 @@ class AdminUI {
             $emp = preg_replace('/[^A-Z0-9]/', '', $_POST['emp'] ?? '');
             $plaza = preg_replace('/[^A-Z0-9]/', '', $_POST['plaza'] ?? '');
             $razon = $_POST['razon_social'] ?? '';
+            $tipo = preg_replace('/[^a-z]/', '', $_POST['tipo'] ?? 'sucursal');
             $enabled = isset($_POST['enabled']) ? 'true' : 'false';
             
             if (strlen($rbfid) > 0) {
-                $this->db->exec("INSERT INTO clients (rbfid, emp, plaza, razon_social, enabled) VALUES (:r, :e, :p, :rz, :en) ON CONFLICT (rbfid) DO UPDATE SET emp=:e, plaza=:p, razon_social=:rz, enabled=:en",
-                    [':r' => $rbfid, ':e' => $emp, ':p' => $plaza, ':rz' => $razon, ':en' => $enabled]);
-                header("Location: /table/clients");
+                $this->db->exec("INSERT INTO clients (rbfid, emp, plaza, razon_social, tipo, enabled) VALUES (:r, :e, :p, :rz, :t, :en) ON CONFLICT (rbfid) DO UPDATE SET emp=:e, plaza=:p, razon_social=:rz, tipo=:t, enabled=:en",
+                    [':r' => $rbfid, ':e' => $emp, ':p' => $plaza, ':rz' => $razon, ':t' => $tipo, ':en' => $enabled]);
+                header("Location: /clients");
+                exit;
+            }
+        }
+        
+        // Eliminar cliente (Solo usuarios autenticados)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_client']) && ($_SESSION['admin_auth'] ?? false)) {
+            $rbfid = preg_replace('/[^A-Z0-9]/', '', $_POST['delete_client']);
+            if (strlen($rbfid) > 0) {
+                $this->db->exec("DELETE FROM clients WHERE rbfid=:r", [':r' => $rbfid]);
+                header("Location: /clients");
                 exit;
             }
         }
         
         // Guardar servicio (Solo usuarios autenticados)
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service']) && ($_SESSION['admin_auth'] ?? false)) {
+         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service']) && ($_SESSION['admin_auth'] ?? false)) {
             $id = (int)($_POST['service_id'] ?? 0);
             $name = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['name'] ?? '');
             $type = preg_replace('/[^a-zA-Z]/', '', $_POST['type'] ?? 'sync');
@@ -148,9 +159,10 @@ class AdminUI {
                     </h1>
                     <?php if ($_SESSION['admin_auth'] ?? false): ?>
                     <div class="navbar-nav flex-row-order-md-last">
-                        <a href="/" class="nav-link">Tablas</a>
-                        <a href="/services" class="nav-link">Servicios</a>
-                        <a href="/logs" class="nav-link">Logs</a>
+                         <a href="/" class="nav-link">Tablas</a>
+                         <a href="/clients" class="nav-link">Clientes</a>
+                         <a href="/services" class="nav-link">Servicios</a>
+                         <a href="/logs" class="nav-link">Logs</a>
                         <a href="/?logout=1" class="nav-link">
 			    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-door-exit"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M13 12v.01" /><path d="M3 21h18" /><path d="M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5" /><path d="M14 7h7m-3 -3l3 3l-3 3" /></svg>
                         </a>
@@ -162,28 +174,40 @@ class AdminUI {
             <div class="page-body">
                 <div class="container-xl">
                 <?php
-                if (!($_SESSION['admin_auth'] ?? false)) {
-                    $this->renderLogin();
-                } elseif ($this->action === 'table') {
-                    $this->viewTable($this->target);
-                } elseif ($this->action === 'logs') {
-                    $this->viewLogs();
-                } else {
-                    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-                    $uriParts = explode('/', trim($uri, '/'));
-                    $serviceId = ($this->action === 'services' && $this->target === 'edit' && isset($uriParts[2])) ? (int)$uriParts[2] : 0;
-                    
-                    if ($this->action === 'services' && $serviceId > 0) {
-                        $this->editService($serviceId);
-                    } elseif ($this->action === 'services' && $this->target === 'new') {
-                        $this->editService(0);
-                    } elseif ($this->action === 'services') {
-                        $this->viewServices();
-                    } else {
-                        $this->dashboard();
-                    }
-                }
-                ?>
+                 if (!($_SESSION['admin_auth'] ?? false)) {
+                     $this->renderLogin();
+                 } elseif ($this->action === 'table') {
+                     $this->viewTable($this->target);
+                 } elseif ($this->action === 'logs') {
+                     $this->viewLogs();
+                 } elseif ($this->action === 'clients') {
+                     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+                     $uriParts = explode('/', trim($uri, '/'));
+                     $rbfid = ($this->target === 'edit' && isset($uriParts[2])) ? $uriParts[2] : '';
+                     
+                     if ($this->target === 'edit' && $rbfid !== '') {
+                         $this->editClient($rbfid);
+                     } elseif ($this->target === 'new') {
+                         $this->editClient('');
+                     } else {
+                         $this->viewClients();
+                     }
+                 } else {
+                     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+                     $uriParts = explode('/', trim($uri, '/'));
+                     $serviceId = ($this->action === 'services' && $this->target === 'edit' && isset($uriParts[2])) ? (int)$uriParts[2] : 0;
+                     
+                     if ($this->action === 'services' && $serviceId > 0) {
+                         $this->editService($serviceId);
+                     } elseif ($this->action === 'services' && $this->target === 'new') {
+                         $this->editService(0);
+                     } elseif ($this->action === 'services') {
+                         $this->viewServices();
+                     } else {
+                         $this->dashboard();
+                     }
+                 }
+                 ?>
                 </div>
             </div>
         </div>
@@ -239,23 +263,7 @@ class AdminUI {
             echo "</tbody>";
         } else { echo "<tr><td>Sin registros disponibles</td></tr>"; }
         echo "</table></div></div>";
-        
-        // Formulario para nuevo cliente (solo en tabla clients)
-        if ($name === 'clients' && ($_SESSION['admin_auth'] ?? false)) {
-            echo "<div class='card mt-3'><div class='card-header'><h3 class='card-title'>Nuevo Cliente</h3></div><div class='card-body'>";
-            echo "<form method='post'>";
-            echo "<input type='hidden' name='save_client' value='1'>";
-            echo "<div class='row mb-3'>";
-            echo "<div class='col-md-3'><label class='form-label'>RBFID</label><input type='text' name='rbfid' class='form-control' maxlength='5' required placeholder='Ej: ABC12'></div>";
-            echo "<div class='col-md-3'><label class='form-label'>Emp</label><input type='text' name='emp' class='form-control' maxlength='3' placeholder='Ej: SIV'></div>";
-            echo "<div class='col-md-3'><label class='form-label'>Plaza</label><input type='text' name='plaza' class='form-control' maxlength='5' placeholder='Ej: XALAP'></div>";
-            echo "<div class='col-md-3'><label class='form-label'>Razón Social</label><input type='text' name='razon_social' class='form-control' placeholder='Ej: Sucursal Xalapa'></div>";
-            echo "</div>";
-            echo "<div class='mb-3'><div class='form-check'><input type='checkbox' name='enabled' class='form-check-input' id='client_enabled' checked><label class='form-check-label' for='client_enabled'>Enabled</label></div></div>";
-            echo "<button type='submit' class='btn btn-primary'>Guardar Cliente</button>";
-            echo "</form></div></div>";
-        }
-    }
+     }
 
     private function viewLogs(): void {
         echo "<h3>Monitoreo de Logs</h3>";
@@ -350,9 +358,144 @@ echo "<tr>";
             echo "</tr>";
         }
         echo "</tbody></table></div>";
-    }
+     }
 
-    private function iconType(?string $type): string {
+     private function viewClients(): void {
+         $filterPlaza = $_GET['plaza'] ?? '';
+         $filterTipo = $_GET['tipo'] ?? '';
+         
+         $tipos = ['sucursal', 'cedis', 'vendedor', 'revresp', 'cotizador', 'publicidad', 'reclamaciones', 'capacitacion', 'administrativa', 'otro'];
+         $plazas = $this->db->qa("SELECT DISTINCT plaza FROM clients WHERE plaza IS NOT NULL AND plaza != '' ORDER BY plaza");
+         ?>
+         <div class="page-header d-print-none" aria-label="Page header">
+           <div class="container-xl">
+             <div class="row g-2 align-items-center">
+               <div class="col">
+                 <div class="page-pretitle">Clients</div>
+                 <h2 class="page-title">Clientes</h2>
+               </div>
+               <div class="col-auto ms-auto d-print-none">
+                 <div class="btn-list">
+                   <a href="/clients/new" class="btn btn-primary d-none d-sm-inline-block">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-2">
+                       <path d="M12 5l0 14"></path>
+                       <path d="M5 12l14 0"></path>
+                     </svg>
+                     Create new client
+                   </a>
+                   <a href="/clients/new" class="btn btn-primary d-sm-none btn-icon" aria-label="Create new client">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-2">
+                       <path d="M12 5l0 14"></path>
+                       <path d="M5 12l14 0"></path>
+                     </svg>
+                   </a>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+         <?php
+         
+         echo "<div class='card mt-3'><div class='card-body'><form method='get' class='row g-3'>";
+         echo "<div class='col-md-4'><label class='form-label'>Filtrar por Plaza</label><select name='plaza' class='form-select' onchange='this.form.submit()'>";
+         echo "<option value=''>Todas</option>";
+         foreach ($plazas as $p) {
+             $selected = $filterPlaza === $p['plaza'] ? ' selected' : '';
+             echo "<option value='" . htmlspecialchars($p['plaza']) . "'$selected>" . htmlspecialchars($p['plaza']) . "</option>";
+         }
+         echo "</select></div>";
+         
+         echo "<div class='col-md-4'><label class='form-label'>Filtrar por Tipo</label><select name='tipo' class='form-select' onchange='this.form.submit()'>";
+         echo "<option value=''>Todos</option>";
+         foreach ($tipos as $tipo) {
+             $selected = $filterTipo === $tipo ? ' selected' : '';
+             echo "<option value='$tipo'$selected>" . ucfirst($tipo) . "</option>";
+         }
+         echo "</select></div>";
+         
+         if ($filterPlaza !== '' || $filterTipo !== '') {
+             echo "<div class='col-md-4 align-self-end'><a href='/clients' class='btn btn-secondary'>Limpiar filtros</a></div>";
+         }
+         echo "</form></div></div>";
+         
+         $sql = "SELECT * FROM clients WHERE 1=1";
+         $params = [];
+         if ($filterPlaza !== '') {
+             $sql .= " AND plaza = :plaza";
+             $params[':plaza'] = $filterPlaza;
+         }
+         if ($filterTipo !== '') {
+             $sql .= " AND tipo = :tipo";
+             $params[':tipo'] = $filterTipo;
+         }
+         $sql .= " ORDER BY enabled DESC, rbfid ASC";
+         
+         $clients = $this->db->qa($sql, $params);
+         
+         echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
+         echo "<thead><tr><th>RBFID</th><th>Emp</th><th>Plaza</th><th>Razón Social</th><th>Tipo</th><th>Enabled</th><th>Acciones</th></tr></thead>";
+         echo "<tbody>";
+         foreach ($clients as $c) {
+             echo "<tr>";
+             echo "<td><strong>" . htmlspecialchars($c['rbfid']) . "</strong></td>";
+             echo "<td>" . htmlspecialchars($c['emp'] ?? '') . "</td>";
+             echo "<td>" . htmlspecialchars($c['plaza'] ?? '') . "</td>";
+             echo "<td>" . htmlspecialchars($c['razon_social'] ?? '') . "</td>";
+             echo "<td>" . htmlspecialchars($c['tipo'] ?? 'sucursal') . "</td>";
+             echo "<td>" . $this->iconEnabled($c['enabled']) . "</td>";
+             echo "<td>";
+             echo "<a href='/clients/edit/" . $c['rbfid'] . "' class='btn btn-sm btn-outline-primary me-1'>Editar</a>";
+             echo "<form method='post' class='d-inline' onsubmit=\"return confirm('¿Eliminar cliente " . $c['rbfid'] . "? Esta acción no se puede deshacer.')\">";
+             echo "<input type='hidden' name='delete_client' value='" . $c['rbfid'] . "'>";
+             echo "<button type='submit' class='btn btn-sm btn-outline-danger'>Eliminar</button>";
+             echo "</form>";
+             echo "</td>";
+             echo "</tr>";
+         }
+         echo "</tbody></table></div>";
+     }
+
+     private function editClient(string $rbfid): void {
+         $client = ['rbfid'=>'', 'emp'=>'', 'plaza'=>'', 'razon_social'=>'', 'tipo'=>'sucursal', 'enabled'=>true];
+         if ($rbfid !== '') {
+             $row = $this->db->q("SELECT * FROM clients WHERE rbfid=:r", [':r'=>$rbfid]);
+             if ($row) $client = array_merge($client, $row);
+         }
+         
+         $tipos = ['sucursal', 'cedis', 'vendedor', 'revresp', 'cotizador', 'publicidad', 'reclamaciones', 'capacitacion', 'administrativa', 'otro'];
+         
+         echo "<h3>" . ($rbfid !== '' ? "Editar" : "Nuevo") . " Cliente</h3>";
+         echo "<div class='card mb-3'><div class='card-body'>";
+         echo "<form method='post'>";
+         echo "<input type='hidden' name='save_client' value='1'>";
+         
+         echo "<div class='row mb-3'>";
+         echo "<div class='col-md-3'><label class='form-label'>RBFID</label><input type='text' name='rbfid' class='form-control' maxlength='5' value='" . htmlspecialchars($client['rbfid'] ?? '') . "' " . ($rbfid !== '' ? 'readonly' : 'required') . " placeholder='Ej: ABC12'></div>";
+         echo "<div class='col-md-3'><label class='form-label'>Emp</label><input type='text' name='emp' class='form-control' maxlength='3' value='" . htmlspecialchars($client['emp'] ?? '') . "' placeholder='Ej: SIV'></div>";
+         echo "<div class='col-md-3'><label class='form-label'>Plaza</label><input type='text' name='plaza' class='form-control' maxlength='5' value='" . htmlspecialchars($client['plaza'] ?? '') . "' placeholder='Ej: XALAP'></div>";
+         echo "<div class='col-md-3'><label class='form-label'>Razón Social</label><input type='text' name='razon_social' class='form-control' value='" . htmlspecialchars($client['razon_social'] ?? '') . "' placeholder='Ej: Sucursal Xalapa'></div>";
+         echo "</div>";
+         
+         echo "<div class='row mb-3'>";
+         echo "<div class='col-md-4'><label class='form-label'>Tipo</label><select name='tipo' class='form-select'>";
+         foreach ($tipos as $tipo) {
+             $selected = ($client['tipo'] ?? 'sucursal') === $tipo ? ' selected' : '';
+             echo "<option value='$tipo'$selected>" . ucfirst($tipo) . "</option>";
+         }
+         echo "</select></div>";
+         echo "</div>";
+         
+         $enabledChecked = ($client['enabled'] ?? false)===true || ($client['enabled'] ?? '')==='t' ? ' checked' : '';
+         echo "<div class='mb-3'><div class='form-check'><input type='checkbox' name='enabled' class='form-check-input' id='client_enabled'" . $enabledChecked . "><label class='form-check-label' for='client_enabled'>Enabled</label></div></div>";
+          
+         echo "<div class='mb-3'>";
+         echo "<button type='submit' class='btn btn-primary'>Guardar</button>";
+         echo "<a href='/clients' class='btn btn-secondary ms-2'>Cancelar</a>";
+         echo "</div>";
+         echo "</form></div></div>";
+     }
+
+     private function iconType(?string $type): string {
         $type = $type ?? 'sync';
         $icons = [
             'sync' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-info"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>',
