@@ -297,7 +297,7 @@ private function viewServices(): void {
         echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
         echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Archivos</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Acciones</th></tr></thead>";
         echo "<tbody>";
-        $services = $this->db->qa("SELECT * FROM services ORDER BY name");
+        $services = $this->db->qa("SELECT * FROM services ORDER BY enabled DESC, name ASC");
         foreach ($services as $s) {
             $filesStr = trim($s['files'] ?? '');
             $fileCount = $filesStr === '' ? 0 : count(explode(',', $filesStr));
