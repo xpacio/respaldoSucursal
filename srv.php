@@ -161,54 +161,56 @@ class Server
                     
                     $this->db->exec("DELETE FROM file_chunks WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                     
-                    // Limpiar chunks temporales si existen
-                    if (is_dir($chunkDir)) {
-                        array_map('unlink', glob($chunkDir . '/*'));
-                        rmdir($chunkDir);
-                    }
-                    
-                    // OPTIMIZACIÓN: Si tenemos chunks existentes, compararlos individualmente
                     $pendingChunks = (int)$cnt; // Por defecto, todos pendientes
-                    $firstPendingChunk = 0;
                     
-                    // Verificar si hay chunks en directorio .chunks/
-                    $hasExistingChunks = $tempExists;
-                    
-                    if ($hasExistingChunks && is_dir($chunkDir)) {
+                    // CASO ESPECIAL: Archivo en destino, mismo tamaño, pero hash cambió
+                    if (!$hashMatches && $isCompleted && file_exists($destFile) && !$sizeChanged) {
+                        // Comparar chunks del archivo destino con los nuevos hashes del cliente
+                        Log::info("Sync: File unchanged size but hash differs. Comparing dest file chunks for $name");
+                        
+                        if (!is_dir($chunkDir)) {
+                            @mkdir($chunkDir, 0755, true);
+                        }
+                        
                         $pendingChunks = 0;
-                        $firstPendingChunk = null;
                         $chunkSize = \App\Chunk::size($fileSize);
                         
-                        Log::info("Sync Patching [$r] $name: Comparing $cnt chunks from .chunks/ (Size: $chunkSize)");
-                        
+                        $fh = fopen($destFile, 'rb');
                         for ($i = 0; $i < $cnt; $i++) {
-                            $chunkPath = $chunkDir . '/' . $i;
                             $expectedHash = $chunkHashes[$i] ?? '';
+                            $offset = $i * $chunkSize;
+                            $length = min($chunkSize, $fileSize - $offset);
                             
-                            if (file_exists($chunkPath)) {
-                                $chunkData = file_get_contents($chunkPath);
-                                $chunkHash = \App\Hash::toBase64(hash('xxh3', $chunkData));
-                                
-                                if ($chunkHash === $expectedHash) {
-                                    $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'received', NOW())", 
-                                            [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
-                                } else {
-                                    $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
-                                            [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
-                                    $pendingChunks++;
-                                    if ($firstPendingChunk === null) $firstPendingChunk = $i;
-                                    Log::debug("Sync: Chunk $i differs (Local: $chunkHash, Remote: $expectedHash)");
-                                }
+                            if ($length <= 0) continue;
+                            
+                            fseek($fh, $offset);
+                            $chunkData = fread($fh, $length);
+                            $chunkHash = \App\Hash::toBase64(hash('xxh3', $chunkData));
+                            
+                            // Guardar chunk en .chunks/ para reutilización
+                            file_put_contents($chunkDir . '/' . $i, $chunkData);
+                            
+                            if ($chunkHash === $expectedHash) {
+                                $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'received', NOW())", 
+                                        [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
                             } else {
-                                // Chunk no existe en disco, marcar como pendiente
                                 $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
                                         [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
                                 $pendingChunks++;
-                                if ($firstPendingChunk === null) $firstPendingChunk = $i;
+                                Log::debug("Sync: Chunk $i differs (Local: $chunkHash, Remote: $expectedHash)");
                             }
                         }
+                        fclose($fh);
+                        
                     } else {
-                        // Sin archivo existente, todos los chunks pendientes
+                        // CASO: Tamaño cambió o no hay archivo en destino → limpiar y marcar todos pendientes
+                        if (is_dir($chunkDir)) {
+                            array_map('unlink', glob($chunkDir . '/*'));
+                            rmdir($chunkDir);
+                        }
+                        
+                        Log::info("Sync: Full re-upload needed for $name (size changed or no dest file)");
+                        
                         for ($i = 0; $i < $cnt; $i++) {
                             $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
                                 [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $chunkHashes[$i] ?? '']);
@@ -442,7 +444,8 @@ class Server
             rename($wp, $dp);
             $this->db->exec("UPDATE files SET status='completed', chunk_pending=0 WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
             
-            // Cleanup chunks
+            // Cleanup chunks - both DB and disk
+            $this->db->exec("DELETE FROM file_chunks WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
             array_map('unlink', glob($chunkDir . '/*'));
             rmdir($chunkDir);
             
