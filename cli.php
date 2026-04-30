@@ -111,6 +111,9 @@ class Client {
 
     public function executeService(string $service, string $rbfid): void {
         $start = microtime(true);
+        $GLOBALS['totalBytesTransferred'] = 0;
+        $GLOBALS['totalChunks'] = 0;
+        $GLOBALS['totalSizeIncrease'] = 0;
         $loc = null;
         foreach ($this->locations as $l) { if ($l['rbfid'] === $rbfid) { $loc = $l; break; } }
         if (!$loc) return;
@@ -148,6 +151,13 @@ class Client {
             ]);
             
             Log::info("=== Service End: $service | Status: $finalStatus ===");
+            $execMs = (int)((microtime(true) - $start) * 1000);
+            $bytes = $GLOBALS['totalBytesTransferred'] ?? 0;
+            $chunks = $GLOBALS['totalChunks'] ?? 0;
+            $sizeInc = $GLOBALS['totalSizeIncrease'] ?? 0;
+            $fmtBytes = $bytes < 1048576 ? round($bytes/1024,2).' KB' : round($bytes/1048576,2).' MB';
+            $fmtSize = $sizeInc < 1048576 ? round($sizeInc/1024,2).' KB' : round($sizeInc/1048576,2).' MB';
+            Log::info("  Time: {$execMs}ms | Data: $fmtBytes | Chunks: $chunks | Size +: $fmtSize");
         } catch (\Throwable $e) { Log::error("Service Error ($service): " . $e->getMessage()); }
     }
 
@@ -435,7 +445,14 @@ class Client {
                 'service' => $service,
                 'files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => $chs, 'mtime' => filemtime($wp), 'size' => $size]]
             ]);
-
+            
+            // Accumulate total size increase from all sync responses
+            if (!empty($req['file_changes'])) {
+                foreach ($req['file_changes'] as $fc) {
+                    $GLOBALS['totalSizeIncrease'] = ($GLOBALS['totalSizeIncrease'] ?? 0) + ($fc['diff_bytes'] ?? 0);
+                }
+            }
+            
             if (empty($req['needs_upload'])) {
                 Log::info("  File $file is synchronized.");
                 // Show file changes if available
@@ -458,12 +475,18 @@ class Client {
             }
             
             $chunksToUpload = count($req['needs_upload']);
+            $desface = number_format(($chunksToUpload / $totalChunks) * 100, 2);
+            Log::info("Sincronizando $file: $chunksToUpload chunks pendientes ($desface% de desface)");
+            
+            $chunksToUpload = count($req['needs_upload']);
             $desfase = number_format(($chunksToUpload / $totalChunks) * 100, 2);
             Log::info("Sincronizando $file: $chunksToUpload chunks pendientes ($desfase% de desfase)");
 
             foreach ($req['needs_upload'] as $chunkIdx) {
                 $off = $chunkIdx * $cs;
                 $data = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
+                $dataLen = strlen($data);
+                $GLOBALS['totalBytesTransferred'] = ($GLOBALS['totalBytesTransferred'] ?? 0) + $dataLen;
                 $attempts = 0; $success = false;
                 while ($attempts < 3 && !$success) {
                     $res = $this->http->req('upload', $loc['rbfid'], [
@@ -475,6 +498,7 @@ class Client {
 
                     if ($res['ok'] ?? false){ 
                         $chunksToUpload--;
+                        $GLOBALS['totalChunks'] = ($GLOBALS['totalChunks'] ?? 0) + 1;
                         $progreso = number_format((($totalChunks - $chunksToUpload) / $totalChunks) * 100, 1);
                         Log::info(sprintf("  [%s%%] Uploaded chunk %d de %s", $progreso, $chunkIdx, $file));
                         $success = true; 
