@@ -226,18 +226,35 @@ class Server
                     
                     // Track file size changes
                     if ($srv && $srv['file_size'] !== null) {
-                        $oldSize = (int)$srv['file_size'];
+                        $oldSize = (int)($srv['file_size'] ?? 0);
                         $newSize = (int)$fileSize;
                         $diffBytes = $newSize - $oldSize;
                         $growthPct = $oldSize > 0 ? round(($diffBytes / $oldSize) * 100, 2) : 0;
+                        
+                        // Format sizes for client log
+                        $formatSize = function($bytes) {
+                            if ($bytes < 1024) return $bytes . ' B';
+                            if ($bytes < 1048576) return round($bytes / 1024, 2) . ' KB';
+                            return round($bytes / 1048576, 2) . ' MB';
+                        };
+                        
+                        $oldFmt = $formatSize($oldSize);
+                        $newFmt = $formatSize($newSize);
+                        $diffFmt = $formatSize(abs($diffBytes));
+                        
                         $fileChanges[] = [
                             'file' => $name,
                             'old_size' => $oldSize,
                             'new_size' => $newSize,
                             'diff_bytes' => $diffBytes,
-                            'growth_pct' => $growthPct
+                            'diff_kb' => round($diffBytes / 1024, 2),
+                            'diff_mb' => round($diffBytes / 1048576, 2),
+                            'growth_pct' => $growthPct,
+                            'old_size_fmt' => $oldFmt,
+                            'new_size_fmt' => $newFmt,
+                            'diff_fmt' => $diffFmt
                         ];
-                        Log::info("Sync: File $name size change: $oldSize -> $newSize (diff: $diffBytes bytes, $growthPct%)");
+                        Log::info("Sync: File $name size change: $oldFmt -> $newFmt (diff: $diffFmt, $growthPct%)");
                     }
                 }
                 
