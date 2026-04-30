@@ -141,11 +141,11 @@ class Server
                 // Si el archivo estaba marcado como 'missing' pero el cliente lo envió, 
                 // continuaremos para actualizar su estado a 'completed' o 'pending'.
                 
-                $workFile = $paths['work'] . '/' . $name;
+                $chunkDir = $paths['work'] . '/.chunks/' . $name;
                 $destFile = $paths['base'] . '/' . $name;
                 $isCompleted = ($srv && $srv['status'] === 'completed' && file_exists($destFile));
                 $hashMatches = ($srv && trim((string)$srv['file_hash']) === trim((string)$hash));
-                $tempExists = file_exists($workFile);
+                $tempExists = is_dir($chunkDir) && count(glob($chunkDir . '/*')) > 0;
 
                 // Si el hash es igual y el archivo físico existe en destino, SALTAMOS.
                 if ($isCompleted && $hashMatches) {
@@ -161,55 +161,50 @@ class Server
                     
                     $this->db->exec("DELETE FROM file_chunks WHERE rbfid = :r AND file_name = :n", [':r' => $r, ':n' => $name]);
                     
-                    $hasExistingFile = false;
-                    
-                    if (file_exists($destFile)) {
-                        Log::debug("Sync: File $name exists at destination, copying to work for patching");
-                        if (!is_dir($paths['work'])) {
-                            mkdir($paths['work'], 0755, true);
-                        }
-                        if (copy($destFile, $workFile)) {
-                            $hasExistingFile = true;
-                            // Asegurar que el archivo tenga el tamaño exacto que espera el cliente ahora
-                            $fh_fix = fopen($workFile, 'r+b');
-                            ftruncate($fh_fix, (int)$fileSize);
-                            fclose($fh_fix);
-                        }
+                    // Limpiar chunks temporales si existen
+                    if (is_dir($chunkDir)) {
+                        array_map('unlink', glob($chunkDir . '/*'));
+                        rmdir($chunkDir);
                     }
                     
-                    // OPTIMIZACIÓN: Si tenemos archivo existente, comparar chunks individualmente
+                    // OPTIMIZACIÓN: Si tenemos chunks existentes, compararlos individualmente
                     $pendingChunks = (int)$cnt; // Por defecto, todos pendientes
                     $firstPendingChunk = 0;
-if ($hasExistingFile && file_exists($workFile)) {
-                            $fh_truncate = fopen($workFile, 'r+b');
-                            if ($fh_truncate) {
-                                ftruncate($fh_truncate, $fileSize);
-                                fclose($fh_truncate);
-                            }
+                    
+                    // Verificar si hay chunks en directorio .chunks/
+                    $hasExistingChunks = $tempExists;
+                    
+                    if ($hasExistingChunks && is_dir($chunkDir)) {
                         $pendingChunks = 0;
                         $firstPendingChunk = null;
                         $chunkSize = \App\Chunk::size($fileSize);
                         
-                        Log::info("Sync Patching [$r] $name: Comparing $cnt chunks (Size: $chunkSize)");
+                        Log::info("Sync Patching [$r] $name: Comparing $cnt chunks from .chunks/ (Size: $chunkSize)");
                         
                         for ($i = 0; $i < $cnt; $i++) {
-                            $offset = $i * $chunkSize;
-                            $length = min($chunkSize, $fileSize - $offset);
-                            if ($length <= 0) continue;
-                            
-                            $chunkData = file_get_contents($workFile, false, null, $offset, $length);
-                            $chunkHash = \App\Hash::toBase64(hash('xxh3', $chunkData));
+                            $chunkPath = $chunkDir . '/' . $i;
                             $expectedHash = $chunkHashes[$i] ?? '';
                             
-                            if ($chunkHash === $expectedHash) {
-                                $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'received', NOW())", 
-                                    [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
+                            if (file_exists($chunkPath)) {
+                                $chunkData = file_get_contents($chunkPath);
+                                $chunkHash = \App\Hash::toBase64(hash('xxh3', $chunkData));
+                                
+                                if ($chunkHash === $expectedHash) {
+                                    $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'received', NOW())", 
+                                            [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
+                                } else {
+                                    $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
+                                            [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
+                                    $pendingChunks++;
+                                    if ($firstPendingChunk === null) $firstPendingChunk = $i;
+                                    Log::debug("Sync: Chunk $i differs (Local: $chunkHash, Remote: $expectedHash)");
+                                }
                             } else {
+                                // Chunk no existe en disco, marcar como pendiente
                                 $this->db->exec("INSERT INTO file_chunks (rbfid, file_name, chunk_index, chunk_hash, status, updated_at) VALUES (:rbfid, :file, :idx, :hash, 'pending', NOW())", 
-                                    [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
+                                        [':rbfid' => $r, ':file' => $name, ':idx' => $i, ':hash' => $expectedHash]);
                                 $pendingChunks++;
                                 if ($firstPendingChunk === null) $firstPendingChunk = $i;
-                                Log::debug("Sync: Chunk $i differs (Local: $chunkHash, Remote: $expectedHash)");
                             }
                         }
                     } else {
@@ -301,10 +296,9 @@ if ($hasExistingFile && file_exists($workFile)) {
             $idx = max(0, (int) ($b['chunk_index'] ?? 0));
             $sz = max(0, (int) ($b['size'] ?? 0));
             $hash = $b['chunk_hash'] ?? '';
-            if ($sz > 5368709120)
+            if ($sz > 1073741824)
                 self::err('File too large');
-
-            // Importante: Obtener info del archivo antes de calcular el offset
+        
             $fileInfo = $this->db->q("SELECT chunk_count, chunk_pending, file_size FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $file]);
             if (!$fileInfo) {
                 self::err('Sesión de sincronización no encontrada para este archivo', 400);
@@ -324,13 +318,14 @@ if ($hasExistingFile && file_exists($workFile)) {
 
             Log::info("Upload: Using paths - work: {$paths['work']}, base: {$paths['base']}, service: $serviceName");
 
-            // El offset DEBE basarse en el tamaño original registrado en el sync para mantener integridad
-            $chunkSize = \App\Chunk::size((int)$fileInfo['file_size']);
-            $offset = $idx * $chunkSize;
-
-            Log::info("Upload: [$r] $file | Chunk $idx | Offset: $offset | Size: " . strlen($data) . " bytes");
-            if (!Storage::saveChunk($paths['work'], $file, $idx, $offset, $data)) {
-                Log::error("Upload: Storage::saveChunk failed for $file index $idx");
+            Log::info("Upload: [$r] $file | Chunk $idx | Size: " . strlen($data) . " bytes");
+            $chunkDir = $paths['work'] . '/.chunks/' . $file;
+            if (!is_dir($chunkDir)) {
+                @mkdir($chunkDir, 0755, true);
+            }
+            $chunkPath = $chunkDir . '/' . $idx;
+            if (file_put_contents($chunkPath, $data) !== strlen($data)) {
+                Log::error("Upload: Failed to save chunk $idx for $file");
                 self::err('Save failed');
             }
 
@@ -375,48 +370,133 @@ if ($hasExistingFile && file_exists($workFile)) {
     }
     private function finalize(string $r, string $f, array $paths): void
     {
-        $wp = $paths['work'] . '/' . $f;
         $row = $this->db->q("SELECT file_hash, file_size, chunk_count FROM files WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
         $target = $row['file_hash'] ?? '';
         $expectedSize = (int)($row['file_size'] ?? 0);
         $chunkCount = (int)($row['chunk_count'] ?? 0);
+        $wp = $paths['work'] . '/' . $f;
+        $chunkDir = $paths['work'] . '/.chunks/' . $f;
         
-        $actualSize = file_exists($wp) ? filesize($wp) : 0;
-        $actual = \App\Hash::computeFile($wp);
+        // Verify all chunks exist on disk
+        $missingChunks = [];
+        for ($i = 0; $i < $chunkCount; $i++) {
+            if (!file_exists($chunkDir . '/' . $i)) {
+                $missingChunks[] = $i;
+            }
+        }
+        
+        if (!empty($missingChunks)) {
+            Log::error("Finalize: Missing chunks for $f: " . implode(', ', $missingChunks));
+            foreach ($missingChunks as $idx) {
+                $this->db->exec("UPDATE file_chunks SET status='pending' WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx",
+                    [':r' => $r, ':f' => $f, ':idx' => $idx]);
+            }
+            $nextChunk = $missingChunks[0];
+            $pendingCount = count($missingChunks);
+            $this->db->exec("UPDATE files SET chunk_pending=:p WHERE rbfid=:r AND file_name=:f", [':p' => $pendingCount, ':r' => $r, ':f' => $f]);
+            self::json(['ok' => true, 'status' => 'missing_chunks', 'next_chunk' => $nextChunk]);
+            return;
+        }
+        
+        // Assemble chunks atomically
+        $assemblyFile = $wp . '.assembling';
+        $chunkSize = \App\Chunk::size($expectedSize);
+        
+        $fh = fopen($assemblyFile, 'wb');
+        if (!$fh) {
+            Log::error("Finalize: Cannot create assembly file for $f");
+            self::json(['ok' => false, 'error' => 'Cannot create assembly file']);
+            return;
+        }
+        
+        for ($i = 0; $i < $chunkCount; $i++) {
+            $chunkData = file_get_contents($chunkDir . '/' . $i);
+            fwrite($fh, $chunkData);
+        }
+        fclose($fh);
+        
+        // Verify final hash
+        $actual = \App\Hash::computeFile($assemblyFile);
         $actualBase64 = \App\Hash::toBase64($actual);
         
-        Log::debug("Finalize: $f | Expected size: $expectedSize, Actual: $actualSize, Chunks: $chunkCount");
-        Log::debug("Finalize: $f | Target hash: $target, Actual hash: $actualBase64");
-
+        Log::debug("Finalize: $f | Target: $target, Actual: $actualBase64");
+        
         if ($target === $actualBase64) {
+            // Success - move to work dir, then to destination
+            rename($assemblyFile, $wp);
+            
             if (!is_dir($paths['base'])) {
-                Log::debug("Finalize: Creating base dir {$paths['base']}");
                 mkdir($paths['base'], 0755, true);
             }
             $dp = $paths['base'] . '/' . $f;
+            
             if (file_exists($dp)) {
-                // Si el archivo nuevo es notablemente más pequeño (< 90%), preservamos el anterior en Cerrados.
                 if (filesize($wp) < (filesize($dp) * 0.90)) {
-                    Log::info("Finalize: New file $f is notably smaller. Archiving old version.");
+                    Log::info("Finalize: Archiving old version of $f");
                     $this->archiveHistorical($r, $f, $dp, $paths);
                 } else {
-                    Log::debug("Finalize: Removing old file $dp");
                     unlink($dp);
                 }
             }
-            Log::info("Finalize: Moving verified file from {$paths['work']}/$f to $dp (hash: $actualBase64)");
+            
             rename($wp, $dp);
             $this->db->exec("UPDATE files SET status='completed', chunk_pending=0 WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
-            Log::info("File $f finalized & verified for $r | Final path: $dp");
+            
+            // Cleanup chunks
+            array_map('unlink', glob($chunkDir . '/*'));
+            rmdir($chunkDir);
+            
+            Log::info("File $f finalized successfully for $r");
             self::json(['ok' => true, 'status' => 'complete']);
             return;
         }
-
-        // Caso de Error de Hash Final
-        Log::error("File $f: Final hash mismatch (exp: $target, act: $actualBase64)");
-        if (file_exists($wp)) unlink($wp);
-        $this->db->exec("UPDATE files SET status='failed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
-        self::json(['ok' => false, 'error' => 'Hash mismatch', 'status' => 'error']);
+        
+        // Hash mismatch - rehash each chunk to find bad ones
+        Log::error("Finalize: Hash mismatch for $f (expected: $target, got: $actualBase64)");
+        
+        $badChunks = [];
+        $fh = fopen($assemblyFile, 'rb');
+        for ($i = 0; $i < $chunkCount; $i++) {
+            $offset = $i * $chunkSize;
+            $length = min($chunkSize, $expectedSize - $offset);
+            if ($length <= 0) continue;
+            
+            fseek($fh, $offset);
+            $chunkData = fread($fh, $length);
+            $chunkHash = \App\Hash::toBase64(hash('xxh3', $chunkData));
+            
+            $expectedChunkHash = $this->db->q("SELECT chunk_hash FROM file_chunks WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx",
+                [':r' => $r, ':f' => $f, ':idx' => $i])['chunk_hash'] ?? '';
+            
+            if ($chunkHash !== $expectedChunkHash) {
+                $badChunks[] = $i;
+                $this->db->exec("UPDATE file_chunks SET status='pending' WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx",
+                    [':r' => $r, ':f' => $f, ':idx' => $i]);
+            } else {
+                $this->db->exec("UPDATE file_chunks SET status='received' WHERE rbfid=:r AND file_name=:f AND chunk_index=:idx",
+                    [':r' => $r, ':f' => $f, ':idx' => $i]);
+            }
+        }
+        fclose($fh);
+        
+        // Update pending count
+        $pendingCount = count($badChunks);
+        $this->db->exec("UPDATE files SET chunk_pending=:p WHERE rbfid=:r AND file_name=:f", [':p' => $pendingCount, ':r' => $r, ':f' => $f]);
+        
+        // Clean up assembly file
+        unlink($assemblyFile);
+        
+        if (!empty($badChunks)) {
+            $nextChunk = $badChunks[0];
+            Log::info("Finalize: Found " . count($badChunks) . " bad chunks for $f, next: $nextChunk");
+            self::json(['ok' => true, 'status' => 'rehash', 'next_chunk' => $nextChunk, 'bad_chunks' => $badChunks]);
+        } else {
+            // All chunks match but final hash doesn't - inconsistent state
+            Log::error("Finalize: All chunks match but final hash differs for $f");
+            if (file_exists($wp)) unlink($wp);
+            $this->db->exec("UPDATE files SET status='failed' WHERE rbfid=:r AND file_name=:f", [':r' => $r, ':f' => $f]);
+            self::json(['ok' => false, 'error' => 'Hash mismatch - inconsistent state', 'status' => 'error']);
+        }
     }
 
     private function archiveHistorical(string $r, string $f, string $dp, array $paths): void
@@ -475,15 +555,31 @@ if ($hasExistingFile && file_exists($workFile)) {
     {
         $specificService = $b['service'] ?? null;
         
-        $sql = "SELECT s.name, s.type, 
-                       CASE 
-                         WHEN cs.config IS NULL OR cs.config = '{}'::jsonb THEN s.default_config 
-                         ELSE cs.config 
-                       END as config, 
-                       COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds 
-                FROM service_config cs
-                JOIN services s ON s.id = cs.service_id
-                WHERE cs.client_rbfid = :r AND cs.enabled = true";
+        // Opción C: Primero verificar si hay personalizaciones en service_config
+        $hasCustomConfig = $this->db->q(
+            "SELECT 1 FROM service_config WHERE client_rbfid = :r LIMIT 1",
+            [':r' => $r]
+        );
+        
+        if ($hasCustomConfig) {
+            // Usar service_config con JOIN (personalizaciones existen)
+            $sql = "SELECT s.name, s.type, 
+                           CASE 
+                             WHEN cs.config IS NULL OR cs.config = '{}'::jsonb THEN s.default_config 
+                             ELSE cs.config 
+                           END as config, 
+                           COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds 
+                    FROM service_config cs
+                    JOIN services s ON s.id = cs.service_id
+                    WHERE cs.client_rbfid = :r AND cs.enabled = true";
+        } else {
+            // Fallback: usar solo services por defecto
+            $sql = "SELECT s.name, s.type, 
+                           s.default_config as config, 
+                           s.default_frequency_seconds as frequency_seconds 
+                    FROM services s
+                    WHERE s.enabled = true";
+        }
         
         $params = [':r' => $r];
 
@@ -512,8 +608,11 @@ if ($hasExistingFile && file_exists($workFile)) {
             return;
         }
 
-        // Modo Orquestador: Solo lo que ya toca ejecutar
-        $sql .= " AND (cs.next_execution IS NULL OR cs.next_execution <= NOW())";
+        if ($hasCustomConfig) {
+            // Modo Orquestador: Solo lo que ya toca ejecutar (solo para service_config)
+            $sql .= " AND (cs.next_execution IS NULL OR cs.next_execution <= NOW())";
+        }
+        
         $services = $this->db->qa($sql, $params);
         
         foreach ($services as $svc) {
@@ -525,31 +624,62 @@ if ($hasExistingFile && file_exists($workFile)) {
 
     private function listServices(string $r): void
     {
-        $sql = "SELECT s.name, s.type, 
-                       COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds,
-                       cs.last_execution,
-                       cs.next_execution,
-                       (SELECT status FROM service_history sh 
-                        WHERE sh.client_rbfid = cs.client_rbfid AND sh.service_name = s.name 
-                        ORDER BY sh.completed_at DESC LIMIT 1) as last_status
-                FROM service_config cs
-                JOIN services s ON s.id = cs.service_id
-                WHERE cs.client_rbfid = :r AND cs.enabled = true
-                ORDER BY s.name";
+        // Opción C: Verificar si hay personalizaciones
+        $hasCustomConfig = $this->db->q(
+            "SELECT 1 FROM service_config WHERE client_rbfid = :r LIMIT 1",
+            [':r' => $r]
+        );
+        
+        if ($hasCustomConfig) {
+            // Usar service_config con personalizaciones
+            $sql = "SELECT s.name, s.type, 
+                           COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds,
+                           cs.last_execution,
+                           cs.next_execution,
+                           (SELECT status FROM service_history sh 
+                            WHERE sh.client_rbfid = cs.client_rbfid AND sh.service_name = s.name 
+                            ORDER BY sh.completed_at DESC LIMIT 1) as last_status
+                    FROM service_config cs
+                    JOIN services s ON s.id = cs.service_id
+                    WHERE cs.client_rbfid = :r AND cs.enabled = true
+                    ORDER BY s.name";
+        } else {
+            // Fallback: usar solo services
+            $sql = "SELECT s.name, s.type, 
+                           s.default_frequency_seconds as frequency_seconds,
+                           NULL as last_execution,
+                           NULL as next_execution,
+                           (SELECT status FROM service_history sh 
+                            WHERE sh.client_rbfid = :r AND sh.service_name = s.name 
+                            ORDER BY sh.completed_at DESC LIMIT 1) as last_status
+                    FROM services s
+                    WHERE s.enabled = true
+                    ORDER BY s.name";
+        }
         
         self::json(['ok' => true, 'services' => $this->db->qa($sql, [':r' => $r])]);
     }
 
     private function updateNextExecution(string $r, string $serviceName, int $seconds): void
     {
-        $this->db->exec("UPDATE service_config 
-                        SET next_execution = NOW() + (:s || ' seconds')::interval,
-                            last_execution = NOW()
-                        FROM services s
-                        WHERE service_config.service_id = s.id 
-                        AND service_config.client_rbfid = :r 
-                        AND s.name = :n", 
-                        [':r' => $r, ':n' => $serviceName, ':s' => $seconds]);
+        // Solo actualizar si existe en service_config
+        $exists = $this->db->q(
+            "SELECT 1 FROM service_config cs JOIN services s ON s.id = cs.service_id 
+             WHERE cs.client_rbfid = :r AND s.name = :n",
+            [':r' => $r, ':n' => $serviceName]
+        );
+        
+        if ($exists) {
+            $this->db->exec("UPDATE service_config 
+                            SET next_execution = NOW() + (:s || ' seconds')::interval,
+                                last_execution = NOW()
+                            FROM services s
+                            WHERE service_config.service_id = s.id 
+                            AND service_config.client_rbfid = :r 
+                            AND s.name = :n", 
+                            [':r' => $r, ':n' => $serviceName, ':s' => $seconds]);
+        }
+        // Si no existe en service_config, omitir (usa valores por defecto de services)
     }
 
     private function serviceResult(string $r, array $b): void
@@ -600,16 +730,37 @@ private function serviceConfig(string $r, array $b): void
     {
         $name = $b['service'] ?? '';
         
-        // Buscar config en service_config (JSONB) primero, luego en services (columnas)
-        $row = $this->db->q(
-            "SELECT s.type, s.name, s.files, s.direction, s.temp, s.dest, s.source, s.recursive, s.exclude, s.maxage,
-                    COALESCE(cs.config, '{}'::jsonb) as client_cfg,
-                    COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds
+        // Opción C: Buscar primero si hay personalización en service_config
+        $hasCustom = $this->db->q(
+            "SELECT cs.config, cs.frequency_seconds 
              FROM service_config cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
             [':r' => $r, ':n' => $name]
         );
-        if (!$row) self::err("Service '$name' not configured for $r", 404);
+        
+        if ($hasCustom) {
+            // Usar service_config (hay personalización)
+            $row = $this->db->q(
+                "SELECT s.type, s.name, s.files, s.direction, s.temp, s.dest, s.source, s.recursive, s.exclude, s.maxage,
+                        COALESCE(cs.config, '{}'::jsonb) as client_cfg,
+                        COALESCE(cs.frequency_seconds, s.default_frequency_seconds) as frequency_seconds
+                 FROM service_config cs JOIN services s ON s.id = cs.service_id
+                 WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
+                [':r' => $r, ':n' => $name]
+            );
+        } else {
+            // Fallback: usar solo services (valores por defecto)
+            $row = $this->db->q(
+                "SELECT s.type, s.name, s.files, s.direction, s.temp, s.dest, s.source, s.recursive, s.exclude, s.maxage,
+                        s.default_config as client_cfg,
+                        s.default_frequency_seconds as frequency_seconds
+                 FROM services s
+                 WHERE s.name = :n AND s.enabled = true",
+                [':n' => $name]
+            );
+        }
+        
+        if (!$row) self::err("Service '$name' not found or disabled", 404);
         
         $paths = $this->paths($r, $name);
         $ctx = ['rbfid' => $r, 'emp' => $paths['emp'] ?? '_', 'plaza' => $paths['plaza'] ?? '_'];
@@ -640,14 +791,33 @@ private function serviceConfig(string $r, array $b): void
         if (!$paths) self::err('Client not found');
         $ctx = ['rbfid' => $r, 'emp' => $paths['emp'], 'plaza' => $paths['plaza']];
 
-        // Obtener config del servicio (nuevas columnas o client_cfg)
-        $row = $this->db->q(
-            "SELECT s.files, s.dest, s.source, s.direction,
-                    COALESCE(cs.config, '{}'::jsonb) as client_cfg
-             FROM service_config cs JOIN services s ON s.id = cs.service_id
+        // Opción C: Verificar si hay personalización
+        $hasCustom = $this->db->q(
+            "SELECT cs.config FROM service_config cs JOIN services s ON s.id = cs.service_id
              WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
             [':r' => $r, ':n' => $serviceName]
         );
+        
+        if ($hasCustom) {
+            // Usar service_config
+            $row = $this->db->q(
+                "SELECT s.files, s.dest, s.source, s.direction,
+                        COALESCE(cs.config, '{}'::jsonb) as client_cfg
+                 FROM service_config cs JOIN services s ON s.id = cs.service_id
+                 WHERE cs.client_rbfid = :r AND s.name = :n AND cs.enabled = true",
+                [':r' => $r, ':n' => $serviceName]
+            );
+        } else {
+            // Fallback: usar services por defecto
+            $row = $this->db->q(
+                "SELECT s.files, s.dest, s.source, s.direction,
+                        s.default_config as client_cfg
+                 FROM services s
+                 WHERE s.name = :n AND s.enabled = true",
+                [':n' => $serviceName]
+            );
+        }
+        
         if (!$row) self::err("Service '$serviceName' not found or disabled", 404);
         
         // Solo procesar si direction es download
@@ -767,7 +937,6 @@ private function serviceConfig(string $r, array $b): void
                 $baseDir = $svc['dest'];
                 $baseDir = str_replace(['{emp}', '{plaza}', '{rbfid}'], [$e, $p, $r], $baseDir);
             }
-            $workDir = "/tmp/respaldoSucursal/$r/$serviceName";
         }
         
         return ['emp' => $e, 'plaza' => $p, 'base' => $baseDir, 'work' => $workDir];
