@@ -153,10 +153,16 @@ class Server
                 $hashMatches = ($srv && trim((string)$srv['file_hash']) === trim((string)$hash));
                 $tempExists = is_dir($chunkDir) && count(glob($chunkDir . '/*')) > 0;
                 
-                // Si el hash es igual y el archivo físico existe en destino, SALTAMOS.
+                // Si el hash es igual y el archivo físico existe en destino, verificar si hay chunks pendientes
                 if ($destFileExists && $hashMatches) {
-                    Log::debug("Sync: Skipping $name (already exists in destination and hash matches)");
-                    continue;
+                    $pendingCount = (int)$this->db->q("SELECT COUNT(*) as cnt FROM file_chunks WHERE rbfid = :r AND file_name = :n AND status != 'received'", 
+                        [':r' => $r, ':n' => $name])['cnt'];
+                    
+                    if ($pendingCount == 0) {
+                        Log::debug("Sync: Skipping $name (already exists in destination and hash matches)");
+                        continue;
+                    }
+                    Log::info("Sync: File $name has $pendingCount pending chunks. Processing remaining chunks.");
                 }
 
                 $sizeChanged = $srv && $srv['file_size'] !== null && (int)$srv['file_size'] !== (int)$fileSize;
