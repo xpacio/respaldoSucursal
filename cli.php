@@ -105,6 +105,17 @@ class Client {
         Log::info("Orchestrator started with " . count($this->locations) . " locations.");
         while (true) {
             $pollStartedAt = time(); // Marca inicial del poll
+            
+            // Enviar heartbeat al iniciar ciclo
+            foreach ($this->locations as $loc) {
+                try {
+                    $this->http->req('heartbeat', $loc['rbfid'], [
+                        'status' => 'running',
+                        'system_info' => ['cycle_start' => date('H:i:s')]
+                    ]);
+                } catch (\Throwable $e) { /* ignorar errores */ }
+            }
+            
             foreach ($this->locations as $loc) {
                 $rbfid = $loc['rbfid'];
                 try {
