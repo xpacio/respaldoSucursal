@@ -524,7 +524,7 @@ private function viewServices(): void {
          $clients = $this->db->qa($sql, $params);
          
          echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
-         echo "<thead><tr><th>RBFID</th><th>Emp</th><th>Plaza</th><th>Razón Social</th><th>Tipo</th><th>Heartbeat</th><th>Enabled</th><th>Acciones</th></tr></thead>";
+         echo "<thead><tr><th>RBFID</th><th>Emp</th><th>Plaza</th><th>Razón Social</th><th>Tipo</th><th>Heartbeat</th><th>Última Interacción</th><th>Enabled</th><th>Acciones</th></tr></thead>";
          echo "<tbody>";
         foreach ($clients as $c) {
             echo "<tr>";
@@ -534,6 +534,23 @@ private function viewServices(): void {
             echo "<td>" . htmlspecialchars($c['razon_social'] ?? '') . "</td>";
             echo "<td>" . htmlspecialchars($c['tipo'] ?? 'sucursal') . "</td>";
             echo "<td>" . $this->heartbeatIcon($c['last_heartbeat'] ?? null) . "</td>";
+            
+            // NUEVO: Última Interacción formateada
+            $lastInteraction = 'Nunca';
+            if (!empty($c['last_heartbeat'])) {
+                $secondsAgo = time() - strtotime($c['last_heartbeat']);
+                if ($secondsAgo < 60) {
+                    $lastInteraction = $secondsAgo . 's';
+                } elseif ($secondsAgo < 3600) {
+                    $lastInteraction = round($secondsAgo / 60, 1) . 'm';
+                } elseif ($secondsAgo < 86400) {
+                    $lastInteraction = round($secondsAgo / 3600, 1) . 'h';
+                } else {
+                    $lastInteraction = round($secondsAgo / 86400, 1) . 'd';
+                }
+            }
+            echo "<td><small>" . $lastInteraction . "</small></td>";
+            
             echo "<td>" . $this->iconEnabled($c['enabled']) . "</td>";
              echo "<td>";
              echo "<a href='/clients/edit/" . $c['rbfid'] . "' class='btn btn-sm btn-outline-primary me-1'>Editar</a>";

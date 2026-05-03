@@ -146,6 +146,14 @@ class Client {
     }
 
     public function executeService(string $service, string $rbfid): void {
+        // Send heartbeat before executing
+        try {
+            $this->http->req('heartbeat', $rbfid, [
+                'status' => 'running',
+                'system_info' => ['service' => $service, 'start' => date('H:i:s')]
+            ]);
+        } catch (\Throwable $e) { /* ignore errors */ }
+        
         $start = microtime(true);
         $GLOBALS['totalBytesTransferred'] = 0;
         $GLOBALS['totalChunks'] = 0;
