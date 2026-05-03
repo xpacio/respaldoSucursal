@@ -720,7 +720,7 @@ class Server
             $this->updateNextExecution($r, $svc['name'], (int)$svc['frequency_seconds']);
         }
         
-        self::json(['ok' => true, 'services' => $services]);
+        self::json(['ok' => true, 'services' => $services, 'rate_delay' => 3000]);
     }
 
     private function listServices(string $r): void

@@ -104,6 +104,7 @@ class Client {
         }
         Log::info("Orchestrator started with " . count($this->locations) . " locations.");
         while (true) {
+            $pollStartedAt = time(); // Marca inicial del poll
             foreach ($this->locations as $loc) {
                 $rbfid = $loc['rbfid'];
                 try {
@@ -115,7 +116,21 @@ class Client {
                     }
                 } catch (\Throwable $e) { Log::error("Orchestrator Error ($rbfid): " . $e->getMessage()); }
             }
-            sleep(Constants::POLL_SEC);
+            
+            // Lógica de espera: mantener ciclos de 50s
+            $elapsed = time() - $pollStartedAt;
+            
+            if ($elapsed > 50) {
+                // Caso atraso: recuperar en 10s
+                Log::info("Overdue execution ({$elapsed}s > 50s), re-polling in 10s");
+                sleep(10);
+            } else {
+                // Caso normal: completar ciclo de 50s
+                $sleepSecs = 50 - $elapsed;
+                if ($sleepSecs < 10) $sleepSecs = 10; // Mínimo 10s
+                Log::debug("Maintaining 50s cycle, sleeping {$sleepSecs}s (elapsed: {$elapsed}s)");
+                sleep($sleepSecs);
+            }
         }
     }
 
