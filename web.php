@@ -89,6 +89,18 @@ class AdminUI {
             exit;
         }
 
+        // Toggle frecuencia (AJAX)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_frequency']) && ($_SESSION['admin_auth'] ?? false)) {
+            $id = (int)($_POST['service_id'] ?? 0);
+            $freq = (int)($_POST['frequency'] ?? 1800);
+            if ($id > 0) {
+                $this->db->exec("UPDATE services SET default_frequency_seconds=:f WHERE id=:id", [':id'=>$id, ':f'=>$freq]);
+            }
+            header('Content-Type: application/json');
+            echo json_encode(['ok'=>true]);
+            exit;
+        }
+        
         // Guardar servicio (Solo usuarios autenticados)
           if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service']) && ($_SESSION['admin_auth'] ?? false)) {
             $id = (int)($_POST['service_id'] ?? 0);
@@ -226,6 +238,7 @@ class AdminUI {
         <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Service enabled toggle
             document.querySelectorAll('.service-toggle').forEach(function(toggle) {
                 toggle.addEventListener('change', function() {
                     const serviceId = this.dataset.serviceId;
@@ -234,7 +247,7 @@ class AdminUI {
                     formData.append('toggle_service_enabled', '1');
                     formData.append('service_id', serviceId);
                     if (enabled) formData.append('enabled', '1');
-
+                    
                     fetch('/services', {
                         method: 'POST',
                         body: new URLSearchParams(formData)
@@ -248,6 +261,32 @@ class AdminUI {
                     })
                     .catch(() => {
                         this.checked = !enabled;
+                        alert('Error de conexión');
+                    });
+                });
+            });
+            
+            // Frequency toggle
+            document.querySelectorAll('.freq-toggle').forEach(function(select) {
+                select.addEventListener('change', function() {
+                    const serviceId = this.dataset.serviceId;
+                    const frequency = this.value;
+                    const formData = new FormData();
+                    formData.append('toggle_frequency', '1');
+                    formData.append('service_id', serviceId);
+                    formData.append('frequency', frequency);
+                    
+                    fetch('/services', {
+                        method: 'POST',
+                        body: new URLSearchParams(formData)
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (!data.ok) {
+                            alert('Error al actualizar frecuencia');
+                        }
+                    })
+                    .catch(() => {
                         alert('Error de conexión');
                     });
                 });
@@ -377,7 +416,7 @@ private function viewServices(): void {
         <?php
         
         echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
-        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Freq</th><th>Archivos</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Acciones</th></tr></thead>";
+        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Freq</th><th>Archivos</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Freq Toggle</th><th>Acciones</th></tr></thead>";
         echo "<tbody>";
         $services = $this->db->qa("SELECT * FROM services ORDER BY enabled DESC, name ASC");
         foreach ($services as $s) {
@@ -391,7 +430,7 @@ private function viewServices(): void {
             echo "<td><strong>{$s['name']}</strong></td>";
             echo "<td>" . $this->iconType($s['type']) . "</td>";
             echo "<td>" . $this->iconDirection($s['direction']) . "</td>";
-            $freq = (int)($s['default_frequency_seconds'] ?? 300);
+            $freq = (int)($s['default_frequency_seconds'] ?? 1800);
             $freqDisplay = $freq >= 86400 ? round($freq/86400,1).'d' : ($freq >= 3600 ? round($freq/3600,1).'h' : ($freq >= 60 ? round($freq/60,1).'m' : $freq.'s'));
             echo "<td><strong>$freqDisplay</strong></td>";
             echo "<td>{$fileCount}</td>";
@@ -399,6 +438,7 @@ private function viewServices(): void {
             echo "<td><small>" . htmlspecialchars(substr($exclude, 0, 30)) . "</small></td>";
             echo "<td>" . $this->iconRecursive($s['recursive']) . "</td>";
             echo "<td>" . $this->iconEnabled($s['enabled'], $s['id']) . "</td>";
+            echo "<td>" . $this->freqToggle($s['id'], $freq) . "</td>";
             echo "<td><a href='/services/edit/{$s['id']}' class='btn btn-sm btn-outline-primary'>Editar</a></td>";
             echo "</tr>";
         }
@@ -584,10 +624,24 @@ HTML;
         return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-success"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>';
     }
     return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-danger"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 10h.01" /><path d="M15 10h.01" /><path d="M9.5 15.5a3.5 3.5 0 0 0 5 0" /></svg>';
-}
+ }
+
+    private function freqToggle(int $serviceId, int $currentFreq): string {
+        $freqOptions = [1=>'1m', 5=>'5m', 10=>'10m', 15=>'15m', 20=>'20m', 30=>'30m', 45=>'45m', 60=>'1h', 120=>'2h', 180=>'3h'];
+        $currentMins = $currentFreq / 60;
+        $selectId = "freq-toggle-{$serviceId}";
+        $html = "<select class='form-select form-select-sm freq-toggle' id='{$selectId}' data-service-id='{$serviceId}' style='min-width: 80px;'>";
+        foreach ($freqOptions as $mins => $label) {
+            $selected = ($currentMins == $mins) ? ' selected' : '';
+            $seconds = $mins * 60;
+            $html .= "<option value='{$seconds}'{$selected}>{$label}</option>";
+        }
+        $html .= "</select>";
+        return $html;
+    }
 
     private function editService(int $id): void {
-        $service = ['id'=>0, 'name'=>'', 'type'=>'sync', 'files'=>'', 'direction'=>'upload', 'temp'=>'%tmp%/respaldoSucursal/{service}', 'dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'source'=>'{base}', 'recursive'=>false, 'exclude'=>'', 'maxage'=>null, 'description'=>'', 'enabled'=>true];
+        $service = ['id'=>0, 'name'=>'', 'type'=>'sync', 'files'=>'', 'direction'=>'upload', 'temp'=>'%tmp%/respaldoSucursal/{service}', 'dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'source'=>'{base}', 'recursive'=>false, 'exclude'=>'', 'maxage'=>null, 'description'=>'', 'enabled'=>true, 'default_frequency_seconds'=>1800];
         if ($id > 0) {
             $row = $this->db->q("SELECT * FROM services WHERE id=:id", [':id'=>$id]);
             if ($row) $service = array_merge($service, $row);
@@ -616,7 +670,15 @@ HTML;
         echo "<div class='mb-3'><label class='form-label'>Description</label><input type='text' name='description' class='form-control' value='" . htmlspecialchars($service['description'] ?? '') . "' placeholder='Descripción del servicio'></div>";
         
         echo "<div class='row mb-3'>";
-        echo "<div class='col-md-6'><label class='form-label'>Frecuencia (segundos)</label><input type='number' name='default_frequency_seconds' class='form-control' value='" . (int)($service['default_frequency_seconds'] ?? 300) . "' placeholder='300' min='60' step='60'><small class='form-hint'>300=5min, 3600=1hr, 86400=1día</small></div>";
+        echo "<div class='col-md-6'><label class='form-label'>Frecuencia</label><select name='default_frequency_seconds' class='form-select'>";
+        $freqOptions = [1=>'1 min', 5=>'5 min', 10=>'10 min', 15=>'15 min', 20=>'20 min', 30=>'30 min', 45=>'45 min', 60=>'60 min (1 hr)', 120=>'120 min (2 hrs)', 180=>'180 min (3 hrs)'];
+        $currentFreq = (int)($service['default_frequency_seconds'] ?? 1800) / 60; // Convert to minutes for comparison
+        foreach ($freqOptions as $mins => $label) {
+            $selected = ($currentFreq == $mins) ? ' selected' : '';
+            $seconds = $mins * 60;
+            echo "<option value='$seconds'$selected>$label</option>";
+        }
+        echo "</select></div>";
         echo "</div>";
         
         echo "<div class='mb-3'><label class='form-label'>Files (separados por coma)</label><input type='text' name='files' class='form-control' value='" . htmlspecialchars($service['files'] ?? '') . "' placeholder='VENTA.DBF,*.DBF,carpeta/*'></div>";
