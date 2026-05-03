@@ -416,7 +416,7 @@ private function viewServices(): void {
         <?php
         
         echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
-        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Freq</th><th>Archivos</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Freq Toggle</th><th>Acciones</th></tr></thead>";
+        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Archivos</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Freq</th><th>Acciones</th></tr></thead>";
         echo "<tbody>";
         $services = $this->db->qa("SELECT * FROM services ORDER BY enabled DESC, name ASC");
         foreach ($services as $s) {
@@ -430,15 +430,12 @@ private function viewServices(): void {
             echo "<td><strong>{$s['name']}</strong></td>";
             echo "<td>" . $this->iconType($s['type']) . "</td>";
             echo "<td>" . $this->iconDirection($s['direction']) . "</td>";
-            $freq = (int)($s['default_frequency_seconds'] ?? 1800);
-            $freqDisplay = $freq >= 86400 ? round($freq/86400,1).'d' : ($freq >= 3600 ? round($freq/3600,1).'h' : ($freq >= 60 ? round($freq/60,1).'m' : $freq.'s'));
-            echo "<td><strong>$freqDisplay</strong></td>";
             echo "<td>{$fileCount}</td>";
             echo "<td>" . ($maxage !== '' ? $maxage : "") . "</td>";
             echo "<td><small>" . htmlspecialchars(substr($exclude, 0, 30)) . "</small></td>";
             echo "<td>" . $this->iconRecursive($s['recursive']) . "</td>";
             echo "<td>" . $this->iconEnabled($s['enabled'], $s['id']) . "</td>";
-            echo "<td>" . $this->freqToggle($s['id'], $freq) . "</td>";
+            echo "<td>" . $this->freqToggle($s['id'], (int)($s['default_frequency_seconds'] ?? 1800)) . "</td>";
             echo "<td><a href='/services/edit/{$s['id']}' class='btn btn-sm btn-outline-primary'>Editar</a></td>";
             echo "</tr>";
         }
