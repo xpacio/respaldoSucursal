@@ -661,6 +661,21 @@ class Server
             [':r' => $r]
         );
         
+        // Si NO hay personalizaciones, crear entradas automaticas para poder trackear next_execution
+        if (!$hasCustomConfig) {
+            Log::info("No service_config found for $r, creating default entries");
+            $services = $this->db->qa("SELECT id, name, default_frequency_seconds FROM services WHERE enabled = true");
+            foreach ($services as $s) {
+                $this->db->exec(
+                    "INSERT INTO service_config (client_rbfid, service_id, frequency_seconds, enabled, next_execution) 
+                     VALUES (:r, :sid, :freq, true, NOW()) 
+                     ON CONFLICT (client_rbfid, service_id) DO NOTHING",
+                    [':r' => $r, ':sid' => $s['id'], ':freq' => $s['default_frequency_seconds'] ?? 300]
+                );
+            }
+            $hasCustomConfig = true; // Ahora sí hay config
+        }
+        
         $params = [];
         
         if ($hasCustomConfig) {
