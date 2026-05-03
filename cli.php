@@ -92,6 +92,16 @@ class Client {
     }
 
     public function runOrchestrator(): void {
+        if (empty($this->locations)) {
+            Log::info("No locations found. Running disk scan...");
+            $this->scanAndCreateConfig();
+            $data = \App\ClientConfig::load($this->configPath);
+            $this->locations = $data['locations'] ?? [];
+        }
+        if (empty($this->locations)) {
+            Log::error("No locations found after scan. Check /pvsi directories.");
+            return;
+        }
         Log::info("Orchestrator started with " . count($this->locations) . " locations.");
         while (true) {
             foreach ($this->locations as $loc) {

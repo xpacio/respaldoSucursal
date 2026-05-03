@@ -661,6 +661,8 @@ class Server
             [':r' => $r]
         );
         
+        $params = [];
+        
         if ($hasCustomConfig) {
             // Usar service_config con JOIN (personalizaciones existen)
             $sql = "SELECT s.name, s.type, 
@@ -672,6 +674,7 @@ class Server
                     FROM service_config cs
                     JOIN services s ON s.id = cs.service_id
                     WHERE cs.client_rbfid = :r AND cs.enabled = true";
+            $params[':r'] = $r;
         } else {
             // Fallback: usar solo services por defecto
             $sql = "SELECT s.name, s.type, 
@@ -680,8 +683,6 @@ class Server
                     FROM services s
                     WHERE s.enabled = true";
         }
-        
-        $params = [':r' => $r];
 
         if ($specificService) {
             // Modo Manual: Buscar el servicio solicitado sin importar el horario
