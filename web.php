@@ -503,9 +503,9 @@ private function viewServices(): void {
         $sql = "SELECT c.*, sh.last_heartbeat,
             CASE 
                 WHEN sh.last_heartbeat IS NULL THEN 3
-                WHEN sh.last_heartbeat < NOW() - INTERVAL '30 minutes' THEN 2
-                WHEN sh.last_heartbeat < NOW() - INTERVAL '50 seconds' THEN 0
-                ELSE 1
+                WHEN sh.last_heartbeat < NOW() - INTERVAL '30 minutes' THEN 1
+                WHEN sh.last_heartbeat < NOW() - INTERVAL '50 seconds' THEN 2
+                ELSE 0
             END as hb_priority
         FROM clients c
         LEFT JOIN service_health sh ON c.rbfid = sh.client_rbfid
@@ -634,7 +634,7 @@ HTML;
 }
 
     private function heartbeatIcon(?string $lastHeartbeat): string {
-        $alertSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.537a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.871l-8.106 -13.537a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>';
+        $alertSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.537a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.871L13.637 3.59a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>';
         
         if ($lastHeartbeat === null) {
             return '<span class="text-info">' . $alertSvg . '</span>';
@@ -642,11 +642,11 @@ HTML;
         
         $secondsAgo = time() - strtotime($lastHeartbeat);
         
-        if ($secondsAgo > 1800) { // >30 min
+        if ($secondsAgo > 1800) { // >30 min - ROJO (aparece PRIMERO)
             return '<span class="text-danger">' . $alertSvg . '</span>';
-        } elseif ($secondsAgo > 50) { // >50s
+        } elseif ($secondsAgo > 50) { // >50s - NARANJA (segundo)
             return '<span class="text-warning">' . $alertSvg . '</span>';
-        } else { // <=50s
+        } else { // <=50s - VERDE (tercero)
             return '<span class="text-success">' . $alertSvg . '</span>';
         }
     }
