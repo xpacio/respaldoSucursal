@@ -158,6 +158,18 @@ class Client {
             $fmtBytes = $bytes < 1048576 ? round($bytes/1024,2).' KB' : round($bytes/1048576,2).' MB';
             $fmtSize = $sizeInc < 1048576 ? round($sizeInc/1024,2).' KB' : round($sizeInc/1048576,2).' MB';
             Log::info("  Time: {$execMs}ms | Data: $fmtBytes | Chunks: $chunks | Size +: $fmtSize");
+            
+            // Compression savings summary
+            $uncompressed = $GLOBALS['totalUncompressed'] ?? 0;
+            $compressed = $GLOBALS['totalCompressed'] ?? 0;
+            if ($uncompressed > 0 && $compressed > 0) {
+                $saved = $uncompressed - $compressed;
+                $savedPct = round(($saved / $uncompressed) * 100, 1);
+                $fmtOriginal = $uncompressed < 1048576 ? round($uncompressed/1024,2).' KB' : round($uncompressed/1048576,2).' MB';
+                $fmtCompressed = $compressed < 1048576 ? round($compressed/1024,2).' KB' : round($compressed/1048576,2).' MB';
+                $fmtSaved = $saved < 1048576 ? round($saved/1024,2).' KB' : round($saved/1048576,2).' MB';
+                Log::info("  Compression: $fmtOriginal → $fmtCompressed (saved: $fmtSaved, $savedPct%)");
+            }
         } catch (\Throwable $e) { Log::error("Service Error ($service): " . $e->getMessage()); }
     }
 
@@ -490,6 +502,11 @@ class Client {
                 $attempts = 0; $success = false;
                 while ($attempts < 3 && !$success) {
                     $compressed = gzcompress($data, 6);
+                    $compressedLen = strlen($compressed);
+                    $ratio = round(($compressedLen / $dataLen) * 100, 1);
+                    $GLOBALS['totalUncompressed'] = ($GLOBALS['totalUncompressed'] ?? 0) + $dataLen;
+                    $GLOBALS['totalCompressed'] = ($GLOBALS['totalCompressed'] ?? 0) + $compressedLen;
+                    
                     $res = $this->http->req('upload', $loc['rbfid'], [
                         'service' => $service,
                         'filename' => $file, 'chunk_index' => $chunkIdx, 
@@ -502,7 +519,8 @@ class Client {
                         $chunksToUpload--;
                         $GLOBALS['totalChunks'] = ($GLOBALS['totalChunks'] ?? 0) + 1;
                         $progreso = number_format((($totalChunks - $chunksToUpload) / $totalChunks) * 100, 1);
-                        Log::info(sprintf("  [%s%%] Uploaded chunk %d de %s", $progreso, $chunkIdx, $file));
+                        Log::info(sprintf("  [%s%%] Uploaded chunk %d de %s (compression: %s%%, %s -> %s bytes)", 
+                            $progreso, $chunkIdx, $file, $ratio, $dataLen, $compressedLen));
                         $success = true; 
                     } else {
                         $attempts++;
