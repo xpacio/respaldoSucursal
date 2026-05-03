@@ -500,31 +500,41 @@ private function viewServices(): void {
          }
          echo "</form></div></div>";
          
-         $sql = "SELECT * FROM clients WHERE 1=1";
-         $params = [];
-         if ($filterPlaza !== '') {
-             $sql .= " AND plaza = :plaza";
-             $params[':plaza'] = $filterPlaza;
-         }
-         if ($filterTipo !== '') {
-             $sql .= " AND tipo = :tipo";
-             $params[':tipo'] = $filterTipo;
-         }
-         $sql .= " ORDER BY enabled DESC, rbfid ASC";
+        $sql = "SELECT c.*, sh.last_heartbeat,
+            CASE 
+                WHEN sh.last_heartbeat IS NULL THEN 3
+                WHEN sh.last_heartbeat < NOW() - INTERVAL '30 minutes' THEN 2
+                WHEN sh.last_heartbeat < NOW() - INTERVAL '50 seconds' THEN 0
+                ELSE 1
+            END as hb_priority
+        FROM clients c
+        LEFT JOIN service_health sh ON c.rbfid = sh.client_rbfid
+        WHERE 1=1";
+        $params = [];
+        if ($filterPlaza !== '') {
+            $sql .= " AND c.plaza = :plaza";
+            $params[':plaza'] = $filterPlaza;
+        }
+        if ($filterTipo !== '') {
+            $sql .= " AND c.tipo = :tipo";
+            $params[':tipo'] = $filterTipo;
+        }
+        $sql .= " ORDER BY hb_priority, enabled DESC, rbfid ASC";
          
          $clients = $this->db->qa($sql, $params);
          
          echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
-         echo "<thead><tr><th>RBFID</th><th>Emp</th><th>Plaza</th><th>Razón Social</th><th>Tipo</th><th>Enabled</th><th>Acciones</th></tr></thead>";
+         echo "<thead><tr><th>RBFID</th><th>Emp</th><th>Plaza</th><th>Razón Social</th><th>Tipo</th><th>Heartbeat</th><th>Enabled</th><th>Acciones</th></tr></thead>";
          echo "<tbody>";
-         foreach ($clients as $c) {
-             echo "<tr>";
-             echo "<td><strong>" . htmlspecialchars($c['rbfid']) . "</strong></td>";
-             echo "<td>" . htmlspecialchars($c['emp'] ?? '') . "</td>";
-             echo "<td>" . htmlspecialchars($c['plaza'] ?? '') . "</td>";
-             echo "<td>" . htmlspecialchars($c['razon_social'] ?? '') . "</td>";
-             echo "<td>" . htmlspecialchars($c['tipo'] ?? 'sucursal') . "</td>";
-             echo "<td>" . $this->iconEnabled($c['enabled']) . "</td>";
+        foreach ($clients as $c) {
+            echo "<tr>";
+            echo "<td><strong>" . htmlspecialchars($c['rbfid']) . "</strong></td>";
+            echo "<td>" . htmlspecialchars($c['emp'] ?? '') . "</td>";
+            echo "<td>" . htmlspecialchars($c['plaza'] ?? '') . "</td>";
+            echo "<td>" . htmlspecialchars($c['razon_social'] ?? '') . "</td>";
+            echo "<td>" . htmlspecialchars($c['tipo'] ?? 'sucursal') . "</td>";
+            echo "<td>" . $this->heartbeatIcon($c['last_heartbeat'] ?? null) . "</td>";
+            echo "<td>" . $this->iconEnabled($c['enabled']) . "</td>";
              echo "<td>";
              echo "<a href='/clients/edit/" . $c['rbfid'] . "' class='btn btn-sm btn-outline-primary me-1'>Editar</a>";
              echo "<form method='post' class='d-inline' onsubmit=\"return confirm('¿Eliminar cliente " . $c['rbfid'] . "? Esta acción no se puede deshacer.')\">";
@@ -606,7 +616,7 @@ private function viewServices(): void {
         return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-muted"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2" /></svg>';
     }
 
-private function iconEnabled($enabled, ?int $serviceId = null): string {
+    private function iconEnabled($enabled, ?int $serviceId = null): string {
     if ($serviceId !== null && $serviceId > 0) {
         $checked = ($enabled === true || $enabled === 'true' || $enabled === 't') ? 'checked' : '';
         $toggleId = "service-toggle-{$serviceId}";
@@ -621,7 +631,25 @@ HTML;
         return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-success"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>';
     }
     return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-danger"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 10h.01" /><path d="M15 10h.01" /><path d="M9.5 15.5a3.5 3.5 0 0 0 5 0" /></svg>';
- }
+}
+
+    private function heartbeatIcon(?string $lastHeartbeat): string {
+        $alertSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.537a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.871l-8.106 -13.537a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>';
+        
+        if ($lastHeartbeat === null) {
+            return '<span class="text-info">' . $alertSvg . '</span>';
+        }
+        
+        $secondsAgo = time() - strtotime($lastHeartbeat);
+        
+        if ($secondsAgo > 1800) { // >30 min
+            return '<span class="text-danger">' . $alertSvg . '</span>';
+        } elseif ($secondsAgo > 50) { // >50s
+            return '<span class="text-warning">' . $alertSvg . '</span>';
+        } else { // <=50s
+            return '<span class="text-success">' . $alertSvg . '</span>';
+        }
+    }
 
     private function freqToggle(int $serviceId, int $currentFreq): string {
         $freqOptions = [1=>'1m', 5=>'5m', 10=>'10m', 15=>'15m', 20=>'20m', 30=>'30m', 45=>'45m', 60=>'1h', 120=>'2h', 180=>'3h'];
