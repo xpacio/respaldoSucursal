@@ -489,11 +489,13 @@ class Client {
                 $GLOBALS['totalBytesTransferred'] = ($GLOBALS['totalBytesTransferred'] ?? 0) + $dataLen;
                 $attempts = 0; $success = false;
                 while ($attempts < 3 && !$success) {
+                    $compressed = gzcompress($data, 6);
                     $res = $this->http->req('upload', $loc['rbfid'], [
                         'service' => $service,
                         'filename' => $file, 'chunk_index' => $chunkIdx, 
                         'chunk_hash' => Hash::toBase64(hash('xxh3', $data)), 
-                        'data' => base64_encode($data), 'size' => $size
+                        'data' => base64_encode($compressed), 'size' => $size,
+                        'compressed' => true
                     ]);
 
                     if ($res['ok'] ?? false){ 

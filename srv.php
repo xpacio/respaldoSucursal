@@ -383,6 +383,17 @@ class Server
             $data = base64_decode($b['data'] ?? '');
             if (!$file || !$data)
                 self::err('Missing fields');
+            
+            // Decompress if client sent compressed data
+            if (($b['compressed'] ?? false) === true) {
+                $decompressed = gzuncompress($data);
+                if ($decompressed === false) {
+                    Log::error("Upload: Failed to decompress chunk $idx for $file");
+                    self::err('Chunk decompression failed');
+                }
+                $data = $decompressed;
+            }
+            
             if (strlen($data) > 10485760)
                 self::err('Chunk too large');
 
