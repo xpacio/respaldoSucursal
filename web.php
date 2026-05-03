@@ -77,8 +77,20 @@ class AdminUI {
             }
         }
         
+        // Toggle servicio enabled (AJAX)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_service_enabled']) && ($_SESSION['admin_auth'] ?? false)) {
+            $id = (int)($_POST['service_id'] ?? 0);
+            $enabled = isset($_POST['enabled']) ? 'true' : 'false';
+            if ($id > 0) {
+                $this->db->exec("UPDATE services SET enabled=:en WHERE id=:id", [':id'=>$id, ':en'=>$enabled]);
+            }
+            header('Content-Type: application/json');
+            echo json_encode(['ok'=>true, 'enabled'=>$enabled==='true']);
+            exit;
+        }
+
         // Guardar servicio (Solo usuarios autenticados)
-         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service']) && ($_SESSION['admin_auth'] ?? false)) {
+          if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service']) && ($_SESSION['admin_auth'] ?? false)) {
             $id = (int)($_POST['service_id'] ?? 0);
             $name = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['name'] ?? '');
             $type = preg_replace('/[^a-zA-Z]/', '', $_POST['type'] ?? 'sync');
@@ -91,14 +103,14 @@ class AdminUI {
             $exclude = $_POST['exclude'] ?? '';
             $maxage = ($_POST['maxage'] ?? '') !== '' ? (int)$_POST['maxage'] : null;
             $description = $_POST['description'] ?? '';
-            $defaultConfig = '{}';
-            $defaultFrequency = 300;
+            $defaultFrequency = (int)($_POST['default_frequency_seconds'] ?? 300);
             $enabled = isset($_POST['enabled']) ? 'true' : 'false';
             
             if ($id > 0) {
-                $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, temp=:temp, dest=:dest, source=:source, recursive=:r, exclude=:e, maxage=:m, description=:desc, enabled=:en WHERE id=:id", 
-                    [':id'=>$id, ':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage, ':desc'=>$description, ':en'=>$enabled]);
+                $this->db->exec("UPDATE services SET name=:n, type=:t, files=:f, direction=:d, temp=:temp, dest=:dest, source=:source, recursive=:r, exclude=:e, maxage=:m, description=:desc, default_frequency_seconds=:freq, enabled=:en WHERE id=:id", 
+                    [':id'=>$id, ':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage, ':desc'=>$description, ':freq'=>$defaultFrequency, ':en'=>$enabled]);
             } else {
+                $defaultConfig = '{}';
                 $this->db->exec("INSERT INTO services (name, type, files, direction, temp, dest, source, recursive, exclude, maxage, description, default_config, default_frequency_seconds, enabled) VALUES (:n, :t, :f, :d, :temp, :dest, :source, :r, :e, :m, :desc, :cfg, :freq, :en)", 
                     [':n'=>$name, ':t'=>$type, ':f'=>$files, ':d'=>$direction, ':temp'=>$temp, ':dest'=>$dest, ':source'=>$source, ':r'=>$recursive, ':e'=>$exclude, ':m'=>$maxage, ':desc'=>$description, ':cfg'=>$defaultConfig, ':freq'=>$defaultFrequency, ':en'=>$enabled]);
             }
@@ -212,6 +224,36 @@ class AdminUI {
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.service-toggle').forEach(function(toggle) {
+                toggle.addEventListener('change', function() {
+                    const serviceId = this.dataset.serviceId;
+                    const enabled = this.checked;
+                    const formData = new FormData();
+                    formData.append('toggle_service_enabled', '1');
+                    formData.append('service_id', serviceId);
+                    if (enabled) formData.append('enabled', '1');
+
+                    fetch('/services', {
+                        method: 'POST',
+                        body: new URLSearchParams(formData)
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (!data.ok) {
+                            this.checked = !enabled;
+                            alert('Error al actualizar');
+                        }
+                    })
+                    .catch(() => {
+                        this.checked = !enabled;
+                        alert('Error de conexión');
+                    });
+                });
+            });
+        });
+        </script>
         </body>
         </html>
         <?php
@@ -335,7 +377,7 @@ private function viewServices(): void {
         <?php
         
         echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
-        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Archivos</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Acciones</th></tr></thead>";
+        echo "<thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Direction</th><th>Freq</th><th>Archivos</th><th>MaxAge</th><th>Exclude</th><th>Recursive</th><th>Enabled</th><th>Acciones</th></tr></thead>";
         echo "<tbody>";
         $services = $this->db->qa("SELECT * FROM services ORDER BY enabled DESC, name ASC");
         foreach ($services as $s) {
@@ -344,16 +386,19 @@ private function viewServices(): void {
             $maxage = $s['maxage'] ?? '';
             $exclude = $s['exclude'] ?? '';
             
-echo "<tr>";
+        echo "<tr>";
             echo "<td>{$s['id']}</td>";
             echo "<td><strong>{$s['name']}</strong></td>";
             echo "<td>" . $this->iconType($s['type']) . "</td>";
             echo "<td>" . $this->iconDirection($s['direction']) . "</td>";
+            $freq = (int)($s['default_frequency_seconds'] ?? 300);
+            $freqDisplay = $freq >= 86400 ? round($freq/86400,1).'d' : ($freq >= 3600 ? round($freq/3600,1).'h' : ($freq >= 60 ? round($freq/60,1).'m' : $freq.'s'));
+            echo "<td><strong>$freqDisplay</strong></td>";
             echo "<td>{$fileCount}</td>";
             echo "<td>" . ($maxage !== '' ? $maxage : "") . "</td>";
             echo "<td><small>" . htmlspecialchars(substr($exclude, 0, 30)) . "</small></td>";
             echo "<td>" . $this->iconRecursive($s['recursive']) . "</td>";
-            echo "<td>" . $this->iconEnabled($s['enabled']) . "</td>";
+            echo "<td>" . $this->iconEnabled($s['enabled'], $s['id']) . "</td>";
             echo "<td><a href='/services/edit/{$s['id']}' class='btn btn-sm btn-outline-primary'>Editar</a></td>";
             echo "</tr>";
         }
@@ -524,12 +569,22 @@ echo "<tr>";
         return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-muted"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2" /></svg>';
     }
 
-    private function iconEnabled(?bool $enabled): string {
-        if ($enabled === true) {
-            return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-success"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>';
-        }
-        return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-danger"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 10h.01" /><path d="M15 10h.01" /><path d="M9.5 15.5a3.5 3.5 0 0 0 5 0" /></svg>';
+private function iconEnabled($enabled, ?int $serviceId = null): string {
+    if ($serviceId !== null && $serviceId > 0) {
+        $checked = ($enabled === true || $enabled === 'true' || $enabled === 't') ? 'checked' : '';
+        $toggleId = "service-toggle-{$serviceId}";
+        return <<<HTML
+<div class="form-check form-switch">
+    <input class="form-check-input service-toggle" type="checkbox" id="{$toggleId}" data-service-id="{$serviceId}" {$checked}>
+    <label class="form-check-label" for="{$toggleId}"></label>
+</div>
+HTML;
     }
+    if ($enabled === true || $enabled === 'true' || $enabled === 't') {
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-success"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>';
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler text-danger"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 10h.01" /><path d="M15 10h.01" /><path d="M9.5 15.5a3.5 3.5 0 0 0 5 0" /></svg>';
+}
 
     private function editService(int $id): void {
         $service = ['id'=>0, 'name'=>'', 'type'=>'sync', 'files'=>'', 'direction'=>'upload', 'temp'=>'%tmp%/respaldoSucursal/{service}', 'dest'=>'/srv/qbck/{emp}/{plaza}/{rbfid}', 'source'=>'{base}', 'recursive'=>false, 'exclude'=>'', 'maxage'=>null, 'description'=>'', 'enabled'=>true];
@@ -559,6 +614,10 @@ echo "<tr>";
         echo "</div>";
         
         echo "<div class='mb-3'><label class='form-label'>Description</label><input type='text' name='description' class='form-control' value='" . htmlspecialchars($service['description'] ?? '') . "' placeholder='Descripción del servicio'></div>";
+        
+        echo "<div class='row mb-3'>";
+        echo "<div class='col-md-6'><label class='form-label'>Frecuencia (segundos)</label><input type='number' name='default_frequency_seconds' class='form-control' value='" . (int)($service['default_frequency_seconds'] ?? 300) . "' placeholder='300' min='60' step='60'><small class='form-hint'>300=5min, 3600=1hr, 86400=1día</small></div>";
+        echo "</div>";
         
         echo "<div class='mb-3'><label class='form-label'>Files (separados por coma)</label><input type='text' name='files' class='form-control' value='" . htmlspecialchars($service['files'] ?? '') . "' placeholder='VENTA.DBF,*.DBF,carpeta/*'></div>";
         
