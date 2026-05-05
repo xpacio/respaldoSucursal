@@ -63,6 +63,22 @@ class Client {
         } else {
             Log::error("Failed to save config to: {$this->configPath}");
         }
+    }    
+
+    public function listServicesInfo(): void {
+        if (empty($this->locations)) {
+            Log::info("No locations found. Running disk scan...");
+            $this->scanAndCreateConfig();
+            $data = \App\ClientConfig::load($this->configPath);
+            $this->locations = $data['locations'] ?? [];
+        }
+        if (empty($this->locations)) {
+            Log::error("No locations found after scan. Check /pvsi directories.");
+            return;
+        }
+        foreach ($this->locations as $loc) {
+            $this->listServices($loc['rbfid']);
+        }
     }
 
     public function listServices(string $rbfid): void {
@@ -452,14 +468,13 @@ class Client {
             fclose($fh);
             
             // Mover a destino final
-            if (is_dir(dirname($destFile))) {
-                rename($workFile, $destFile);
-                Log::info("File saved: $destFile");
-                $results['sync_ok'][] = strtoupper($filename);
-                $results['files_sync']++;
-            } else {
-                Log::error("Destination directory not found: " . dirname($destFile));
-            }
+            $destDir = dirname($destFile);
+            if (!is_dir($destDir)) @mkdir($destDir, 0755, true);
+
+            rename($workFile, $destFile);
+            Log::info("File saved: $destFile");
+            $results['sync_ok'][] = strtoupper($filename);
+            $results['files_sync']++;
             
             $results['files_count']++;
         }
@@ -590,11 +605,16 @@ if (empty($args)) {
 }
 
 $cmd = $args[0];
-if ($cmd === '--main') {
+if ($cmd === '-s') {
     $client->runOrchestrator();
+} elseif ($cmd === '' || $cmd === 'info') {
+    $client->showStatus();
+    $client->listServicesInfo();
+} elseif ($cmd === 'info') {
+
 } elseif ($cmd === '--scan' || $cmd === '-scan' || $cmd === '-ls-rbfid') {
     $client->scanAndCreateConfig();
-} elseif ($cmd === '-ls' || $cmd === '-list_services') {
+} elseif ($cmd === '-ls') {
     $rbfid = $args[1] ?? '';
     if (empty($rbfid)) die("Error: Se requiere RBFID.\n");
     $client->listServices($rbfid);
