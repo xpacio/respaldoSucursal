@@ -26,30 +26,30 @@ class Client {
     }
 
     public function showStatus(): void {
-        Log::info("=== Status Mode ===");
+        Log::info("= ===== Estado ===== =");
         try {
             $health = $this->http->req('health', 'system', []);
-            Log::info("Server Health: " . ($health['ok'] ? 'ONLINE' : 'OFFLINE'));
+            Log::info("Servidor: " . ($health['ok'] ? 'ONLINE' : 'OFFLINE'));
         } catch (\Throwable $e) { Log::error("Health check failed."); }
 
         foreach ($this->locations as $loc) {
-            Log::info(sprintf("Location Found: [%s] | Path: %s", $loc['rbfid'], $loc['base']));
+            Log::info(sprintf("Ubicacion encontrada : [%s] | Path: %s", $loc['rbfid'], $loc['base']));
         }
-        Log::info("====================");
+        Log::info("- - - - - - - - - - - - - - - - - -");
     }
 
     public function scanAndCreateConfig(): void {
-        Log::info("=== Scan Disk Mode ===");
+        Log::info("=== Buscando Instalaciones ===");
         $locations = Platform::scanDisk();
         
         if (empty($locations)) {
-            Log::error("No locations found. Asegúrate de tener un directorio /pvsi con archivo .rbfid o rbf/rbf.ini.");
+            Log::error("No se localizo ninguna instalacion. Asegúrate de tener un directorio /pvsi con archivo .rbfid o rbf/rbf.ini.");
             return;
         }
         
-        Log::info("Found " . count($locations) . " location(s):");
+        Log::info("hay " . count($locations) . " ubicacione(s):");
         foreach ($locations as $loc) {
-            Log::info(sprintf("  - [%s] Base: %s | Work: %s", $loc['rbfid'], $loc['base'], $loc['work']));
+            Log::info(sprintf("  - [%s] Carpeta de trabajo: %s | Temporal: %s", $loc['rbfid'], $loc['base'], $loc['work']));
         }
         
         // Cargar config existente para preservar otras configuraciones
@@ -59,21 +59,21 @@ class Client {
         $config['files_version'] = substr(md5(implode(',', Constants::$WATCH_FILES)),0, 8);
         
         if (\App\ClientConfig::save($this->configPath, $config)) {
-            Log::info("Config saved to: {$this->configPath}");
+            Log::info("Configuracion guardada en : {$this->configPath}");
         } else {
-            Log::error("Failed to save config to: {$this->configPath}");
+            Log::error("No se pudo guardar la configuracion: {$this->configPath}");
         }
     }    
 
     public function listServicesInfo(): void {
         if (empty($this->locations)) {
-            Log::info("No locations found. Running disk scan...");
+            Log::info("No hay instalaciones configuradas. buscando...");
             $this->scanAndCreateConfig();
             $data = \App\ClientConfig::load($this->configPath);
             $this->locations = $data['locations'] ?? [];
         }
         if (empty($this->locations)) {
-            Log::error("No locations found after scan. Check /pvsi directories.");
+            Log::error("No se ubicaron instalaciones. Revise los directorios de pvsi.");
             return;
         }
         foreach ($this->locations as $loc) {
@@ -82,7 +82,7 @@ class Client {
     }
 
     public function listServices(string $rbfid): void {
-        Log::info("Fetching services for [$rbfid]...");
+        Log::info("Consultando los servicios para [$rbfid]...");
         try {
             $res = $this->http->req('list_services', $rbfid, []);
             if (!$res['ok']) {
@@ -91,11 +91,11 @@ class Client {
             }
 
             if (empty($res['services'])) {
-                Log::info("No services configured or enabled for $rbfid.");
+                Log::error("$rbfid no tiene servicios configurados.");
                 return;
             }
 
-            Log::info(sprintf("%-20s | %-10s | %-8s | %-19s | %-10s", "Service", "Type", "Freq(s)", "Last Execution", "Status"));
+            Log::info(sprintf("%-20s | %-10s | %-8s | %-19s | %-10s", "Servicio", "Tipo", "Freq", "Ultima ejecucion", "Estado"));
             Log::info(str_repeat("-", 80));
             foreach ($res['services'] as $svc) {
                 Log::info(sprintf(
@@ -104,7 +104,7 @@ class Client {
                     $svc['last_execution'] ?? 'Never', $svc['last_status'] ?? 'N/A'
                 ));
             }
-        } catch (\Throwable $e) { Log::error("Failed to list services: " . $e->getMessage()); }
+        } catch (\Throwable $e) { Log::error("Fallo al listar los servicios: " . $e->getMessage()); }
     }
 
     public function runOrchestrator(): void {
@@ -600,28 +600,32 @@ array_shift($args); // Quitar nombre del script
 
 if (empty($args)) {
     $client->showStatus();
-    echo "Uso: php cli.php [--main | --scan | -ls {rbfid} | -service {nombre} {rbfid} | -{nombre} {rbfid} | -ls-rbfid]\n";
+    echo "Uso: php cli.php [comando] | -{nombreServicio} [{rbfid}]\n";
+    echo "Comandos :\n";
+    echo "s | start | main\n";
+    echo "b | buscar | scan | scann\n";
+    echo "l | ls \n";
     exit(0);
 }
 
 $cmd = $args[0];
-if ($cmd === '-s') {
+if (in_array($cmd,['s','start','main'])) {
     $client->runOrchestrator();
 } elseif ($cmd === '' || $cmd === 'info') {
     $client->showStatus();
     $client->listServicesInfo();
-} elseif ($cmd === 'info') {
-
-} elseif ($cmd === '--scan' || $cmd === '-scan' || $cmd === '-ls-rbfid') {
+} elseif ($cmd === 'infos') {
+    echo "metodo no desarrollado";
+} elseif ( in_array($cmd,['b','buscar','scan','scann']) ) {
     $client->scanAndCreateConfig();
-} elseif ($cmd === '-ls') {
+} elseif ( in_array($cmd,['l','ls']) ) {
     $rbfid = $args[1] ?? '';
     if (empty($rbfid)) die("Error: Se requiere RBFID.\n");
     $client->listServices($rbfid);
 } elseif (str_starts_with($cmd, '-')) {
     // Soporta "-service descargaVales roton" o "-descargaVales roton"
-    $serviceName = ($cmd === '-service') ? ($args[1] ?? '') : ltrim($cmd, '-');
-    $rbfid = ($cmd === '-service') ? ($args[2] ?? '') : ($args[1] ?? '');
+    $serviceName = ltrim($cmd, '-');
+    $rbfid = $args[1] ?? '';
 
     if (empty($serviceName) || empty($rbfid)) {
         die("Error: Se requiere nombre de servicio y RBFID.\n");
