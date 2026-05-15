@@ -396,7 +396,8 @@ static void upload_file(const char *service, const Location *loc, const char *fn
                 bfree(&resp);
                 int r=http_req("upload",loc->rbfid,up_body,&resp);
                 if(r==0&&json_bool(resp.d,"ok",0)) { remain--; g_chunks_xfer++;
-                    log_info("  [%.1f%%] Uploaded chunk %d of %s",(float)(cnt-remain)/cnt*100,ci,fname); break; }
+                    int ratio=comp_ok?(int)(comp_len*100/act):100;
+                    log_info("  [%.1f%%] Uploaded chunk %d of %s (compression: %d%%, %d -> %d bytes)",(float)(cnt-remain)/cnt*100,ci,fname,ratio,act,comp_ok?(int)comp_len:act); break; }
                 log_info("  Retry chunk %d (%d/3)",ci,att+1); Sleep(1000);
             }
             free(up_body); free(b64d); free(comp); free(cd);
@@ -428,7 +429,7 @@ static int b64dec(const char *in, unsigned char *out, int out_max) {
 }
 
 /* ─── Download ─── */
-static void download_files(const char *service, const Location *loc, const char *src_dir, const char *dest_dir, const char *work_dir, char files[][64], int fc) {
+static void download_files(const char *service, const Location *loc, const char *src_dir, const char *dest_dir, const char *work_dir, char files[][64], int fc, int *ok_count, char ok_names[][64]) {
     /* Build local files list */
     char local_json[32768]={0};
     strcat(local_json, "{\"service\":\"");
@@ -438,7 +439,7 @@ static void download_files(const char *service, const Location *loc, const char 
     for(int f=0;f<fc;f++) {
         char *item=files[f]; if(!item[0]) continue;
         if(strchr(item,'*')||strchr(item,'?')) continue; /* skip masks */
-        char sf[260]; find_ci(src_dir,item,sf,sizeof(sf));
+        char sf[260]; find_ci(dest_dir,item,sf,sizeof(sf));
         if(!sf[0]) continue;
         unsigned char fhb[8]; xxh3_file(sf,fhb);
         unsigned char rv[8]; for(int i=0;i<8;i++) rv[i]=fhb[7-i];
@@ -512,6 +513,7 @@ static void download_files(const char *service, const Location *loc, const char 
         long long dsz=fsize(df);
         char dsf[32]; if(dsz<1048576)snprintf(dsf,sizeof(dsf),"%.2f KB",(double)dsz/1024);else snprintf(dsf,sizeof(dsf),"%.2f MB",(double)dsz/1048576);
         log_info("  Saved: %s (%s, hash: %s)",df,dsf,fh_b64);
+        if(ok_count&&ok_names) { if(*ok_count<128) { strncpy(ok_names[*ok_count],upfn,63); } (*ok_count)++; }
         fa=eb+1;
     }
     bfree(&resp);
@@ -520,6 +522,10 @@ static void download_files(const char *service, const Location *loc, const char 
 /* ─── Execute a single service (upload or download) ─── */
 static void execute_service(const char *sname, Location *loc) {
     g_bytes_xfer=g_chunks_xfer=g_size_inc=g_uncomp=g_comp=0;
+    /* Heartbeat before executing */
+    {time_t n=time(NULL);struct tm *lt=localtime(&n);char ts[16];snprintf(ts,sizeof(ts),"%02d:%02d:%02d",lt->tm_hour,lt->tm_min,lt->tm_sec);
+    char hb[512];snprintf(hb,sizeof(hb),"{\"status\":\"running\",\"system_info\":{\"service\":\"%s\",\"start\":\"%s\"}}",sname,ts);
+    Buf hbr;binit(&hbr);http_req("heartbeat",loc->rbfid,hb,&hbr);bfree(&hbr);}
     DWORD svc_start=GetTickCount();
     Buf cr; binit(&cr);
     char sb[256]; snprintf(sb,sizeof(sb),"{\"service\":\"%s\"}",sname);
@@ -534,16 +540,17 @@ static void execute_service(const char *sname, Location *loc) {
     char fl[128][64]; int fc=json_str_array(cr.d,"files",fl,128);
     log_info("=== Service Start: %s (%s) ===",sname,loc->rbfid);
 
-    int sok=0,smis=0; char smis_names[128][64];
+    int sok=0,smis=0,sexc=0,fsynced=0; char sok_names[128][64]; char smis_names[128][64];
     if(strcmp(dir,"download")==0) {
         char sdir[260]; strncpy(sdir,src,sizeof(sdir)-1);
         if(strcmp(src,"{base}")==0) strncpy(sdir,loc->base,sizeof(sdir)-1);
         char ddir[260]; strncpy(ddir,dest_c,sizeof(ddir)-1);
         if(strcmp(dest_c,"{base}")==0) strncpy(ddir,loc->base,sizeof(ddir)-1);
+        {char *p; while((p=strstr(ddir,"{rbfid}"))) { memmove(p,loc->rbfid,strlen(loc->rbfid)); memmove(p+strlen(loc->rbfid),p+7,strlen(p+7)+1); }}
         char tdir[260];
         {char tb[260];GetTempPathA(260,tb);int tk=(int)strlen(tb);while(tk>0&&(tb[tk-1]=='\\'||tb[tk-1]==' '))tb[--tk]=0;
         snprintf(tdir,sizeof(tdir),"%s\\respaldoSucursal\\%s",tb,sname);}
-        download_files(sname,loc,sdir,ddir,tdir,fl,fc);
+        download_files(sname,loc,sdir,ddir,tdir,fl,fc,&sok,sok_names); fsynced=sok;
     } else {
         char sdir[260]; strncpy(sdir,src,sizeof(sdir)-1);
         if(strcmp(src,"{base}")==0) strncpy(sdir,loc->base,sizeof(sdir)-1);
@@ -557,21 +564,21 @@ static void execute_service(const char *sname, Location *loc) {
                 char *item=fl[f]; if(!item[0]) continue;
                 if(strchr(item,'*')||strchr(item,'?')) {
                     char cmd[1024];
-                    wsprintfA(cmd,"robocopy %s %s %s /R:1 /W:1 /NJH /NJS /NDL /NC /NS %s%s",sdir,wdir,item,rec?"/S":"/E",maxage>0?(char*)" /maxage:1":"");
-                    if(maxage>0){char ma[16];wsprintfA(ma," /maxage:%d",maxage);strcat(cmd,ma);}
+                    char ma[16]={0}; if(maxage>0) wsprintfA(ma," /maxage:%d",maxage);
+                    wsprintfA(cmd,"robocopy %s %s %s /R:1 /W:1 /NJH /NJS /NDL /NC /NS %s%s",sdir,wdir,item,rec?"/S":"/E",ma);
                     log_info("  Running robocopy..."); system(cmd);
                     WIN32_FIND_DATAA fd; char pat[260]; wsprintfA(pat,"%s\\*",wdir);
                     HANDLE h=FindFirstFileA(pat,&fd);
                     if(h!=INVALID_HANDLE_VALUE) { do { if(fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) continue;
                         char fp[260]; wsprintfA(fp,"%s\\%s",wdir,fd.cFileName);
-                        upload_file(sname,loc,fd.cFileName,fp); sok++;
+                        upload_file(sname,loc,fd.cFileName,fp); if(sok<128)strncpy(sok_names[sok],fd.cFileName,63); sok++; fsynced++;
                     } while(FindNextFileA(h,&fd)); FindClose(h); }
                     if(exc[0]) {
                         WIN32_FIND_DATAA fdx; HANDLE hx=FindFirstFileA(pat,&fdx);
                         if(hx!=INVALID_HANDLE_VALUE) { do { if(fdx.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) continue;
                             char *m=exc; while(m&&*m) { while(*m==' '||*m==',') m++;
                                 char mask[64]; int mi=0; while(*m&&*m!=','&&*m!=' '&&mi<63) mask[mi++]=*m++; mask[mi]=0; if(!mi) continue;
-                                if(wcmatch(fdx.cFileName,mask)) { char fp[260]; wsprintfA(fp,"%s\\%s",wdir,fdx.cFileName); DeleteFileA(fp); log_info("  Excluded: %s",fdx.cFileName); }
+                                if(wcmatch(fdx.cFileName,mask)) { char fp[260]; wsprintfA(fp,"%s\\%s",wdir,fdx.cFileName); DeleteFileA(fp); log_info("  Excluded: %s",fdx.cFileName); sexc++; }
                             }
                         } while(FindNextFileA(hx,&fdx)); FindClose(hx); }
                     }
@@ -589,7 +596,7 @@ static void execute_service(const char *sname, Location *loc) {
                         snprintf(df,sizeof(df),"%s%s\\%s",wdir,sub,up);
                     } else snprintf(df,sizeof(df),"%s\\%s",wdir,up);
                     mkdir_p(wdir);
-                    if(CopyFileA(sf,df,FALSE)) { log_info("--- Processing: %s ---",up); upload_file(sname,loc,up,df); sok++; }
+                    if(CopyFileA(sf,df,FALSE)) { log_info("--- Processing: %s ---",up); upload_file(sname,loc,up,df); if(sok<128)strncpy(sok_names[sok],up,63); sok++; fsynced++; }
                 }
             }
         }
@@ -601,11 +608,16 @@ static void execute_service(const char *sname, Location *loc) {
         strcat(missing_body,"]}");
         Buf mr; binit(&mr); http_req("missing",loc->rbfid,missing_body,&mr); bfree(&mr);
     }
+    log_info("[RESULT] files_count=%d, sync_ok=%d, sync_missing=%d, sync_excluded=%d, files_sync=%d",sok+smis,sok,smis,sexc,fsynced);
+    if(sok>0){char okn[4096]={0};int op=0;for(int i=0;i<sok;i++){if(i>0)op+=snprintf(okn+op,sizeof(okn)-op,", ");op+=snprintf(okn+op,sizeof(okn)-op,"%s",sok_names[i]);}log_info("[OK] %s",okn);}
+    if(smis>0){char misn[4096]={0};int mp=0;for(int i=0;i<smis;i++){if(i>0)mp+=snprintf(misn+mp,sizeof(misn)-mp,", ");mp+=snprintf(misn+mp,sizeof(misn)-mp,"%s",smis_names[i]);}log_msg("WARN","[MISSING] %s",misn);}
+    const char *status="success";
+    if(smis>0) status=(sok==0)?"failed":"partial";
     DWORD svc_ms=GetTickCount()-svc_start;
     char df[32],sf2[32];
     snprintf(df,sizeof(df),g_bytes_xfer<1048576?"%.2f KB":"%.2f MB",g_bytes_xfer<1048576?(double)g_bytes_xfer/1024:(double)g_bytes_xfer/1048576);
     snprintf(sf2,sizeof(sf2),g_size_inc<1048576?"%.2f KB":"%.2f MB",g_size_inc<1048576?(double)g_size_inc/1024:(double)g_size_inc/1048576);
-    log_info("=== Service End: %s | Status: success ===",sname);
+    log_info("=== Service End: %s | Status: %s ===",sname,status);
     log_info("  Time: %ldms | Data: %s | Chunks: %d | Size +: %s",svc_ms,df,g_chunks_xfer,sf2);
     if(g_uncomp>0&&g_comp>0){long long saved=g_uncomp-g_comp;int sp=(int)(saved*100/g_uncomp);
         char of[32],cf[32],svf[32];
@@ -614,7 +626,12 @@ static void execute_service(const char *sname, Location *loc) {
         snprintf(svf,sizeof(svf),saved<1048576?"%.2f KB":"%.2f MB",saved<1048576?(double)saved/1024:(double)saved/1048576);
         log_info("  Compression: %s -> %s (saved: %s, %d%%)",of,cf,svf,sp);}
     Buf rr; binit(&rr);
-    char rb[512]; snprintf(rb,sizeof(rb),"{\"service\":\"%s\",\"status\":\"success\",\"results\":{\"sync_ok\":%d,\"sync_missing\":%d},\"execution_time_ms\":%ld}",sname,sok,smis,svc_ms);
+    char rb[16384]; int rp=0;
+    rp+=snprintf(rb+rp,sizeof(rb)-rp,"{\"service\":\"%s\",\"status\":\"%s\",\"results\":{\"files_count\":%d,\"files_sync\":%d,\"sync_ok\":[",sname,status,sok+smis,fsynced);
+    for(int i=0;i<sok;i++){if(i>0)rp+=snprintf(rb+rp,sizeof(rb)-rp,",");rp+=snprintf(rb+rp,sizeof(rb)-rp,"\"%s\"",sok_names[i]);}
+    rp+=snprintf(rb+rp,sizeof(rb)-rp,"],\"sync_missing\":[");
+    for(int i=0;i<smis;i++){if(i>0)rp+=snprintf(rb+rp,sizeof(rb)-rp,",");rp+=snprintf(rb+rp,sizeof(rb)-rp,"\"%s\"",smis_names[i]);}
+    rp+=snprintf(rb+rp,sizeof(rb)-rp,"],\"sync_excluded\":%d},\"execution_time_ms\":%ld}",sexc,svc_ms);
     http_req("service_result",loc->rbfid,rb,&rr); bfree(&rr);
     bfree(&cr);
 }
@@ -629,7 +646,9 @@ static void run_orchestrator(void) {
         for(int i=0;i<cfg.locCount;i++) {
             Location *loc=&cfg.locs[i];
             Buf r; binit(&r);
-            http_req("heartbeat",loc->rbfid,"{\"status\":\"running\"}",&r); bfree(&r);
+            {time_t n=time(NULL);struct tm *lt=localtime(&n);char ts[16];snprintf(ts,sizeof(ts),"%02d:%02d:%02d",lt->tm_hour,lt->tm_min,lt->tm_sec);
+            char hb[512];snprintf(hb,sizeof(hb),"{\"status\":\"running\",\"system_info\":{\"cycle_start\":\"%s\"}}",ts);
+            http_req("heartbeat",loc->rbfid,hb,&r);} bfree(&r);
             binit(&r);
             if(http_req("schedule",loc->rbfid,"{}",&r)==0 && json_bool(r.d,"ok",0)) {
                 char svc[16][64]; int sn=json_str_array(r.d,"services",svc,16);
