@@ -341,7 +341,7 @@ static void upload_file(const char *service, const Location *loc, const char *fn
         }}
 
         if(!json_bool(resp.d,"needs_upload",0)) {
-            log_info("  File %s synchronized.",fname);
+            log_info("  Sync %s: COMPLETO",fname);
             /* Display file_changes details */
             const char *fcp=strstr(resp.d,"\"file_changes\"");
             if(fcp&&(fcp=strchr(fcp,'['))){fcp++;const char *ob=strchr(fcp,'{');
@@ -365,7 +365,7 @@ static void upload_file(const char *service, const Location *loc, const char *fn
         }
 
         int idxs[MAX_CHUNKS],cnt=json_int_array(resp.d,"needs_upload",idxs,MAX_CHUNKS),remain=cnt;
-        log_info("Syncing %s: %d chunks pending (%.1f%%)",fname,cnt,(float)cnt/total_chunks*100);
+        log_info("  Sync %s: %d chunks pendientes (%.1f%% de desfase)",fname,cnt,(float)cnt/total_chunks*100);
 
         for(int i=0;i<cnt;i++) {
             int ci=idxs[i];
@@ -477,9 +477,11 @@ static void download_files(const char *service, const Location *loc, const char 
         {char pd[260];strncpy(pd,wf,259);pd[259]=0;char *ls=strrchr(pd,'\\');if(ls){*ls=0;mkdir_p(pd);}}
         {char pd2[260];strncpy(pd2,df,259);pd2[259]=0;char *ls2=strrchr(pd2,'\\');if(ls2){*ls2=0;mkdir_p(pd2);}}
 
-        log_info("  Downloading %s (%d bytes)",fn,fsz);
         int total=(int)((fsz+dchunk-1)/dchunk);
+        char sz_fmt[32]; if(fsz<1048576)snprintf(sz_fmt,sizeof(sz_fmt),"%.2f KB",(double)fsz/1024);else snprintf(sz_fmt,sizeof(sz_fmt),"%.2f MB",(double)fsz/1048576);
+        log_info("  Downloading: %s (%s, %d chunks)",fn,sz_fmt,total);
         FILE *fw=fopen(wf,"wb"); if(!fw){fa=eb+1;continue;}
+        XXH3_state_t *hst=XXH3_createState(); XXH3_64bits_reset(hst);
 
         for(int ci=0;ci<total;ci++){
             char dl_body[1024];
@@ -490,21 +492,26 @@ static void download_files(const char *service, const Location *loc, const char 
             if(!dp){break;}
             dp=strchr(dp,':'); if(!dp) break; dp++; while(*dp==' ') dp++;
             if(*dp!='"') break; dp++;
-            /* Find end quote */
             const char *eq=strchr(dp,'"'); if(!eq) break;
             int dlen=(int)(eq-dp);
             if(dlen<=0) break;
             char *b64data=malloc(dlen+1); strncpy(b64data,dp,dlen); b64data[dlen]=0;
             unsigned char *raw=malloc(dlen); int rlen=b64dec(b64data,raw,dlen);
-            if(rlen>0) fwrite(raw,1,rlen,fw);
+            if(rlen>0){fwrite(raw,1,rlen,fw);XXH3_64bits_update(hst,raw,rlen);}
             g_bytes_xfer+=rlen;
+            char chunk_hash[32]; {unsigned char hb[8];unsigned char rv[8];xxh3_bin(raw,rlen,hb);for(int j=0;j<8;j++)rv[j]=hb[7-j];b64enc_nopad(rv,8,chunk_hash);}
             free(raw); free(b64data);
-            log_info("    Chunk %d/%d",ci+1,total);
+            log_info("  [%.0f%%] Chunk %d/%d (%s, %d bytes)",(double)(ci+1)/total*100,ci+1,total,chunk_hash,rlen);
         }
         fclose(fw);
+        unsigned char fhb[8]; XXH64_hash_t fh64=XXH3_64bits_digest(hst); XXH3_freeState(hst); memcpy(fhb,&fh64,8);
+        unsigned char rv[8]; for(int j=0;j<8;j++) rv[j]=fhb[7-j];
+        char fh_b64[32]; b64enc_nopad(rv,8,fh_b64);
         /* Move to dest */
         CopyFileA(wf,df,FALSE);
-        log_info("  Saved: %s",df);
+        long long dsz=fsize(df);
+        char dsf[32]; if(dsz<1048576)snprintf(dsf,sizeof(dsf),"%.2f KB",(double)dsz/1024);else snprintf(dsf,sizeof(dsf),"%.2f MB",(double)dsz/1048576);
+        log_info("  Saved: %s (%s, hash: %s)",df,dsf,fh_b64);
         fa=eb+1;
     }
     bfree(&resp);
