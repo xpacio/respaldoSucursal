@@ -116,7 +116,7 @@ class HttpClient
             }
         }
         
-        Log::add("Server responded to '$action': " . ($ok ? 'OK' : 'FAIL'), $ok ? 'DEBUG' : 'ERROR');
+        Log::debug("Server responded to '$action': " . ($ok ? 'OK' : 'FAIL'));
         return $res;
     }
 
