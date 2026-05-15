@@ -10,6 +10,7 @@ use App\Constants;
 use App\Log;
 use App\Hash;
 use App\Chunk;
+use App\Fmt;
 use App\Platform;
 use App\HttpClient;
 
@@ -215,9 +216,7 @@ class Client {
             $bytes = $GLOBALS['totalBytesTransferred'] ?? 0;
             $chunks = $GLOBALS['totalChunks'] ?? 0;
             $sizeInc = $GLOBALS['totalSizeIncrease'] ?? 0;
-            $fmtBytes = $bytes < 1048576 ? round($bytes/1024,2).' KB' : round($bytes/1048576,2).' MB';
-            $fmtSize = $sizeInc < 1048576 ? round($sizeInc/1024,2).' KB' : round($sizeInc/1048576,2).' MB';
-            Log::info("  Time: {$execMs}ms | Data: $fmtBytes | Chunks: $chunks | Size +: $fmtSize");
+            Log::info("  Time: {$execMs}ms | Data: " . Fmt::bytes($bytes) . " | Chunks: $chunks | Size +: " . Fmt::bytes($sizeInc));
             
             // Compression savings summary
             $uncompressed = $GLOBALS['totalUncompressed'] ?? 0;
@@ -225,10 +224,7 @@ class Client {
             if ($uncompressed > 0 && $compressed > 0) {
                 $saved = $uncompressed - $compressed;
                 $savedPct = round(($saved / $uncompressed) * 100, 1);
-                $fmtOriginal = $uncompressed < 1048576 ? round($uncompressed/1024,2).' KB' : round($uncompressed/1048576,2).' MB';
-                $fmtCompressed = $compressed < 1048576 ? round($compressed/1024,2).' KB' : round($compressed/1048576,2).' MB';
-                $fmtSaved = $saved < 1048576 ? round($saved/1024,2).' KB' : round($saved/1048576,2).' MB';
-                Log::info("  Compression: $fmtOriginal → $fmtCompressed (saved: $fmtSaved, $savedPct%)");
+                Log::info("  Compression: " . Fmt::bytes($uncompressed) . " → " . Fmt::bytes($compressed) . " (saved: " . Fmt::bytes($saved) . ", {$savedPct}%)");
             }
         } catch (\Throwable $e) { Log::error("Service Error ($service): " . $e->getMessage()); }
     }
@@ -432,8 +428,7 @@ class Client {
             $chunkSize = \App\Chunk::size($fileSize);
             $totalChunks = (int)ceil($fileSize / $chunkSize);
             
-            $fmtBytes = $fileSize < 1048576 ? round($fileSize/1024,2).' KB' : round($fileSize/1048576,2).' MB';
-            Log::info("Downloading: $filename ($fmtBytes, $totalChunks chunks)");
+            Log::info("Downloading: $filename (" . Fmt::bytes($fileSize) . ", $totalChunks chunks)");
             
             // Descargar chunks y escribir directo a archivo temporal
             $fh = fopen($workFile, 'wb');
@@ -474,8 +469,7 @@ class Client {
 
             rename($workFile, $destFile);
             $destSize = filesize($destFile);
-            $destSizeFmt = $destSize < 1048576 ? round($destSize/1024,2).' KB' : round($destSize/1048576,2).' MB';
-            Log::info("  Saved: $destFile ($destSizeFmt, hash: $fileHash)");
+            Log::info("  Saved: $destFile (" . Fmt::bytes($destSize) . ", hash: $fileHash)");
             $results['sync_ok'][] = strtoupper($filename);
             $results['files_sync']++;
             $results['files_count']++;

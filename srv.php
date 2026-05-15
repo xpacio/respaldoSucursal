@@ -242,28 +242,14 @@ class Server
                         $diffBytes = $newSize - $oldSize;
                         $growthPct = $oldSize > 0 ? round(($diffBytes / $oldSize) * 100, 2) : 0;
                         
-                        // Format sizes for client log
-                        $formatSize = function($bytes) {
-                            if ($bytes < 1024) return $bytes . ' B';
-                            if ($bytes < 1048576) return round($bytes / 1024, 2) . ' KB';
-                            return round($bytes / 1048576, 2) . ' MB';
-                        };
-                        
-                        $oldFmt = $formatSize($oldSize);
-                        $newFmt = $formatSize($newSize);
-                        $diffFmt = $formatSize(abs($diffBytes));
+                        $oldFmt = \App\Fmt::bytes($oldSize);
+                        $newFmt = \App\Fmt::bytes($newSize);
+                        $diffFmt = \App\Fmt::bytes(abs($diffBytes));
                         
                         // Time difference tracking
                         $oldMtime = (int)($srv['file_mtime'] ?? 0);
                         $newMtime = (int)$fileMtime;
                         $timeDiffSec = abs($newMtime - $oldMtime);
-                        
-                        $formatTime = function($secs) {
-                            if ($secs < 60) return $secs . 's';
-                            if ($secs < 3600) return round($secs / 60, 1) . 'm';
-                            if ($secs < 86400) return round($secs / 3600, 1) . 'h';
-                            return round($secs / 86400, 1) . 'd';
-                        };
                         
                         $fileChanges[] = [
                             'file' => $name,
@@ -281,9 +267,9 @@ class Server
                             'old_mtime' => $oldMtime,
                             'new_mtime' => $newMtime,
                             'time_diff_sec' => $timeDiffSec,
-                            'time_diff_fmt' => $formatTime($timeDiffSec)
+                            'time_diff_fmt' => \App\Fmt::duration($timeDiffSec)
                         ];
-                        Log::info("Sync: File $name size change: $oldFmt -> $newFmt (diff: $diffFmt, $growthPct%) | Time: {$formatTime($timeDiffSec)}");
+                        Log::info("Sync: File $name size change: $oldFmt -> $newFmt (diff: $diffFmt, $growthPct%) | Time: " . \App\Fmt::duration($timeDiffSec));
                     }
                 }
                 

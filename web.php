@@ -539,15 +539,7 @@ private function viewServices(): void {
             $lastInteraction = 'Nunca';
             if (!empty($c['last_heartbeat'])) {
                 $secondsAgo = time() - strtotime($c['last_heartbeat']);
-                if ($secondsAgo < 60) {
-                    $lastInteraction = $secondsAgo . 's';
-                } elseif ($secondsAgo < 3600) {
-                    $lastInteraction = round($secondsAgo / 60, 1) . 'm';
-                } elseif ($secondsAgo < 86400) {
-                    $lastInteraction = round($secondsAgo / 3600, 1) . 'h';
-                } else {
-                    $lastInteraction = round($secondsAgo / 86400, 1) . 'd';
-                }
+                $lastInteraction = \App\Fmt::duration($secondsAgo);
             }
             echo "<td><small>" . $lastInteraction . "</small></td>";
             

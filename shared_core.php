@@ -46,6 +46,7 @@ class Log
         if (self::$syslogEnabled) {
             $priority = match($level) {
                 'ERROR' => LOG_ERR,
+                'WARN' => LOG_WARNING,
                 'DEBUG' => LOG_DEBUG,
                 default => LOG_INFO
             };
@@ -63,6 +64,7 @@ class Log
 
     public static function debug(string $m): void { self::add($m, 'DEBUG'); }
     public static function info(string $m): void { self::add($m, 'INFO'); }
+    public static function warn(string $m): void { self::add($m, 'WARN'); }
     public static function error(string $m): void { self::add($m, 'ERROR'); }
 
     public static function flush(): void
@@ -127,5 +129,24 @@ class Totp
     public static function gen(string $rbfid, int $ts): string
     {
         return Hash::toBase64(Hash::compute(substr((string) $ts, 0, -2) . $rbfid));
+    }
+}
+
+// --- Format Helpers ---
+class Fmt
+{
+    public static function bytes(int|float $b): string
+    {
+        if ($b < 1024) return $b . ' B';
+        if ($b < 1048576) return round($b / 1024, 2) . ' KB';
+        return round($b / 1048576, 2) . ' MB';
+    }
+
+    public static function duration(int $secs): string
+    {
+        if ($secs < 60) return $secs . 's';
+        if ($secs < 3600) return round($secs / 60, 1) . 'm';
+        if ($secs < 86400) return round($secs / 3600, 1) . 'h';
+        return round($secs / 86400, 1) . 'd';
     }
 }
