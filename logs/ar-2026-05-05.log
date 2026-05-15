@@ -1,0 +1,204 @@
+[2026-05-05 21:07:39] [INFO] Request started
+[2026-05-05 21:07:39] [INFO] Action: [health] | RBFID: system | Path: health/system
+[2026-05-05 21:08:01] [INFO] Request started
+[2026-05-05 21:08:01] [INFO] Action: [health] | RBFID: system | Path: health/system
+[2026-05-05 21:09:46] [INFO] Request started
+[2026-05-05 21:09:46] [INFO] Action: [heartbeat] | RBFID: roton | Path: heartbeat/roton
+[2026-05-05 21:10:02] [INFO] Request started
+[2026-05-05 21:10:02] [INFO] Action: [health] | RBFID: system | Path: health/system
+[2026-05-05 21:13:37] [INFO] Request started
+[2026-05-05 21:13:37] [INFO] Action: [health] | RBFID: system | Path: health/system
+[2026-05-05 21:50:53] [INFO] Request started
+[2026-05-05 21:50:53] [INFO] Action: [health] | RBFID: system | Path: health/system
+[2026-05-05 22:27:21] [INFO] Request started
+[2026-05-05 22:27:21] [INFO] Action: [health] | RBFID: system | Path: health/system
+[2026-05-05 22:27:55] [INFO] Request started
+[2026-05-05 22:27:55] [INFO] Action: [list_services] | RBFID: roton | Path: list_services/roton
+[2026-05-05 22:28:39] [INFO] Request started
+[2026-05-05 22:28:39] [INFO] Action: [heartbeat] | RBFID: roton | Path: heartbeat/roton
+[2026-05-05 22:28:39] [INFO] Request started
+[2026-05-05 22:28:39] [INFO] Action: [schedule] | RBFID: roton | Path: schedule/roton
+[2026-05-05 22:28:40] [INFO] Request started
+[2026-05-05 22:28:40] [INFO] Action: [heartbeat] | RBFID: roton | Path: heartbeat/roton
+[2026-05-05 22:28:40] [INFO] Request started
+[2026-05-05 22:28:40] [INFO] Action: [service_config] | RBFID: roton | Path: service_config/roton
+[2026-05-05 22:28:40] [INFO] Request started
+[2026-05-05 22:28:40] [INFO] Action: [download_list] | RBFID: roton | Path: download_list/roton
+[2026-05-05 22:28:40] [INFO] Request started
+[2026-05-05 22:28:40] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:41] [INFO] Request started
+[2026-05-05 22:28:41] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:41] [INFO] Request started
+[2026-05-05 22:28:41] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:42] [INFO] Request started
+[2026-05-05 22:28:42] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:43] [INFO] Request started
+[2026-05-05 22:28:43] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:43] [INFO] Request started
+[2026-05-05 22:28:43] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:44] [INFO] Request started
+[2026-05-05 22:28:44] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:44] [INFO] Request started
+[2026-05-05 22:28:44] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:44] [INFO] Request started
+[2026-05-05 22:28:44] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:45] [INFO] Request started
+[2026-05-05 22:28:45] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:45] [INFO] Request started
+[2026-05-05 22:28:45] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:46] [INFO] Request started
+[2026-05-05 22:28:46] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:46] [INFO] Request started
+[2026-05-05 22:28:46] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:46] [INFO] Request started
+[2026-05-05 22:28:46] [INFO] Action: [download_file] | RBFID: roton | Path: download_file/roton
+[2026-05-05 22:28:46] [INFO] Request started
+[2026-05-05 22:28:46] [INFO] Action: [service_result] | RBFID: roton | Path: service_result/roton
+[2026-05-05 22:28:46] [INFO] Request started
+[2026-05-05 22:28:46] [INFO] Action: [heartbeat] | RBFID: roton | Path: heartbeat/roton
+[2026-05-05 22:28:47] [INFO] Request started
+[2026-05-05 22:28:47] [INFO] Action: [service_config] | RBFID: roton | Path: service_config/roton
+[2026-05-05 22:28:47] [INFO] Request started
+[2026-05-05 22:28:47] [INFO] Action: [sync] | RBFID: roton | Path: sync/roton
+[2026-05-05 22:28:47] [INFO] Sync: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:47] [DEBUG] Sync: File sizes from client: VENTA.DBF=119132262
+[2026-05-05 22:28:47] [INFO] Sync: Resetting/Starting VENTA.DBF (Hash match: NO, DestExists: YES, Temp: NO, SizeChanged: YES)
+[2026-05-05 22:28:47] [INFO] Sync: Full re-upload needed for VENTA.DBF (size changed or no dest file)
+[2026-05-05 22:28:47] [INFO] Sync: [roton] VENTA.DBF -> Expecting 114 chunks | Target Hash: RCRaCVT8yGQ
+[2026-05-05 22:28:47] [INFO] Sync: File VENTA.DBF size change: 49.84 KB -> 113.61 MB (diff: 113.56 MB, 233318.75%) | Time: 2.8d
+[2026-05-05 22:28:47] [INFO] Sync complete for roton. Pending files: 114 | Time: 48.49ms | Files: 1 | Bytes: 0
+[2026-05-05 22:28:48] [INFO] Request started
+[2026-05-05 22:28:48] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:48] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:48] [INFO] Upload: [roton] VENTA.DBF | Chunk 0 | Size: 1048576 bytes
+[2026-05-05 22:28:48] [DEBUG] Upload Hash Check: computed=387519fa94f9ad0c, decoded=387519fa94f9ad0c, match=YES
+[2026-05-05 22:28:49] [INFO] Request started
+[2026-05-05 22:28:49] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:49] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:49] [INFO] Upload: [roton] VENTA.DBF | Chunk 1 | Size: 1048576 bytes
+[2026-05-05 22:28:49] [DEBUG] Upload Hash Check: computed=a5dbcfc4495ab33a, decoded=a5dbcfc4495ab33a, match=YES
+[2026-05-05 22:28:49] [INFO] Request started
+[2026-05-05 22:28:49] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:49] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:49] [INFO] Upload: [roton] VENTA.DBF | Chunk 2 | Size: 1048576 bytes
+[2026-05-05 22:28:49] [DEBUG] Upload Hash Check: computed=bb0686a14d276e13, decoded=bb0686a14d276e13, match=YES
+[2026-05-05 22:28:50] [INFO] Request started
+[2026-05-05 22:28:50] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:50] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:50] [INFO] Upload: [roton] VENTA.DBF | Chunk 3 | Size: 1048576 bytes
+[2026-05-05 22:28:50] [DEBUG] Upload Hash Check: computed=67eb1d0f2c2f39bb, decoded=67eb1d0f2c2f39bb, match=YES
+[2026-05-05 22:28:50] [INFO] Request started
+[2026-05-05 22:28:50] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:50] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:50] [INFO] Upload: [roton] VENTA.DBF | Chunk 4 | Size: 1048576 bytes
+[2026-05-05 22:28:50] [DEBUG] Upload Hash Check: computed=461edce2ec4b1ae8, decoded=461edce2ec4b1ae8, match=YES
+[2026-05-05 22:28:51] [INFO] Request started
+[2026-05-05 22:28:51] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:51] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:51] [INFO] Upload: [roton] VENTA.DBF | Chunk 5 | Size: 1048576 bytes
+[2026-05-05 22:28:51] [DEBUG] Upload Hash Check: computed=5c6e86398b633a6b, decoded=5c6e86398b633a6b, match=YES
+[2026-05-05 22:28:51] [INFO] Request started
+[2026-05-05 22:28:51] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:51] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:51] [INFO] Upload: [roton] VENTA.DBF | Chunk 6 | Size: 1048576 bytes
+[2026-05-05 22:28:51] [DEBUG] Upload Hash Check: computed=a06a0a8a64c0c54f, decoded=a06a0a8a64c0c54f, match=YES
+[2026-05-05 22:28:51] [INFO] Request started
+[2026-05-05 22:28:51] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:51] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:51] [INFO] Upload: [roton] VENTA.DBF | Chunk 7 | Size: 1048576 bytes
+[2026-05-05 22:28:51] [DEBUG] Upload Hash Check: computed=40c81e6fa301077f, decoded=40c81e6fa301077f, match=YES
+[2026-05-05 22:28:52] [INFO] Request started
+[2026-05-05 22:28:52] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:52] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:52] [INFO] Upload: [roton] VENTA.DBF | Chunk 8 | Size: 1048576 bytes
+[2026-05-05 22:28:52] [DEBUG] Upload Hash Check: computed=cc09be95da789422, decoded=cc09be95da789422, match=YES
+[2026-05-05 22:28:52] [INFO] Request started
+[2026-05-05 22:28:52] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:52] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:52] [INFO] Upload: [roton] VENTA.DBF | Chunk 9 | Size: 1048576 bytes
+[2026-05-05 22:28:52] [DEBUG] Upload Hash Check: computed=c4bbc62bfba258b9, decoded=c4bbc62bfba258b9, match=YES
+[2026-05-05 22:28:53] [INFO] Request started
+[2026-05-05 22:28:53] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:53] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:53] [INFO] Upload: [roton] VENTA.DBF | Chunk 10 | Size: 1048576 bytes
+[2026-05-05 22:28:53] [DEBUG] Upload Hash Check: computed=7b3f91a84549ec0b, decoded=7b3f91a84549ec0b, match=YES
+[2026-05-05 22:28:53] [INFO] Request started
+[2026-05-05 22:28:53] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:53] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:53] [INFO] Upload: [roton] VENTA.DBF | Chunk 11 | Size: 1048576 bytes
+[2026-05-05 22:28:53] [DEBUG] Upload Hash Check: computed=c09dc30be67bfb88, decoded=c09dc30be67bfb88, match=YES
+[2026-05-05 22:28:54] [INFO] Request started
+[2026-05-05 22:28:54] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:54] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:54] [INFO] Upload: [roton] VENTA.DBF | Chunk 12 | Size: 1048576 bytes
+[2026-05-05 22:28:54] [DEBUG] Upload Hash Check: computed=29b81cac981ca03f, decoded=29b81cac981ca03f, match=YES
+[2026-05-05 22:28:54] [INFO] Request started
+[2026-05-05 22:28:54] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:54] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:54] [INFO] Upload: [roton] VENTA.DBF | Chunk 13 | Size: 1048576 bytes
+[2026-05-05 22:28:54] [DEBUG] Upload Hash Check: computed=16ff4ba79851ed51, decoded=16ff4ba79851ed51, match=YES
+[2026-05-05 22:28:55] [INFO] Request started
+[2026-05-05 22:28:55] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:55] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:55] [INFO] Upload: [roton] VENTA.DBF | Chunk 14 | Size: 1048576 bytes
+[2026-05-05 22:28:55] [DEBUG] Upload Hash Check: computed=c5cd4567be019e95, decoded=c5cd4567be019e95, match=YES
+[2026-05-05 22:28:55] [INFO] Request started
+[2026-05-05 22:28:55] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:55] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:55] [INFO] Upload: [roton] VENTA.DBF | Chunk 15 | Size: 1048576 bytes
+[2026-05-05 22:28:55] [DEBUG] Upload Hash Check: computed=332f18df17f8c668, decoded=332f18df17f8c668, match=YES
+[2026-05-05 22:28:56] [INFO] Request started
+[2026-05-05 22:28:56] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:56] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:56] [INFO] Upload: [roton] VENTA.DBF | Chunk 16 | Size: 1048576 bytes
+[2026-05-05 22:28:56] [DEBUG] Upload Hash Check: computed=3eef4a13d36e10a8, decoded=3eef4a13d36e10a8, match=YES
+[2026-05-05 22:28:56] [INFO] Request started
+[2026-05-05 22:28:56] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:56] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:56] [INFO] Upload: [roton] VENTA.DBF | Chunk 17 | Size: 1048576 bytes
+[2026-05-05 22:28:56] [DEBUG] Upload Hash Check: computed=cb5ced62f9b2a9b9, decoded=cb5ced62f9b2a9b9, match=YES
+[2026-05-05 22:28:57] [INFO] Request started
+[2026-05-05 22:28:57] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:57] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:57] [INFO] Upload: [roton] VENTA.DBF | Chunk 18 | Size: 1048576 bytes
+[2026-05-05 22:28:57] [DEBUG] Upload Hash Check: computed=9df7e5907f440773, decoded=9df7e5907f440773, match=YES
+[2026-05-05 22:28:57] [INFO] Request started
+[2026-05-05 22:28:57] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:57] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:57] [INFO] Upload: [roton] VENTA.DBF | Chunk 19 | Size: 1048576 bytes
+[2026-05-05 22:28:57] [DEBUG] Upload Hash Check: computed=32d9749fb97e83a2, decoded=32d9749fb97e83a2, match=YES
+[2026-05-05 22:28:57] [INFO] Request started
+[2026-05-05 22:28:57] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:57] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:57] [INFO] Upload: [roton] VENTA.DBF | Chunk 20 | Size: 1048576 bytes
+[2026-05-05 22:28:57] [DEBUG] Upload Hash Check: computed=9741a632bfc81d28, decoded=9741a632bfc81d28, match=YES
+[2026-05-05 22:28:58] [INFO] Request started
+[2026-05-05 22:28:58] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:58] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:58] [INFO] Upload: [roton] VENTA.DBF | Chunk 21 | Size: 1048576 bytes
+[2026-05-05 22:28:58] [DEBUG] Upload Hash Check: computed=29d4cd72fa295946, decoded=29d4cd72fa295946, match=YES
+[2026-05-05 22:28:58] [INFO] Request started
+[2026-05-05 22:28:58] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:58] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:58] [INFO] Upload: [roton] VENTA.DBF | Chunk 22 | Size: 1048576 bytes
+[2026-05-05 22:28:58] [DEBUG] Upload Hash Check: computed=dc11d65dea0951ea, decoded=dc11d65dea0951ea, match=YES
+[2026-05-05 22:28:59] [INFO] Request started
+[2026-05-05 22:28:59] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:59] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:59] [INFO] Upload: [roton] VENTA.DBF | Chunk 23 | Size: 1048576 bytes
+[2026-05-05 22:28:59] [DEBUG] Upload Hash Check: computed=a22af2eb58461461, decoded=a22af2eb58461461, match=YES
+[2026-05-05 22:28:59] [INFO] Request started
+[2026-05-05 22:28:59] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:28:59] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:28:59] [INFO] Upload: [roton] VENTA.DBF | Chunk 24 | Size: 1048576 bytes
+[2026-05-05 22:28:59] [DEBUG] Upload Hash Check: computed=3cab089231fd3bca, decoded=3cab089231fd3bca, match=YES
+[2026-05-05 22:29:00] [INFO] Request started
+[2026-05-05 22:29:00] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:29:00] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:29:00] [INFO] Upload: [roton] VENTA.DBF | Chunk 25 | Size: 1048576 bytes
+[2026-05-05 22:29:00] [DEBUG] Upload Hash Check: computed=7b53fd2f3950df04, decoded=7b53fd2f3950df04, match=YES
+[2026-05-05 22:29:00] [INFO] Request started
+[2026-05-05 22:29:00] [INFO] Action: [upload] | RBFID: roton | Path: upload/roton
+[2026-05-05 22:29:00] [INFO] Upload: Using paths - work: /tmp/respaldoSucursal/roton, base: /srv/qbck/siv/xalap/roton, service: testRespaldo
+[2026-05-05 22:29:00] [INFO] Upload: [roton] VENTA.DBF | Chunk 26 | Size: 1048576 bytes
+[2026-05-05 22:29:00] [DEBUG] Upload Hash Check: computed=7dda04e67baf8eb1, decoded=7dda04e67baf8eb1, match=YES
