@@ -513,7 +513,6 @@ class Client {
 
         
         while (true) {
-            // Log::debug("  Checking sync status for $file...");
             $req = $this->http->req('sync', $loc['rbfid'], [
                 'service' => $service,
                 'files' => [['filename' => $file, 'hash_completo' => Hash::toBase64($h), 'chunk_hashes' => $chs, 'mtime' => filemtime($wp), 'size' => $size]]
@@ -526,8 +525,9 @@ class Client {
                 }
             }
             
-            if (empty($req['needs_upload'])) {
-                Log::info("  File $file is synchronized.");
+            $pending = count($req['needs_upload'] ?? []);
+            if ($pending === 0) {
+                Log::info("  Sync $file: COMPLETO");
                 // Show file changes if available
                 if (!empty($req['file_changes'])) {
                     foreach ($req['file_changes'] as $fc) {
@@ -547,13 +547,8 @@ class Client {
                 break; 
             }
             
-            $chunksToUpload = count($req['needs_upload']);
-            $desface = number_format(($chunksToUpload / $totalChunks) * 100, 2);
-            Log::info("Sincronizando $file: $chunksToUpload chunks pendientes ($desface% de desface)");
-            
-            $chunksToUpload = count($req['needs_upload']);
-            $desfase = number_format(($chunksToUpload / $totalChunks) * 100, 2);
-            Log::info("Sincronizando $file: $chunksToUpload chunks pendientes ($desfase% de desfase)");
+            $desfase = number_format(($pending / $totalChunks) * 100, 2);
+            Log::info("  Sync $file: $pending chunks pendientes ($desfase% de desfase)");
 
             foreach ($req['needs_upload'] as $chunkIdx) {
                 $off = $chunkIdx * $cs;
