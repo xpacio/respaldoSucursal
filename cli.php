@@ -544,7 +544,8 @@ class Client {
             $desfase = number_format(($pending / $totalChunks) * 100, 2);
             Log::info("  Sync $file: $pending chunks pendientes ($desfase% de desfase)");
 
-            foreach ($req['needs_upload'] as $chunkIdx) {
+            $needsUpload = $req['needs_upload'];
+            foreach ($needsUpload as $i => $chunkIdx) {
                 $off = $chunkIdx * $cs;
                 $data = file_get_contents($wp, false, null, $off, min($cs, $size - $off));
                 $dataLen = strlen($data);
@@ -566,9 +567,8 @@ class Client {
                     ]);
 
                     if ($res['ok'] ?? false){ 
-                        $chunksToUpload--;
                         $GLOBALS['totalChunks'] = ($GLOBALS['totalChunks'] ?? 0) + 1;
-                        $progreso = number_format((($totalChunks - $chunksToUpload) / $totalChunks) * 100, 1);
+                        $progreso = number_format((($i + 1) / count($needsUpload)) * 100, 1);
                         Log::info(sprintf("  [%s%%] Uploaded chunk %d de %s (compression: %s%%, %s -> %s bytes)", 
                             $progreso, $chunkIdx, $file, $ratio, $dataLen, $compressedLen));
                         $success = true; 
