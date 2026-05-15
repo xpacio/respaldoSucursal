@@ -360,21 +360,18 @@ class Client {
     }
 
     private function transferDownload(string $service, array $loc, array $cfg): array {
-        // En download, source es la carpeta del servidor y dest es donde llegan localmente
-        $sourceTemplate = $cfg['source'] ?? '{base}';
-        $source = str_replace('{base}', $loc['base'], $sourceTemplate);
-        
+        // En download, dest es la carpeta local donde ya pueden existir archivos descargados antes
         $destTemplate = $cfg['dest'] ?? '{base}';
-        $dest = str_replace('{base}', $loc['base'], $destTemplate);
+        $dest = str_replace(['{base}','{rbfid}'], [$loc['base'], $loc['rbfid']], $destTemplate);
         
         $tempTemplate = $cfg['temp'] ?? '%tmp%/respaldoSucursal/{service}';
         $work = str_replace(['%tmp%', '{service}', '{base}'], [sys_get_temp_dir(), $service, $loc['base']], $tempTemplate);
         
         if (!is_dir($work)) mkdir($work, 0755, true);
 
-        Log::info("[DOWNLOAD] Source: $source, Dest: $dest, Work: $work");
+        Log::info("[DOWNLOAD] Dest: $dest, Work: $work");
 
-        // Listar archivos locales para enviar al servidor
+        // Listar archivos locales desde DEST para comparar hashes con el servidor
         $files = $cfg['files'] ?? [];
         $filesList = is_array($files) ? $files : explode(',', $files);
         $localFiles = [];
@@ -383,7 +380,7 @@ class Client {
             $f = trim($f);
             if (empty($f) || strpos($f, '*') !== false) continue;
             
-            $p = $source . DIRECTORY_SEPARATOR . $f;
+            $p = $dest . DIRECTORY_SEPARATOR . $f;
             if (file_exists($p)) {
                 $localFiles[] = [
                     'filename' => strtoupper($f),
@@ -432,12 +429,16 @@ class Client {
             // Crear carpetas
             if (!is_dir(dirname($workFile))) mkdir(dirname($workFile), 0755, true);
             
-            Log::info("Downloading file: $filename (" . number_format($fileSize) . " bytes)");
-            
-            // Descargar chunks
             $chunkSize = \App\Chunk::size($fileSize);
             $totalChunks = (int)ceil($fileSize / $chunkSize);
-            $allChunks = [];
+            
+            $fmtBytes = $fileSize < 1048576 ? round($fileSize/1024,2).' KB' : round($fileSize/1048576,2).' MB';
+            Log::info("Downloading: $filename ($fmtBytes, $totalChunks chunks)");
+            
+            // Descargar chunks y escribir directo a archivo temporal
+            $fh = fopen($workFile, 'wb');
+            $hashCtx = hash_init('xxh3');
+            $downloaded = 0;
             
             for ($i = 0; $i < $totalChunks; $i++) {
                 $chunkRes = $this->http->req('download_file', $loc['rbfid'], [
@@ -448,34 +449,35 @@ class Client {
                 ]);
                 
                 if (!($chunkRes['ok'] ?? false)) {
-                    Log::error("Chunk $i download failed for $filename");
+                    Log::error("  Chunk $i/$totalChunks failed for $filename");
                     break;
                 }
                 
                 $data = base64_decode($chunkRes['data'] ?? '');
-                if (!empty($data)) {
-                    $allChunks[$i] = $data;
-                }
-            }
-            
-            // Ensamblar archivo en temp
-            $fh = fopen($workFile, 'wb');
-            for ($i = 0; $i < $totalChunks; $i++) {
-                if (isset($allChunks[$i])) {
-                    fwrite($fh, $allChunks[$i]);
+                $dataLen = strlen($data);
+                if ($dataLen > 0) {
+                    fwrite($fh, $data);
+                    hash_update($hashCtx, $data);
+                    $downloaded += $dataLen;
+                    $pct = round(($i + 1) / $totalChunks * 100, 1);
+                    $chunkHash = \App\Hash::toBase64(hash('xxh3', $data));
+                    Log::info("  [$pct%] Chunk $i/$totalChunks ($chunkHash, " . number_format($dataLen) . " bytes)");
                 }
             }
             fclose($fh);
+            
+            $fileHash = \App\Hash::toBase64(hash_final($hashCtx));
             
             // Mover a destino final
             $destDir = dirname($destFile);
             if (!is_dir($destDir)) @mkdir($destDir, 0755, true);
 
             rename($workFile, $destFile);
-            Log::info("File saved: $destFile");
+            $destSize = filesize($destFile);
+            $destSizeFmt = $destSize < 1048576 ? round($destSize/1024,2).' KB' : round($destSize/1048576,2).' MB';
+            Log::info("  Saved: $destFile ($destSizeFmt, hash: $fileHash)");
             $results['sync_ok'][] = strtoupper($filename);
             $results['files_sync']++;
-            
             $results['files_count']++;
         }
         
