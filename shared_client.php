@@ -70,6 +70,7 @@ class HttpClient
     private $ch;
     private string $baseUrl;
     private int $timeDrift = 0;
+    private string $agentId = '';
 
     public function __construct(string $url)
     {
@@ -83,19 +84,22 @@ class HttpClient
         ]);
     }
 
+    public function setAgentId(string $id): void { $this->agentId = $id; }
+
     public function req(string $action, string $rbfid, array $body): array
     {
         $ts = time() + $this->timeDrift;
         $tok = Totp::gen($rbfid, $ts);
         $url = $this->baseUrl . '/api/' . $action . '/' . $rbfid;
 
-        curl_setopt($this->ch, CURLOPT_URL, $url);
-        curl_setopt($this->ch, CURLOPT_HTTPHEADER, [
+        $headers = [
             'Content-Type: application/json',
             'X-RBFID: ' . $rbfid,
             'X-TOTP-Token: ' . $tok,
             'X-Timestamp: ' . $ts
-        ]);
+        ];
+        if ($this->agentId) $headers[] = 'X-Agent-ID: ' . $this->agentId;
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($body));
         
         $raw = curl_exec($this->ch);

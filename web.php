@@ -219,6 +219,7 @@ class AdminUI {
                          <a href="/services" class="nav-link">Servicios</a>
                           <a href="/logs" class="nav-link">Logs</a>
                           <a href="/users" class="nav-link">Usuarios</a>
+                          <a href="/agents" class="nav-link">Agentes</a>
                         <span style="color:var(--tblr-muted);font-size:.875rem;padding:.5rem .25rem"><?= htmlspecialchars($_SESSION['nombre'] ?? $_SESSION['username'] ?? '') ?></span>
                         <a href="/?logout=1" class="nav-link">
 			    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-door-exit"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M13 12v.01" /><path d="M3 21h18" /><path d="M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5" /><path d="M14 7h7m-3 -3l3 3l-3 3" /></svg>
@@ -239,6 +240,8 @@ class AdminUI {
                      $this->viewLogs();
                   } elseif ($this->action === 'users') {
                      $this->viewUsers();
+                  } elseif ($this->action === 'agents') {
+                     $this->viewAgents();
                   } elseif ($this->action === 'clients') {
                      $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
                      $uriParts = explode('/', trim($uri, '/'));
@@ -495,6 +498,36 @@ class AdminUI {
 <?php
     }
 
+    private function viewAgents(): void {
+        $agents = $this->db->qa("SELECT a.*, (SELECT COUNT(*) FROM clients c WHERE c.agent_adbfid = a.adbfid) as client_count FROM agents a ORDER BY a.last_seen DESC");
+        ?>
+        <div class="page-header d-print-none"><div class="container-xl"><div class="row g-2 align-items-center">
+          <div class="col"><h3 class="page-title">Agentes</h3></div>
+        </div></div></div>
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table table-vcenter card-table table-striped">
+              <thead><tr><th>ADBFID</th><th>Hostname</th><th>Usuario</th><th>IP</th><th>Versión</th><th>Clientes</th><th>Último Contacto</th><th>Registrado</th></tr></thead>
+              <tbody>
+<?php foreach ($agents as $a): ?>
+                <tr>
+                  <td><code><?= htmlspecialchars($a['adbfid']) ?></code></td>
+                  <td><?= htmlspecialchars($a['hostname'] ?? '—') ?></td>
+                  <td><?= htmlspecialchars($a['username'] ?? '—') ?></td>
+                  <td><?= htmlspecialchars($a['ip'] ?? '—') ?></td>
+                  <td><?= htmlspecialchars($a['version'] ?? '—') ?></td>
+                  <td><?= (int)$a['client_count'] ?></td>
+                  <td><small><?= htmlspecialchars($a['last_seen'] ?? '—') ?></small></td>
+                  <td><small><?= htmlspecialchars($a['created_at'] ?? '—') ?></small></td>
+                </tr>
+<?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+<?php
+    }
+
 private function viewServices(): void {
         ?>
         <div class="page-header d-print-none" aria-label="Page header">
@@ -611,7 +644,7 @@ private function viewServices(): void {
          }
          echo "</form></div></div>";
          
-        $sql = "SELECT c.*, sh.last_heartbeat,
+        $sql = "SELECT c.*, sh.last_heartbeat, a.hostname as agent_hostname, a.ip as agent_ip, a.version as agent_version,
             CASE 
                 WHEN sh.last_heartbeat IS NULL THEN 3
                 WHEN sh.last_heartbeat < NOW() - INTERVAL '30 minutes' THEN 1
@@ -620,6 +653,7 @@ private function viewServices(): void {
             END as hb_priority
         FROM clients c
         LEFT JOIN service_health sh ON c.rbfid = sh.client_rbfid
+        LEFT JOIN agents a ON c.agent_adbfid = a.adbfid
         WHERE 1=1";
         $params = [];
         if ($filterPlaza !== '') {
@@ -635,7 +669,7 @@ private function viewServices(): void {
          $clients = $this->db->qa($sql, $params);
          
          echo "<div class='card mt-3'><table class='table table-striped mb-0'>";
-         echo "<thead><tr><th>RBFID</th><th>Emp</th><th>Plaza</th><th>Razón Social</th><th>Tipo</th><th>Heartbeat</th><th>Última Interacción</th><th>Enabled</th><th>Acciones</th></tr></thead>";
+          echo "<thead><tr><th>RBFID</th><th>Emp</th><th>Plaza</th><th>Razón Social</th><th>Tipo</th><th>Heartbeat</th><th>Última Interacción</th><th>Agente</th><th>Enabled</th><th>Acciones</th></tr></thead>";
          echo "<tbody>";
         foreach ($clients as $c) {
             echo "<tr>";
@@ -653,6 +687,14 @@ private function viewServices(): void {
                 $lastInteraction = \App\Fmt::duration($secondsAgo);
             }
             echo "<td><small>" . $lastInteraction . "</small></td>";
+            
+            $agentLabel = '—';
+            if (!empty($c['agent_hostname'])) {
+                $agentLabel = htmlspecialchars($c['agent_hostname']);
+                if (!empty($c['agent_version'])) $agentLabel .= ' <small class="text-muted">v' . htmlspecialchars($c['agent_version']) . '</small>';
+                if (!empty($c['agent_ip'])) $agentLabel .= '<br><small class="text-muted">' . htmlspecialchars($c['agent_ip']) . '</small>';
+            }
+            echo "<td>" . $agentLabel . "</td>";
             
             echo "<td>" . $this->iconEnabled($c['enabled']) . "</td>";
              echo "<td>";

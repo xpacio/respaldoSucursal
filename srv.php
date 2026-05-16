@@ -40,8 +40,14 @@ class Server
         $action = strtolower(trim($parts[0] ?? ''));
         $rbfid = $parts[1] ?? $_SERVER['HTTP_X_RBFID'] ?? $body['rbfid'] ?? '';
         $token = $_SERVER['HTTP_X_TOTP_TOKEN'] ?? $_SERVER['HTTP_X_TOKEN'] ?? $body['totp_token'] ?? '';
+        $agentId = $_SERVER['HTTP_X_AGENT_ID'] ?? '';
         
-        Log::add("Action: [$action] | RBFID: " . ($rbfid ?: 'none') . " | Path: $path");
+        Log::add("Action: [$action] | RBFID: " . ($rbfid ?: 'none') . " | Agent: " . ($agentId ?: 'none') . " | Path: $path");
+
+        if ($action === 'register_agent') {
+            $this->registerAgent($body);
+            return;
+        }
 
         if ($action !== 'health' && $action !== 'download' && (empty($rbfid) || empty($token))) {
             Log::error("Auth failed: Missing RBFID or Token");
@@ -50,6 +56,11 @@ class Server
         if ($action !== 'health' && $action !== 'download' && !Totp::verify($this->db, $rbfid, $token)) {
             Log::error("Auth failed: Invalid TOTP token for $rbfid");
             self::err('Token dinamico invalido', 401);
+        }
+
+        // Track agent on every authenticated request
+        if ($agentId && $rbfid && $action !== 'health' && $action !== 'download') {
+            $this->trackAgent($agentId, $rbfid);
         }
 
         switch ($action) {
@@ -108,6 +119,40 @@ class Server
         }
         Log::info("Config sent to $r (v: $sv)");
         self::json($res);
+    }
+    private function registerAgent(array $b): void
+    {
+        $adbfid = $b['adbfid'] ?? '';
+        if (!$adbfid) self::err('adbfid required');
+        $hostname = $b['hostname'] ?? '';
+        $username = $b['username'] ?? '';
+        $version = $b['version'] ?? '';
+        $platform = $b['platform'] ?? '';
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        $this->db->exec(
+            "INSERT INTO agents (adbfid, hostname, username, ip, version, last_seen)
+             VALUES (:a, :h, :u, :ip, :v, NOW())
+             ON CONFLICT (adbfid) DO UPDATE SET
+             hostname = :h2, username = :u2, ip = :ip2, version = :v2, last_seen = NOW()",
+            [':a' => $adbfid, ':h' => $hostname, ':u' => $username, ':ip' => $ip, ':v' => $version,
+             ':h2' => $hostname, ':u2' => $username, ':ip2' => $ip, ':v2' => $version]
+        );
+        Log::info("Agent registered: $adbfid ($hostname/$ip)");
+        self::json(['ok' => true]);
+    }
+    private function trackAgent(string $adbfid, string $rbfid): void
+    {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        $this->db->exec(
+            "INSERT INTO agents (adbfid, ip, last_seen)
+             VALUES (:a, :ip, NOW())
+             ON CONFLICT (adbfid) DO UPDATE SET ip = :ip2, last_seen = NOW()",
+            [':a' => $adbfid, ':ip' => $ip, ':ip2' => $ip]
+        );
+        $this->db->exec(
+            "UPDATE clients SET agent_adbfid = :a WHERE rbfid = :r AND (agent_adbfid IS NULL OR agent_adbfid = :a2)",
+            [':a' => $adbfid, ':r' => $rbfid, ':a2' => $adbfid]
+        );
     }
     private function sync(string $r, array $b): void
     {

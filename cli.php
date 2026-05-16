@@ -18,12 +18,15 @@ class Client {
     private array $locations = [];
     private string $configPath;
     private HttpClient $http;
+    private string $agentId;
 
     public function __construct(string $cfgPath) {
         $this->configPath = $cfgPath;
         $data = \App\ClientConfig::load($cfgPath);
         $this->locations = $data['locations'] ?? [];
+        $this->agentId = $this->loadAgentId();
         $this->http = new HttpClient(Constants::DEFAULT_URL);
+        $this->http->setAgentId($this->agentId);
     }
 
     public function showStatus(): void {
@@ -65,6 +68,25 @@ class Client {
             Log::error("No se pudo guardar la configuracion: {$this->configPath}");
         }
     }    
+
+    private function loadAgentId(): string {
+        $path = dirname($this->configPath) . '/.agent.id';
+        if (file_exists($path)) return trim(file_get_contents($path));
+        $id = substr(\App\Hash::toBase64(hash('xxh3', php_uname('n') . '|' . get_current_user())), 0, 16);
+        file_put_contents($path, $id);
+        Log::info("Agent ID generated: $id");
+        return $id;
+    }
+
+    private function registerAgent(): void {
+        $this->http->req('register_agent', 'system', [
+            'adbfid' => $this->agentId,
+            'hostname' => php_uname('n'),
+            'username' => get_current_user(),
+            'version' => '0.60430j',
+            'platform' => PHP_OS
+        ]);
+    }
 
     public function listServicesInfo(): void {
         if (empty($this->locations)) {
@@ -109,6 +131,7 @@ class Client {
     }
 
     public function runOrchestrator(): void {
+        $this->registerAgent();
         if (empty($this->locations)) {
             Log::info("No locations found. Running disk scan...");
             $this->scanAndCreateConfig();
@@ -163,6 +186,7 @@ class Client {
     }
 
     public function executeService(string $service, string $rbfid): void {
+        $this->registerAgent();
         // Send heartbeat before executing
         try {
             $this->http->req('heartbeat', $rbfid, [
