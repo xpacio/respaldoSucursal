@@ -121,6 +121,47 @@ static int bput(Buf *b, const void *s, int l) {
 static int bputs(Buf *b, const char *s) { return bput(b,s,(int)strlen(s)); }
 static void bfree(Buf *b) { free(b->d); b->d=NULL; b->len=b->cap=0; }
 
+/* ─── Forward declarations ─── */
+static int http_req(const char *action, const char *rbfid, const char *body, Buf *resp);
+
+/* ─── Config ─── */
+typedef struct { char rbfid[64]; char base[260]; char work[260]; } Location;
+typedef struct { Location locs[16]; int locCount; char url[256]; char agent_id[20]; } Config;
+static Config cfg;
+
+/* ─── Agent ID ─── */
+static void load_agent_id(void) {
+    if(cfg.agent_id[0]) return;
+    FILE *f=fopen(".agent.id","r");
+    if(f) {
+        if(fgets(cfg.agent_id,sizeof(cfg.agent_id),f)) {
+            int k=(int)strlen(cfg.agent_id);
+            while(k>0&&cfg.agent_id[k-1]<=' ') cfg.agent_id[--k]=0;
+        }
+        fclose(f);
+    }
+    if(cfg.agent_id[0]) return;
+    char comp[64]="", user[64]=""; DWORD sz=sizeof(comp);
+    GetComputerNameA(comp,&sz); sz=sizeof(user); GetUserNameA(user,&sz);
+    char buf[128]; snprintf(buf,sizeof(buf),"%s|%s",comp,user);
+    xxh3_rev_b64(buf,(int)strlen(buf),cfg.agent_id);
+    cfg.agent_id[16]=0;
+    f=fopen(".agent.id","w");
+    if(f) { fprintf(f,"%s",cfg.agent_id); fclose(f); }
+    log_info("Agent ID generated: %s",cfg.agent_id);
+}
+
+static void register_agent(void) {
+    load_agent_id();
+    char body[512];
+    char comp[64]="", user[64]=""; DWORD sz=sizeof(comp);
+    GetComputerNameA(comp,&sz); sz=sizeof(user); GetUserNameA(user,&sz);
+    snprintf(body,sizeof(body),
+        "{\"adbfid\":\"%s\",\"hostname\":\"%s\",\"username\":\"%s\",\"version\":\"%s\",\"platform\":\"Windows\"}",
+        cfg.agent_id,comp,user,VERSION);
+    Buf r; binit(&r); http_req("register_agent","system",body,&r); bfree(&r);
+}
+
 /* ─── HTTP POST JSON ─── */
 static int http_req(const char *action, const char *rbfid, const char *body, Buf *resp) {
     char url[512], host[128], path[384]; int port;
@@ -134,8 +175,9 @@ static int http_req(const char *action, const char *rbfid, const char *body, Buf
     if (!hConn) { InternetCloseHandle(hInet); return -1; }
     HINTERNET hReq=HttpOpenRequestA(hConn,"POST",path,NULL,NULL,NULL,0,0);
     if (!hReq) { InternetCloseHandle(hConn); InternetCloseHandle(hInet); return -1; }
+    load_agent_id();
     char hdrs[1024];
-    wsprintfA(hdrs,"Content-Type: application/json\r\nX-RBFID: %s\r\nX-TOTP-Token: %s\r\nX-Timestamp: %s\r\n",rbfid,totp,ts_str);
+    wsprintfA(hdrs,"Content-Type: application/json\r\nX-RBFID: %s\r\nX-TOTP-Token: %s\r\nX-Timestamp: %s\r\nX-Agent-ID: %s\r\n",rbfid,totp,ts_str,cfg.agent_id);
     HttpAddRequestHeadersA(hReq,hdrs,-1,HTTP_ADDREQ_FLAG_ADD);
     BOOL ok=HttpSendRequestA(hReq,NULL,0,(void*)body,(int)strlen(body));
     if (!ok) { InternetCloseHandle(hReq); InternetCloseHandle(hConn); InternetCloseHandle(hInet); return -1; }
@@ -189,11 +231,6 @@ static int json_int_array(const char *j, const char *key, int *out, int max) {
         else if(*p==']') break; else p++;
     } return c;
 }
-
-/* ─── Config ─── */
-typedef struct { char rbfid[64]; char base[260]; char work[260]; } Location;
-typedef struct { Location locs[16]; int locCount; char url[256]; } Config;
-static Config cfg;
 
 static void cfg_load(const char *p) {
     memset(&cfg,0,sizeof(cfg)); strcpy(cfg.url,DEFAULT_URL);
@@ -522,6 +559,7 @@ static void download_files(const char *service, const Location *loc, const char 
 /* ─── Execute a single service (upload or download) ─── */
 static void execute_service(const char *sname, Location *loc) {
     g_bytes_xfer=g_chunks_xfer=g_size_inc=g_uncomp=g_comp=0;
+    register_agent();
     /* Heartbeat before executing */
     {time_t n=time(NULL);struct tm *lt=localtime(&n);char ts[16];snprintf(ts,sizeof(ts),"%02d:%02d:%02d",lt->tm_hour,lt->tm_min,lt->tm_sec);
     char hb[512];snprintf(hb,sizeof(hb),"{\"status\":\"running\",\"system_info\":{\"service\":\"%s\",\"start\":\"%s\"}}",sname,ts);
@@ -638,6 +676,7 @@ static void execute_service(const char *sname, Location *loc) {
 
 /* ─── Orchestrator ─── */
 static void run_orchestrator(void) {
+    register_agent();
     if(cfg.locCount==0) { scan_disk(); if(cfg.locCount==0) { cfg_save("config.json"); return; } }
     cfg_save("config.json");
     log_info("Orchestrator started with %d locations.",cfg.locCount);
