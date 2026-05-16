@@ -788,10 +788,10 @@ private function viewServices(): void {
              $isEnabled = $s['client_enabled'] !== null ? $s['client_enabled'] : $s['global_enabled'];
              $isEnabled = ($isEnabled === true || $isEnabled === 't' || $isEnabled === 'true');
              
-             $statusBadge = '<span class="badge bg-secondary">Nunca</span>';
-             if ($s['last_status'] === 'success') $statusBadge = '<span class="badge bg-success">Success</span>';
-             elseif ($s['last_status'] === 'failed') $statusBadge = '<span class="badge bg-danger">Failed</span>';
-             elseif ($s['last_status'] === 'partial') $statusBadge = '<span class="badge bg-warning">Partial</span>';
+             $statusBadge = '<span class="text-muted">Nunca</span>';
+             if ($s['last_status'] === 'success') $statusBadge = '<span class="text-success fw-bold">Success</span>';
+             elseif ($s['last_status'] === 'failed') $statusBadge = '<span class="text-danger fw-bold">Failed</span>';
+             elseif ($s['last_status'] === 'partial') $statusBadge = '<span class="text-warning fw-bold">Partial</span>';
 
              $lastRun = '-';
              if ($s['last_run']) {
@@ -839,12 +839,12 @@ private function viewServices(): void {
          }
 
          foreach ($files as $f) {
-             $statusClass = match($f['status']) {
-                 'completed' => 'bg-success',
-                 'pending'   => 'bg-warning',
-                 'missing'   => 'bg-danger',
-                 'failed'    => 'bg-dark',
-                 default     => 'bg-secondary'
+             $statusColor = match($f['status']) {
+                 'completed' => 'text-success',
+                 'pending'   => 'text-warning',
+                 'missing'   => 'text-danger',
+                 'failed'    => 'text-dark',
+                 default     => 'text-muted'
              };
 
              $progress = 100;
@@ -854,14 +854,12 @@ private function viewServices(): void {
 
              echo "<tr>";
              echo "<td><strong>" . htmlspecialchars($f['file_name']) . "</strong></td>";
-             echo "<td><span class='badge $statusClass'>" . ucfirst($f['status']) . "</span></td>";
+             echo "<td><span class='$statusColor fw-bold'>" . ucfirst($f['status']) . "</span></td>";
              echo "<td><div class='row align-items-center'><div class='col-auto'>$progress%</div><div class='col'><div class='progress progress-sm'><div class='progress-bar bg-primary' style='width: $progress%'></div></div></div></div></td>";
              echo "<td>" . \App\Fmt::bytes((int)$f['file_size']) . "</td>";
              echo "<td>" . ($f['file_mtime'] ? date('Y-m-d H:i:s', (int)$f['file_mtime']) : '-') . "</td>";
              echo "<td>" . \App\Fmt::duration(time() - strtotime($f['updated_at'])) . " ago</td>";
              echo "</tr>";
-         }
-        echo "</tbody></table></div></div>";
      }
  
      private function editServiceConfig(string $rbfid, string $serviceName): void {
