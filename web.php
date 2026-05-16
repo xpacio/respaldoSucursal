@@ -53,8 +53,8 @@ class AdminUI {
         // Guardar cliente (Solo usuarios autenticados)
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_client']) && ($_SESSION['admin_auth'] ?? false)) {
             $rbfid = preg_replace('/[^A-Z0-9]/', '', $_POST['rbfid'] ?? '');
-            $emp = preg_replace('/[^A-Z0-9]/', '', $_POST['emp'] ?? '');
-            $plaza = preg_replace('/[^A-Z0-9]/', '', $_POST['plaza'] ?? '');
+            $emp = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $_POST['emp'] ?? ''));
+            $plaza = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $_POST['plaza'] ?? ''));
             $razon = $_POST['razon_social'] ?? '';
             $tipo = preg_replace('/[^a-z]/', '', $_POST['tipo'] ?? 'sucursal');
             $enabled = isset($_POST['enabled']) ? 'true' : 'false';
