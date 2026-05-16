@@ -129,6 +129,34 @@ class AdminUI {
             header("Location: /services");
             exit;
         }
+        
+        // Guardar configuración personalizada de servicio por cliente
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service_config']) && ($_SESSION['admin_auth'] ?? false)) {
+            $rbfid = preg_replace('/[^A-Z0-9]/', '', $_POST['rbfid'] ?? '');
+            $serviceName = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['service_name'] ?? '');
+            $freq = (int)($_POST['frequency_seconds'] ?? 0);
+            $enabled = isset($_POST['sc_enabled']) ? 'true' : 'false';
+            $configRaw = $_POST['config_json'] ?? '';
+            $decoded = $configRaw !== '' ? json_decode($configRaw, true) : null;
+            $configJson = ($configRaw !== '' && $decoded !== null) ? json_encode($decoded) : null;
+            
+            if ($rbfid !== '' && $serviceName !== '') {
+                $svc = $this->db->q("SELECT id, default_frequency_seconds FROM services WHERE name = :n", [':n' => $serviceName]);
+                if ($svc) {
+                    if ($freq <= 0) $freq = (int)$svc['default_frequency_seconds'];
+                    $this->db->exec(
+                        "INSERT INTO service_config (client_rbfid, service_id, frequency_seconds, config, enabled, next_execution, created_at, updated_at)
+                         VALUES (:r, :sid, :freq, :cfg::jsonb, :en, NOW(), NOW(), NOW())
+                         ON CONFLICT (client_rbfid, service_id) DO UPDATE SET
+                           frequency_seconds = :freq2, config = :cfg2::jsonb, enabled = :en2, updated_at = NOW()",
+                        [':r' => $rbfid, ':sid' => $svc['id'], ':freq' => $freq, ':cfg' => $configJson ?? '{}', ':en' => $enabled,
+                         ':freq2' => $freq, ':cfg2' => $configJson ?? '{}', ':en2' => $enabled]
+                    );
+                }
+            }
+            header("Location: /clients/status/$rbfid");
+            exit;
+        }
     }
 
     private function renderLogin(): void {
@@ -209,11 +237,14 @@ class AdminUI {
                      $uriParts = explode('/', trim($uri, '/'));
                      $rbfid = (isset($uriParts[2])) ? $uriParts[2] : '';
                      
-                     if ($this->target === 'edit' && $rbfid !== '') {
-                         $this->editClient($rbfid);
-                     } elseif ($this->target === 'status' && $rbfid !== '') {
-                         $this->viewClientStatus($rbfid);
-                     } elseif ($this->target === 'new') {
+                  if ($this->target === 'edit' && $rbfid !== '') {
+                          $this->editClient($rbfid);
+                      } elseif ($this->target === 'editcfg' && $rbfid !== '') {
+                          $serviceName = $uriParts[3] ?? '';
+                          $this->editServiceConfig($rbfid, $serviceName);
+                      } elseif ($this->target === 'status' && $rbfid !== '') {
+                          $this->viewClientStatus($rbfid);
+                      } elseif ($this->target === 'new') {
                          $this->editClient('');
                      } else {
                          $this->viewClients();
@@ -616,8 +647,8 @@ private function viewServices(): void {
          echo "<div class='col-md-4'><div class='card'><div class='card-body'><div class='subheader'>Plataforma</div><div class='h3 m-0'>" . htmlspecialchars(json_decode($health['system_info'] ?? '{}', true)['platform'] ?? 'Desconocida') . "</div></div></div></div>";
          echo "</div>";
 
-         $sql = "SELECT s.name, s.type, s.enabled as global_enabled, 
-                 sc.enabled as client_enabled, sc.frequency_seconds, sc.next_execution,
+         $sql = "SELECT s.id as service_id, s.name, s.type, s.enabled as global_enabled, s.default_frequency_seconds,
+                 sc.enabled as client_enabled, sc.frequency_seconds, sc.next_execution, sc.config as client_config,
                  sh.status as last_status, sh.completed_at as last_run, sh.execution_time_ms
                  FROM services s
                  LEFT JOIN service_config sc ON s.id = sc.service_id AND sc.client_rbfid = :r
@@ -630,8 +661,8 @@ private function viewServices(): void {
                  ORDER BY s.name ASC";
          $services = $this->db->qa($sql, [':r' => $rbfid]);
 
-         echo "<div class='card'><div class='table-responsive'><table class='table table-vcenter card-table table-striped'>";
-         echo "<thead><tr><th>Servicio</th><th>Estado</th><th>Última Ejecución</th><th>Próxima</th><th>Frecuencia</th><th>Config</th></tr></thead><tbody>";
+          echo "<div class='card'><div class='table-responsive'><table class='table table-vcenter card-table table-striped'>";
+          echo "<thead><tr><th>Servicio</th><th>Estado</th><th>Última Ejecución</th><th>Próxima</th><th>Frecuencia</th><th>Config</th><th>Acciones</th></tr></thead><tbody>";
 
          foreach ($services as $s) {
              $isEnabled = $s['client_enabled'] !== null ? $s['client_enabled'] : $s['global_enabled'];
@@ -653,18 +684,27 @@ private function viewServices(): void {
                  $nextExec = ($diff <= 0) ? '<span class="text-danger">Atrasado</span>' : \App\Fmt::duration($diff);
              }
 
-             echo "<tr>";
-             echo "<td><div><strong>{$s['name']}</strong></div><div class='text-muted small'>{$s['type']}</div></td>";
-             echo "<td>$statusBadge</td>";
-             echo "<td>$lastRun " . ($s['execution_time_ms'] ? "<small class='text-muted'>({$s['execution_time_ms']}ms)</small>" : "") . "</td>";
-             echo "<td>$nextExec</td>";
-             echo "<td>" . ($s['frequency_seconds'] ?? 'Default') . "s</td>";
-             echo "<td>" . ($s['client_enabled'] !== null ? '<span class="badge badge-outline text-blue">Custom</span>' : '<span class="text-muted small">Global</span>') . "</td>";
-             echo "</tr>";
-         }
-         echo "</tbody></table></div></div>";
+             $effectiveFreq = $s['frequency_seconds'] ?? $s['default_frequency_seconds'] ?? 300;
+              $isCustom = $s['client_config'] !== null && $s['client_config'] !== '{}';
+              $isFreqCustom = $s['frequency_seconds'] !== null && $s['frequency_seconds'] != $s['default_frequency_seconds'];
+              $showCustom = $isCustom || $isFreqCustom;
 
-         // Sección de Detalle de Archivos
+              echo "<tr>";
+              echo "<td><div><strong>{$s['name']}</strong></div><div class='text-muted small'>{$s['type']}</div></td>";
+              echo "<td>$statusBadge</td>";
+              echo "<td>$lastRun " . ($s['execution_time_ms'] ? "<small class='text-muted'>({$s['execution_time_ms']}ms)</small>" : "") . "</td>";
+              echo "<td>$nextExec</td>";
+              echo "<td>{$effectiveFreq}s</td>";
+              echo "<td>" . ($showCustom ? '<span class="badge badge-outline text-blue">Custom</span>' : '<span class="text-muted small">Global</span>') . "</td>";
+              $editCfgUrl = '/clients/editcfg/' . urlencode($rbfid) . '/' . urlencode($s['name']);
+              echo "<td><a href='$editCfgUrl' class='btn btn-sm btn-outline-secondary'>
+                      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='icon'><path d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' /><circle cx='12' cy='12' r='3' /></svg>
+                      Customize</a></td>";
+              echo "</tr>";
+          }
+          echo "</tbody></table></div></div>";
+          
+          // Sección de Detalle de Archivos
          $files = $this->db->qa("SELECT * FROM files WHERE rbfid = :r ORDER BY status, updated_at DESC", [':r' => $rbfid]);
          
          echo "<div class='d-flex justify-content-between align-items-center mb-3 mt-5'>";
@@ -701,9 +741,73 @@ private function viewServices(): void {
              echo "<td>" . \App\Fmt::duration(time() - strtotime($f['updated_at'])) . " ago</td>";
              echo "</tr>";
          }
-         echo "</tbody></table></div></div>";
+        echo "</tbody></table></div></div>";
      }
-
+ 
+     private function editServiceConfig(string $rbfid, string $serviceName): void {
+         $svc = $this->db->q(
+             "SELECT s.id, s.name, s.type, s.default_frequency_seconds, s.files as default_files,
+                     sc.frequency_seconds, sc.config, sc.enabled as sc_enabled,
+                     c.emp, c.plaza
+              FROM services s
+              CROSS JOIN clients c
+              LEFT JOIN service_config sc ON s.id = sc.service_id AND sc.client_rbfid = c.rbfid
+              WHERE s.name = :sn AND c.rbfid = :r",
+             [':sn' => $serviceName, ':r' => $rbfid]
+         );
+         if (!$svc) { echo "<div class='alert alert-danger'>Servicio o cliente no encontrado</div>"; return; }
+ 
+         $freq = $svc['frequency_seconds'] ?? $svc['default_frequency_seconds'] ?? 300;
+         $enabled = $svc['sc_enabled'] ?? true;
+         $enabled = ($enabled === true || $enabled === 't' || $enabled === 'true');
+         $configRaw = $svc['config'] ?? '';
+         $configPretty = '';
+         if ($configRaw !== null && $configRaw !== '{}') {
+             $decoded = json_decode($configRaw, true);
+             $configPretty = $decoded ? json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : '';
+         }
+ 
+         echo "<div class='d-flex justify-content-between align-items-center mb-3'>";
+         echo "<div><h3 class='m-0'>Configuración Personalizada: {$svc['name']}</h3>";
+         echo "<small class='text-muted'>$rbfid (" . htmlspecialchars($svc['emp'] ?? '') . " - " . htmlspecialchars($svc['plaza'] ?? '') . ")</small></div>";
+         echo "<a href='/clients/status/$rbfid' class='btn btn-secondary'>Regresar</a>";
+         echo "</div>";
+ 
+         echo "<div class='card'><div class='card-body'>";
+         echo "<form method='post'>";
+         echo "<input type='hidden' name='save_service_config' value='1'>";
+         echo "<input type='hidden' name='rbfid' value='$rbfid'>";
+         echo "<input type='hidden' name='service_name' value='" . htmlspecialchars($serviceName) . "'>";
+ 
+         echo "<div class='row mb-3'>";
+         echo "<div class='col-md-4'>";
+         echo "<label class='form-label'>Frecuencia (segundos)</label>";
+         echo "<input type='number' name='frequency_seconds' class='form-control' value='$freq' min='30' step='30'>";
+         echo "<small class='text-muted'>Default: {$svc['default_frequency_seconds']}s</small>";
+         echo "</div>";
+         echo "<div class='col-md-4'>";
+         echo "<div class='form-check mt-4'>";
+         $checked = $enabled ? ' checked' : '';
+         echo "<input type='checkbox' name='sc_enabled' class='form-check-input' id='sc_enabled'$checked>";
+         echo "<label class='form-check-label' for='sc_enabled'>Habilitado para este cliente</label>";
+         echo "</div></div>";
+         echo "</div>";
+ 
+         echo "<div class='mb-3'>";
+         echo "<label class='form-label'>Config JSON <small class='text-muted'>(sobreescribe files, source, dest, temp, exclude, maxage)</small></label>";
+         echo "<textarea name='config_json' class='form-control font-monospace' rows='10' placeholder='{\"files\":[\"*.DBF\"],\"source\":\"{base}\",\"exclude\":\"*.FPT\"}'>" . htmlspecialchars($configPretty) . "</textarea>";
+         if ($svc['default_files']) {
+             echo "<small class='text-muted'>Archivos default del servicio: " . htmlspecialchars($svc['default_files']) . "</small>";
+         }
+         echo "</div>";
+ 
+         echo "<div class='mb-3'>";
+         echo "<button type='submit' class='btn btn-primary'>Guardar</button>";
+         echo "<a href='/clients/status/$rbfid' class='btn btn-secondary ms-2'>Cancelar</a>";
+         echo "</div>";
+         echo "</form></div></div>";
+     }
+ 
      private function iconType(?string $type): string {
         $type = $type ?? 'sync';
         $icons = [
