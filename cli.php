@@ -230,20 +230,17 @@ class Client {
     }
 
     private function transferUpload(string $service, array $loc, array $cfg): array {
-        // source puede ser {base} (usa la base local) o una ruta fija como c:\otra_carpeta
+        $rbfid = $loc['rbfid'];
         $sourceTemplate = $cfg['source'] ?? '{base}';
         $source = str_replace('{base}', $loc['base'], $sourceTemplate);
         
-        // temp usa %tmp% y {service}
         $tempTemplate = $cfg['temp'] ?? '%tmp%/respaldoSucursal/{service}';
         $work = str_replace(['%tmp%', '{service}', '{base}'], [sys_get_temp_dir(), $service, $loc['base']], $tempTemplate);
         
-        // Crear directorio temporal si no existe
         if (!is_dir($work)) mkdir($work, 0755, true);
 
-        // Verificar que client_source existe
         if (!is_dir($source)) {
-            Log::error("Source directory does not exist: $source");
+            Log::error("[$rbfid] Source directory does not exist: $source");
             return ['files_count' => 0, 'sync_ok' => [], 'sync_missing' => [], 'files_sync' => 0, 'error' => "Source directory not found: $source"];
         }
 
@@ -254,7 +251,7 @@ class Client {
         $files = $cfg['files'] ?? Constants::$WATCH_FILES;
         $filesList = is_array($files) ? $files : explode(',', $files);
         
-        Log::info("[UPLOAD] Source: $source, Work: $work, Recursive: " . ($recursive ? 'yes' : 'no') . 
+        Log::info("[$rbfid] [UPLOAD] Source: $source, Work: $work, Recursive: " . ($recursive ? 'yes' : 'no') . 
             ", Exclude: " . ($excludeMasks ?: 'none') . ", MaxAge: " . ($maxage ?? 'none') . 
             ", Files(" . count($filesList) . "): " . implode(', ', array_map('trim', $filesList)));
         
@@ -280,7 +277,7 @@ class Client {
                     $robocopyCmd .= ' /maxage:' . (int)$maxage;
                 }
                 
-                Log::info("--- Processing mask: $item (recursive: $recursive, maxage: $maxage) ---");
+                Log::info("[$rbfid] --- Processing mask: $item (recursive: $recursive, maxage: $maxage) ---");
                 exec($robocopyCmd);
                 
                 // Procesar archivos copiados y aplicar exclude
@@ -306,12 +303,12 @@ class Client {
                 $srcReal = $this->findFileCaseInsensitive($source, $item);
                 
                 if (!$srcReal) {
-                    Log::info("File not found: $item");
+                    Log::info("[$rbfid] File not found: $item");
                     $results['sync_missing'][] = $fUpper;
                     continue;
                 }
 
-                Log::info("--- Processing: $fUpper (found: $srcReal) ---");
+                Log::info("[$rbfid] --- Processing: $fUpper (found: $srcReal) ---");
                 
                 copy($srcReal, $dstPath);
                 $results['files_count']++;
@@ -332,6 +329,7 @@ class Client {
     }
 
     private function processUploadedFiles(string $service, array $loc, string $workDir, array $excludeList, array &$results): void {
+        $rbfid = $loc['rbfid'];
         if (empty($excludeList)) return;
         
         $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($workDir));
@@ -341,7 +339,7 @@ class Client {
             $filename = $file->getFilename();
             foreach ($excludeList as $mask) {
                 if ($this->matchMask($filename, trim($mask))) {
-                    Log::info("Excluding file (matched mask $mask): " . $filename);
+                    Log::info("[$rbfid] Excluding file (matched mask $mask): " . $filename);
                     $results['sync_excluded'][] = $filename;
                     unlink($file->getPathname());
                     break;
@@ -356,7 +354,7 @@ class Client {
     }
 
     private function transferDownload(string $service, array $loc, array $cfg): array {
-        // En download, dest es la carpeta local donde ya pueden existir archivos descargados antes
+        $rbfid = $loc['rbfid'];
         $destTemplate = $cfg['dest'] ?? '{base}';
         $dest = str_replace(['{base}','{rbfid}'], [$loc['base'], $loc['rbfid']], $destTemplate);
         
@@ -365,7 +363,7 @@ class Client {
         
         if (!is_dir($work)) mkdir($work, 0755, true);
 
-        Log::info("[DOWNLOAD] Dest: $dest, Work: $work");
+        Log::info("[$rbfid] [DOWNLOAD] Dest: $dest, Work: $work");
 
         // Listar archivos locales desde DEST para comparar hashes con el servidor
         $files = $cfg['files'] ?? [];
@@ -388,14 +386,14 @@ class Client {
         }
         
         // Solicitar lista de archivos a recibir del servidor
-        Log::info("Requesting download list for service: $service");
+        Log::info("[$rbfid] Requesting download list for service: $service");
         $res = $this->http->req('download_list', $loc['rbfid'], [
             'service' => $service,
             'files' => $localFiles
         ]);
         
         if (!$res['ok']) {
-            Log::error("Download list error: " . ($res['error'] ?? 'Unknown'));
+            Log::error("[$rbfid] Download list error: " . ($res['error'] ?? 'Unknown'));
             return ['files_count' => 0, 'sync_ok' => [], 'sync_missing' => [], 'files_sync' => 0];
         }
         
@@ -407,7 +405,7 @@ class Client {
         ];
         
         $filesToReceive = $res['files'] ?? [];
-        Log::info("Files to receive: " . count($filesToReceive));
+        Log::info("[$rbfid] Files to receive: " . count($filesToReceive));
         
         foreach ($filesToReceive as $fInfo) {
             $filename = $fInfo['filename'] ?? '';
@@ -428,7 +426,7 @@ class Client {
             $chunkSize = \App\Chunk::size($fileSize);
             $totalChunks = (int)ceil($fileSize / $chunkSize);
             
-            Log::info("Downloading: $filename (" . Fmt::bytes($fileSize) . ", $totalChunks chunks)");
+            Log::info("[$rbfid] Downloading: $filename (" . Fmt::bytes($fileSize) . ", $totalChunks chunks)");
             
             // Descargar chunks y escribir directo a archivo temporal
             $fh = fopen($workFile, 'wb');
@@ -444,7 +442,7 @@ class Client {
                 ]);
                 
                 if (!($chunkRes['ok'] ?? false)) {
-                    Log::error("  Chunk $i/$totalChunks failed for $filename");
+                    Log::error("[$rbfid]  Chunk $i/$totalChunks failed for $filename");
                     break;
                 }
                 
@@ -456,20 +454,19 @@ class Client {
                     $downloaded += $dataLen;
                     $pct = round(($i + 1) / $totalChunks * 100, 1);
                     $chunkHash = \App\Hash::toBase64(hash('xxh3', $data));
-                    Log::info("  [$pct%] Chunk $i/$totalChunks ($chunkHash, " . number_format($dataLen) . " bytes)");
+                    Log::info("[$rbfid]  [$pct%] Chunk $i/$totalChunks ($chunkHash, " . number_format($dataLen) . " bytes)");
                 }
             }
             fclose($fh);
             
             $fileHash = \App\Hash::toBase64(hash_final($hashCtx));
             
-            // Mover a destino final
             $destDir = dirname($destFile);
             if (!is_dir($destDir)) @mkdir($destDir, 0755, true);
 
             rename($workFile, $destFile);
             $destSize = filesize($destFile);
-            Log::info("  Saved: $destFile (" . Fmt::bytes($destSize) . ", hash: $fileHash)");
+            Log::info("[$rbfid]  Saved: $destFile (" . Fmt::bytes($destSize) . ", hash: $fileHash)");
             $results['sync_ok'][] = strtoupper($filename);
             $results['files_sync']++;
             $results['files_count']++;
@@ -495,7 +492,7 @@ class Client {
     }
 
     private function uploadFile(string $service, array $loc, string $file, string $wp): void {
-
+        $rbfid = $loc['rbfid'];
         $size = filesize($wp);
         $h = Hash::computeFile($wp);
         $cs = Chunk::size($size);
@@ -503,7 +500,7 @@ class Client {
         while ($chunk = fread($fh, $cs)) { $chs[] = Hash::toBase64(hash('xxh3', $chunk)); }
         fclose($fh);
         $totalChunks = count($chs);
-        Log::debug($loc['work'] . " $size :: $h :: $cs x $totalChunks");
+        Log::debug("[$rbfid] " . $loc['work'] . " $size :: $h :: $cs x $totalChunks");
 
         
         while (true) {
@@ -521,8 +518,7 @@ class Client {
             
             $pending = count($req['needs_upload'] ?? []);
             if ($pending === 0) {
-                Log::info("  Sync $file: COMPLETO");
-                // Show file changes if available
+                Log::info("[$rbfid]  Sync $file: COMPLETO");
                 if (!empty($req['file_changes'])) {
                     foreach ($req['file_changes'] as $fc) {
                         $file = $fc['file'] ?? '?';
@@ -533,16 +529,16 @@ class Client {
                         $diffFmt = $fc['diff_fmt'] ?? '?';
                         $pct = $fc['growth_pct'] ?? 0;
                         $timeFmt = $fc['time_diff_fmt'] ?? '?';
-                        Log::info("  [$file] Hash: $hash | Dest: $dest");
-                        Log::info("  Size: $oldFmt -> $newFmt (diff: $diffFmt, $pct%)");
-                        Log::info("  Time diff: $timeFmt");
+                        Log::info("[$rbfid]  [$file] Hash: $hash | Dest: $dest");
+                        Log::info("[$rbfid]  Size: $oldFmt -> $newFmt (diff: $diffFmt, $pct%)");
+                        Log::info("[$rbfid]  Time diff: $timeFmt");
                     }
                 }
                 break; 
             }
             
             $desfase = number_format(($pending / $totalChunks) * 100, 2);
-            Log::info("  Sync $file: $pending chunks pendientes ($desfase% de desfase)");
+            Log::info("[$rbfid]  Sync $file: $pending chunks pendientes ($desfase% de desfase)");
 
             $needsUpload = $req['needs_upload'];
             foreach ($needsUpload as $i => $chunkIdx) {
@@ -569,12 +565,12 @@ class Client {
                     if ($res['ok'] ?? false){ 
                         $GLOBALS['totalChunks'] = ($GLOBALS['totalChunks'] ?? 0) + 1;
                         $progreso = number_format((($i + 1) / count($needsUpload)) * 100, 1);
-                        Log::info(sprintf("  [%s%%] Uploaded chunk %d de %s (compression: %s%%, %s -> %s bytes)", 
+                        Log::info(sprintf("[$rbfid]  [%s%%] Uploaded chunk %d de %s (compression: %s%%, %s -> %s bytes)", 
                             $progreso, $chunkIdx, $file, $ratio, $dataLen, $compressedLen));
                         $success = true; 
                     } else {
                         $attempts++;
-                        Log::info(" Reintentando chunk $chunkIdx (intento $attempts)");
+                        Log::info("[$rbfid]  Reintentando chunk $chunkIdx (intento $attempts)");
                     };
                 }
                 if (!$success) throw new \Exception("Failed to upload chunk $chunkIdx of $file after 3 attempts");

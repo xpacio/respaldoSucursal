@@ -14,6 +14,7 @@ class AdminUI {
 
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) session_start();
+        $this->db = new DB(Config::getDb());
 
         // Manejo de Logout
         if (isset($_GET['logout'])) {
@@ -26,17 +27,19 @@ class AdminUI {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_btn'])) {
             $user = $_POST['user'] ?? '';
             $pass = $_POST['pass'] ?? '';
-            // Credenciales: mover a variables de entorno o gestor de secretos en producción
-            if ($user === 'admin' && $pass === 'admin123') {
+            $row = $this->db->q("SELECT id, username, password, nombre, role FROM users WHERE username = :u", [':u' => $user]);
+            if ($row && password_verify($pass, $row['password'])) {
                 $_SESSION['admin_auth'] = true;
+                $_SESSION['user_id'] = $row['id'];
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['nombre'] = $row['nombre'];
+                $_SESSION['role'] = $row['role'];
                 header("Location: /");
                 exit;
             } else {
                 $this->login_error = "Credenciales inválidas";
             }
         }
-
-        $this->db = new DB(Config::getDb());
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $parts = explode('/', trim($uri, '/'));
         $this->action = $parts[0] ?: 'dashboard';
@@ -214,7 +217,9 @@ class AdminUI {
                          <a href="/" class="nav-link">Tablas</a>
                          <a href="/clients" class="nav-link">Clientes</a>
                          <a href="/services" class="nav-link">Servicios</a>
-                         <a href="/logs" class="nav-link">Logs</a>
+                          <a href="/logs" class="nav-link">Logs</a>
+                          <a href="/users" class="nav-link">Usuarios</a>
+                        <span style="color:var(--tblr-muted);font-size:.875rem;padding:.5rem .25rem"><?= htmlspecialchars($_SESSION['nombre'] ?? $_SESSION['username'] ?? '') ?></span>
                         <a href="/?logout=1" class="nav-link">
 			    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-door-exit"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M13 12v.01" /><path d="M3 21h18" /><path d="M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5" /><path d="M14 7h7m-3 -3l3 3l-3 3" /></svg>
                         </a>
@@ -230,9 +235,11 @@ class AdminUI {
                      $this->renderLogin();
                  } elseif ($this->action === 'table') {
                      $this->viewTable($this->target);
-                 } elseif ($this->action === 'logs') {
+                  } elseif ($this->action === 'logs') {
                      $this->viewLogs();
-                 } elseif ($this->action === 'clients') {
+                  } elseif ($this->action === 'users') {
+                     $this->viewUsers();
+                  } elseif ($this->action === 'clients') {
                      $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
                      $uriParts = explode('/', trim($uri, '/'));
                      $rbfid = (isset($uriParts[2])) ? $uriParts[2] : '';
@@ -415,6 +422,77 @@ class AdminUI {
         }
         
         echo '</div></div></div>';
+    }
+
+    private function viewUsers(): void {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_SESSION['admin_auth'] ?? false)) {
+            if (isset($_POST['create_user'])) {
+                $u = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['username'] ?? '');
+                $p = $_POST['password'] ?? '';
+                $n = $_POST['nombre'] ?? '';
+                $r = $_POST['role'] ?? 'admin';
+                if ($u && $p) {
+                    $h = password_hash($p, PASSWORD_BCRYPT);
+                    $this->db->exec("INSERT INTO users (username, password, nombre, role) VALUES (:u, :h, :n, :r) ON CONFLICT (username) DO UPDATE SET password=:h2, nombre=:n2, role=:r2",
+                        [':u'=>$u, ':h'=>$h, ':n'=>$n, ':r'=>$r, ':h2'=>$h, ':n2'=>$n, ':r2'=>$r]);
+                }
+                header("Location: /users");
+                exit;
+            }
+            if (isset($_POST['delete_user'])) {
+                $id = $_POST['delete_user'];
+                $this->db->exec("DELETE FROM users WHERE id=:id", [':id'=>$id]);
+                header("Location: /users");
+                exit;
+            }
+        }
+        $users = $this->db->qa("SELECT id, username, nombre, role, created_at FROM users ORDER BY username");
+        ?>
+        <div class="page-header d-print-none"><div class="container-xl"><div class="row g-2 align-items-center">
+          <div class="col"><h3 class="page-title">Usuarios</h3></div>
+        </div></div></div>
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+              <thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Creado</th><th></th></tr></thead>
+              <tbody>
+<?php foreach ($users as $u): ?>
+                <tr>
+                  <td><?= htmlspecialchars($u['username']) ?></td>
+                  <td><?= htmlspecialchars($u['nombre']) ?></td>
+                  <td><?= htmlspecialchars($u['role']) ?></td>
+                  <td><?= htmlspecialchars($u['created_at']) ?></td>
+                  <td>
+                    <form method="post" onsubmit="return confirm('¿Eliminar usuario?')">
+                      <input type="hidden" name="delete_user" value="<?= $u['id'] ?>">
+                      <button class="btn btn-sm btn-outline-danger" <?= $u['username'] === 'admin' ? 'disabled title="No se puede eliminar"' : '' ?>>Eliminar</button>
+                    </form>
+                  </td>
+                </tr>
+<?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card mt-3">
+          <div class="card-header"><h4>Crear / Actualizar Usuario</h4></div>
+          <div class="card-body">
+            <form method="post" class="row g-3">
+              <div class="col-md-3"><input type="text" name="username" class="form-control" placeholder="Usuario" required></div>
+              <div class="col-md-3"><input type="password" name="password" class="form-control" placeholder="Contraseña" required></div>
+              <div class="col-md-3"><input type="text" name="nombre" class="form-control" placeholder="Nombre completo"></div>
+              <div class="col-md-2">
+                <select name="role" class="form-select">
+                  <option value="admin">admin</option>
+                  <option value="agent">agent</option>
+                  <option value="viewer">viewer</option>
+                </select>
+              </div>
+              <div class="col-md-1"><button class="btn btn-primary w-100" name="create_user">Guardar</button></div>
+            </form>
+          </div>
+        </div>
+<?php
     }
 
 private function viewServices(): void {
