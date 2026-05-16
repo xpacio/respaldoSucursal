@@ -207,10 +207,12 @@ class AdminUI {
                  } elseif ($this->action === 'clients') {
                      $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
                      $uriParts = explode('/', trim($uri, '/'));
-                     $rbfid = ($this->target === 'edit' && isset($uriParts[2])) ? $uriParts[2] : '';
+                     $rbfid = (isset($uriParts[2])) ? $uriParts[2] : '';
                      
                      if ($this->target === 'edit' && $rbfid !== '') {
                          $this->editClient($rbfid);
+                     } elseif ($this->target === 'status' && $rbfid !== '') {
+                         $this->viewClientStatus($rbfid);
                      } elseif ($this->target === 'new') {
                          $this->editClient('');
                      } else {
@@ -545,6 +547,7 @@ private function viewServices(): void {
             
             echo "<td>" . $this->iconEnabled($c['enabled']) . "</td>";
              echo "<td>";
+             echo "<a href='/clients/status/" . $c['rbfid'] . "' class='btn btn-sm btn-outline-info me-1'>Status</a>";
              echo "<a href='/clients/edit/" . $c['rbfid'] . "' class='btn btn-sm btn-outline-primary me-1'>Editar</a>";
              echo "<form method='post' class='d-inline' onsubmit=\"return confirm('¿Eliminar cliente " . $c['rbfid'] . "? Esta acción no se puede deshacer.')\">";
              echo "<input type='hidden' name='delete_client' value='" . $c['rbfid'] . "'>";
@@ -594,6 +597,111 @@ private function viewServices(): void {
          echo "<a href='/clients' class='btn btn-secondary ms-2'>Cancelar</a>";
          echo "</div>";
          echo "</form></div></div>";
+     }
+
+     private function viewClientStatus(string $rbfid): void {
+         $client = $this->db->q("SELECT * FROM clients WHERE rbfid = :r", [':r' => $rbfid]);
+         if (!$client) { echo "<div class='alert alert-danger'>Cliente no encontrado</div>"; return; }
+         
+         $health = $this->db->q("SELECT * FROM service_health WHERE client_rbfid = :r", [':r' => $rbfid]);
+         
+         echo "<div class='d-flex justify-content-between align-items-center mb-3'>";
+         echo "<div><h3 class='m-0'>Estado de Servicios: " . htmlspecialchars($client['razon_social'] ?: $rbfid) . "</h3><small class='text-muted'>$rbfid</small></div>";
+         echo "<a href='/clients' class='btn btn-secondary'>Regresar a Clientes</a>";
+         echo "</div>";
+
+         echo "<div class='row row-cards mb-3'>";
+         echo "<div class='col-md-4'><div class='card'><div class='card-body'><div class='subheader'>Último Heartbeat</div><div class='h3 m-0'>" . $this->heartbeatIcon($health['last_heartbeat'] ?? null) . " " . ($health['last_heartbeat'] ? \App\Fmt::duration(time() - strtotime($health['last_heartbeat'])) . ' ago' : 'Nunca') . "</div></div></div></div>";
+         echo "<div class='col-md-4'><div class='card'><div class='card-body'><div class='subheader'>Status Orquestador</div><div class='h3 m-0'>" . htmlspecialchars($health['orchestrator_status'] ?? 'N/A') . "</div></div></div></div>";
+         echo "<div class='col-md-4'><div class='card'><div class='card-body'><div class='subheader'>Plataforma</div><div class='h3 m-0'>" . htmlspecialchars(json_decode($health['system_info'] ?? '{}', true)['platform'] ?? 'Desconocida') . "</div></div></div></div>";
+         echo "</div>";
+
+         $sql = "SELECT s.name, s.type, s.enabled as global_enabled, 
+                 sc.enabled as client_enabled, sc.frequency_seconds, sc.next_execution,
+                 sh.status as last_status, sh.completed_at as last_run, sh.execution_time_ms
+                 FROM services s
+                 LEFT JOIN service_config sc ON s.id = sc.service_id AND sc.client_rbfid = :r
+                 LEFT JOIN LATERAL (
+                     SELECT status, completed_at, execution_time_ms 
+                     FROM service_history 
+                     WHERE client_rbfid = :r AND service_name = s.name 
+                     ORDER BY completed_at DESC LIMIT 1
+                 ) sh ON true
+                 ORDER BY s.name ASC";
+         $services = $this->db->qa($sql, [':r' => $rbfid]);
+
+         echo "<div class='card'><div class='table-responsive'><table class='table table-vcenter card-table table-striped'>";
+         echo "<thead><tr><th>Servicio</th><th>Estado</th><th>Última Ejecución</th><th>Próxima</th><th>Frecuencia</th><th>Config</th></tr></thead><tbody>";
+
+         foreach ($services as $s) {
+             $isEnabled = $s['client_enabled'] !== null ? $s['client_enabled'] : $s['global_enabled'];
+             $isEnabled = ($isEnabled === true || $isEnabled === 't' || $isEnabled === 'true');
+             
+             $statusBadge = '<span class="badge bg-secondary">Nunca</span>';
+             if ($s['last_status'] === 'success') $statusBadge = '<span class="badge bg-success">Success</span>';
+             elseif ($s['last_status'] === 'failed') $statusBadge = '<span class="badge bg-danger">Failed</span>';
+             elseif ($s['last_status'] === 'partial') $statusBadge = '<span class="badge bg-warning">Partial</span>';
+
+             $lastRun = '-';
+             if ($s['last_run']) {
+                 $lastRun = \App\Fmt::duration(time() - strtotime($s['last_run'])) . " ago";
+             }
+
+             $nextExec = '-';
+             if ($isEnabled && $s['next_execution']) {
+                 $diff = strtotime($s['next_execution']) - time();
+                 $nextExec = ($diff <= 0) ? '<span class="text-danger">Atrasado</span>' : \App\Fmt::duration($diff);
+             }
+
+             echo "<tr>";
+             echo "<td><div><strong>{$s['name']}</strong></div><div class='text-muted small'>{$s['type']}</div></td>";
+             echo "<td>$statusBadge</td>";
+             echo "<td>$lastRun " . ($s['execution_time_ms'] ? "<small class='text-muted'>({$s['execution_time_ms']}ms)</small>" : "") . "</td>";
+             echo "<td>$nextExec</td>";
+             echo "<td>" . ($s['frequency_seconds'] ?? 'Default') . "s</td>";
+             echo "<td>" . ($s['client_enabled'] !== null ? '<span class="badge badge-outline text-blue">Custom</span>' : '<span class="text-muted small">Global</span>') . "</td>";
+             echo "</tr>";
+         }
+         echo "</tbody></table></div></div>";
+
+         // Sección de Detalle de Archivos
+         $files = $this->db->qa("SELECT * FROM files WHERE rbfid = :r ORDER BY status, updated_at DESC", [':r' => $rbfid]);
+         
+         echo "<div class='d-flex justify-content-between align-items-center mb-3 mt-5'>";
+         echo "<div><h3 class='m-0'>Inventario de Archivos</h3><small class='text-muted'>Estado actual de la sincronización incremental</small></div>";
+         echo "</div>";
+
+         echo "<div class='card'><div class='table-responsive'><table class='table table-vcenter card-table table-striped'>";
+         echo "<thead><tr><th>Archivo</th><th>Estado</th><th>Progreso</th><th>Peso</th><th>Fecha Archivo (Sucursal)</th><th>Sincronizado</th></tr></thead><tbody>";
+
+         if (empty($files)) {
+             echo "<tr><td colspan='6' class='text-center text-muted'>No hay archivos registrados para este cliente.</td></tr>";
+         }
+
+         foreach ($files as $f) {
+             $statusClass = match($f['status']) {
+                 'completed' => 'bg-success',
+                 'pending'   => 'bg-warning',
+                 'missing'   => 'bg-danger',
+                 'failed'    => 'bg-dark',
+                 default     => 'bg-secondary'
+             };
+
+             $progress = 100;
+             if ($f['chunk_count'] > 0) {
+                 $progress = round((($f['chunk_count'] - $f['chunk_pending']) / $f['chunk_count']) * 100, 1);
+             }
+
+             echo "<tr>";
+             echo "<td><strong>" . htmlspecialchars($f['file_name']) . "</strong></td>";
+             echo "<td><span class='badge $statusClass'>" . ucfirst($f['status']) . "</span></td>";
+             echo "<td><div class='row align-items-center'><div class='col-auto'>$progress%</div><div class='col'><div class='progress progress-sm'><div class='progress-bar bg-primary' style='width: $progress%'></div></div></div></div></td>";
+             echo "<td>" . \App\Fmt::bytes((int)$f['file_size']) . "</td>";
+             echo "<td>" . ($f['file_mtime'] ? date('Y-m-d H:i:s', (int)$f['file_mtime']) : '-') . "</td>";
+             echo "<td>" . \App\Fmt::duration(time() - strtotime($f['updated_at'])) . " ago</td>";
+             echo "</tr>";
+         }
+         echo "</tbody></table></div></div>";
      }
 
      private function iconType(?string $type): string {
