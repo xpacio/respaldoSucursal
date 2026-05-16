@@ -24,8 +24,9 @@ class Client {
         $this->configPath = $cfgPath;
         $data = \App\ClientConfig::load($cfgPath);
         $this->locations = $data['locations'] ?? [];
+        $url = $data['url'] ?? Constants::DEFAULT_URL;
         $this->agentId = $this->loadAgentId();
-        $this->http = new HttpClient(Constants::DEFAULT_URL);
+        $this->http = new HttpClient($url);
         $this->http->setAgentId($this->agentId);
     }
 
@@ -58,6 +59,7 @@ class Client {
         
         // Cargar config existente para preservar otras configuraciones
         $config = \App\ClientConfig::load($this->configPath);
+        if (!isset($config['url'])) $config['url'] = Constants::DEFAULT_URL;
         $config['locations'] = $locations;
         $config['watch_files'] = Constants::$WATCH_FILES;
         $config['files_version'] = substr(md5(implode(',', Constants::$WATCH_FILES)),0, 8);
