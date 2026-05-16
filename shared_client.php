@@ -99,6 +99,7 @@ class HttpClient
             'X-Timestamp: ' . $ts
         ];
         if ($this->agentId) $headers[] = 'X-Agent-ID: ' . $this->agentId;
+        curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($body));
         
