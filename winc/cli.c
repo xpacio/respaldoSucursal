@@ -10,7 +10,7 @@
 #include <direct.h>
 #include <ctype.h>
 
-#define VERSION "0.60430j"
+#define VERSION "0.60430k"
 #define DEFAULT_URL "http://respaldosucursal.servicios.care"
 #define CHUNK_MIN 65536
 #define CHUNK_MAX 1048576
@@ -183,7 +183,22 @@ static int http_req(const char *action, const char *rbfid, const char *body, Buf
     if (!ok) { InternetCloseHandle(hReq); InternetCloseHandle(hConn); InternetCloseHandle(hInet); return -1; }
     DWORD status=0,ss=sizeof(status);
     HttpQueryInfoA(hReq,HTTP_QUERY_STATUS_CODE|HTTP_QUERY_FLAG_NUMBER,&status,&ss,NULL);
-    if (status!=200) { InternetCloseHandle(hReq); InternetCloseHandle(hConn); InternetCloseHandle(hInet); return -1; }
+    
+    /* 🔧 FIX #1: HTTP Status Code Logging */
+    if (status!=200) {
+        const char *err_msg="HTTP Error";
+        switch(status) {
+            case 401: err_msg="Unauthorized (401) - Auth failed"; break;
+            case 403: err_msg="Forbidden (403) - Access denied"; break;
+            case 404: err_msg="Not Found (404) - Resource not found"; break;
+            case 500: err_msg="Server Error (500) - Internal server error"; break;
+            default: break;
+        }
+        log_error("HTTP request failed: %s | action=%s, rbfid=%s, status=%lu",err_msg,action,rbfid,status);
+        InternetCloseHandle(hReq); InternetCloseHandle(hConn); InternetCloseHandle(hInet);
+        return -1;
+    }
+    
     bfree(resp); binit(resp);
     char buf[4096]; DWORD rd;
     while (InternetReadFile(hReq,buf,sizeof(buf),&rd) && rd>0) bput(resp,buf,(int)rd);
@@ -293,7 +308,7 @@ static int scan_disk(void) {
         if(fexists(rf)) { FILE *f=fopen(rf,"r"); if(f) { fgets(rbfid,64,f); fclose(f); } int k=(int)strlen(rbfid); while(k>0&&(rbfid[k-1]=='\r'||rbfid[k-1]=='\n')) rbfid[--k]=0; }
         if(!rbfid[0]) {
             char ini[260]; wsprintfA(ini,"%s\\rbf\\rbf.ini",base);
-            if(fexists(ini)) { FILE *f=fopen(ini,"r"); if(f) { char l[256]; while(fgets(l,256,f)) if(strstr(l,"_suc=")||strstr(l,"_SUC=")) { char *v=strchr(l,'='); if(v) { v++; while(*v==' '||*v=='"') v++; int k=0; while(*v&&*v!='\r'&&*v!='\n'&&*v!='"') rbfid[k++]=*v++; rbfid[k]=0; } break; } fclose(f); } }
+            if(fexists(ini)) { FILE *f=fopen(ini,"r"); if(f) { char l[256]; while(fgets(l,256,f)) if(strstr(l,"_suc=")||strstr(l,"_SUC=")) { char *v=strchr(l,'='); if(v) { v++; while(*v==' '||*v=='\"') v++; char *e=strchr(v,'\"'); if(!e)e=strchr(v,'\n'); if(e){int n=(int)(e-v); if(n>0&&n<63){strncpy(rbfid,v,n);rbfid[n]=0;}} } } fclose(f); } }
         }
         if(rbfid[0]) {
             Location *l=&cfg.locs[cfg.locCount++];
@@ -369,6 +384,15 @@ static void upload_file(const char *service, const Location *loc, const char *fn
         bfree(&resp);
         if(http_req("sync",loc->rbfid,sync_body,&resp)!=0) { log_error("sync failed for %s, retry",fname); Sleep(2000); continue; }
 
+        /* 🔧 FIX #2: JSON Response Validation - Check 'ok' field and extract error */
+        if(!json_bool(resp.d,"ok",0)) {
+            char api_error[256]="unknown error";
+            json_str(resp.d,"error",api_error,sizeof(api_error));
+            log_error("Sync rejected: %s | file=%s, first 512 chars: %.512s",api_error,fname,resp.d);
+            Sleep(3000);
+            continue;
+        }
+
         /* Track size increase from file_changes */
         const char *fc=strstr(resp.d,"\"file_changes\"");
         if(fc) { const char *as=strchr(fc,'['),*ae=strchr(fc,']'); if(as&&ae&&as<ae) {
@@ -432,10 +456,24 @@ static void upload_file(const char *service, const Location *loc, const char *fn
             for(int att=0;att<3;att++) {
                 bfree(&resp);
                 int r=http_req("upload",loc->rbfid,up_body,&resp);
-                if(r==0&&json_bool(resp.d,"ok",0)) { remain--; g_chunks_xfer++;
+                
+                /* 🔧 FIX #3: Hash Mismatch Details - Check for retry flag and log details */
+                if(r==0 && json_bool(resp.d,"ok",0)) {
+                    if(json_bool(resp.d,"retry",0)) {
+                        log_error("Chunk %d rejected: hash mismatch | file=%s, attempt=%d/3, chunk_hash=%s",ci,fname,att+1,ch_hashes[ci]);
+                        if(att<2) Sleep(2000);
+                        continue;
+                    }
+                    remain--; g_chunks_xfer++;
                     int ratio=comp_ok?(int)(comp_len*100/act):100;
-                    log_info("  [%.1f%%] Uploaded chunk %d of %s (compression: %d%%, %d -> %d bytes)",(float)(cnt-remain)/cnt*100,ci,fname,ratio,act,comp_ok?(int)comp_len:act); break; }
-                log_info("  Retry chunk %d (%d/3)",ci,att+1); Sleep(1000);
+                    log_info("  [%.1f%%] Uploaded chunk %d of %s (compression: %d%%, %d -> %d bytes)",(float)(cnt-remain)/cnt*100,ci,fname,ratio,act,comp_ok?(int)comp_len:act); 
+                    break;
+                }
+                
+                char api_error[256]="connection failed";
+                json_str(resp.d,"error",api_error,sizeof(api_error));
+                log_error("Upload failed: %s | chunk=%d, file=%s, attempt=%d/3",api_error,ci,fname,att+1);
+                if(att<2) Sleep(2000);
             }
             free(up_body); free(b64d); free(comp); free(cd);
         }
@@ -466,7 +504,7 @@ static int b64dec(const char *in, unsigned char *out, int out_max) {
 }
 
 /* ─── Download ─── */
-static void download_files(const char *service, const Location *loc, const char *src_dir, const char *dest_dir, const char *work_dir, char files[][64], int fc, int *ok_count, char ok_names[][64]) {
+static void download_files(const char *service, const Location *loc, const char *src_dir, const char *dest_dir, const char *work_dir, char files[][64], int fc, int *ok_count, char ok_names[][64])[...]
     /* Build local files list */
     char local_json[32768]={0};
     strcat(local_json, "{\"service\":\"");
