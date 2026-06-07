@@ -1,6 +1,7 @@
 #include "../include/jsonmin.h"
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 const char *json_find(const char *j, const char *key) {
     char n[64]; snprintf(n,sizeof(n),"\"%s\"",key); return strstr(j,n);
@@ -19,4 +20,13 @@ int json_int(const char *j, const char *key, int def) {
 }
 const char *json_str(const char *j, const char *key, char *out, int ol) {
     const char *p=json_val(j,key); if(!p) return NULL;
-    if(*p!='
+    if(*p!='"') return NULL; p++; int i=0;
+    while(*p && *p!='"' && i<ol-1) { if(*p=='\\' && *(p+1)=='"') { out[i++]='"'; p+=2; } else { out[i++]=*p++; } }
+    out[i]=0; return p;
+}
+int json_str_array(const char *j, const char *key, char out[][64], int max) {
+    const char *p=json_find(j,key); if(!p) return 0;
+    p=strchr(p,'['); if(!p) return 0; p++; int c=0;
+    while(*p && *p!=']' && c<max) {
+        while(*p==' '||*p==',') p++;
+        if(*p=='"') { p++; int i=0; while(*p && *p!='
